@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import axiosInstance from "@/lib/api/axiosInstance";
 import pool from "@/lib/api/pool";
 import { Allplayer } from "@/lib/types/commonTypes";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const allplayers_db = await pool.query(
     "SELECT * FROM common WHERE name = $1;",
     ["allplayers"]

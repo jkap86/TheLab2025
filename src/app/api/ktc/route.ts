@@ -12,7 +12,8 @@ export async function GET(req: NextRequest) {
     ["ktc_dates"]
   );
 
-  const ktc_dates = ktc_dates_db.rows[0]?.data || {};
+  const ktc_dates: { [date: string]: { [key: string]: number } } =
+    ktc_dates_db.rows[0]?.data || {};
 
   const current_date = Object.keys(ktc_dates).sort(
     (a: string, b: string) => new Date(b).getTime() - new Date(a).getTime()
