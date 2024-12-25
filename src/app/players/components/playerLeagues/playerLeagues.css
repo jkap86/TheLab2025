@@ -1,0 +1,8 @@
+div.nav {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+div.nav button.active {
+  color: var(--color1);
+}

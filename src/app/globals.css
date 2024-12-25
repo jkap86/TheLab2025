@@ -3,19 +3,75 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --backgroundcolor: rgb(0, 0, 25);
+  --color1: #00ceb8;
+  --color2: rgb(0, 0, 100);
+  --color3: #4169e1;
+  --color4: #1a1c20;
+  --color5: rgb(50, 50, 50);
+  --color6: rgb(100, 20, 100);
+  --color7: rgb(218, 165, 32);
+  --color8: #ffff0040;
+  --color9: rgba(218, 165, 32, 0.5);
+  --fontPulang: "Pulang", sans-serif;
+  --fontChill: "Chillit", sans-serif;
+  --fontMetal: "d Dredex", sans-serif;
+  --fontHugmate: "Hugmate", sans-serif;
+  --fontScore: "Kwizi", sans-serif;
+  font-size: 1vmin;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  padding: 0;
+  margin: 0;
+  border: none;
+  scrollbar-width: none;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--backgroundcolor);
+  width: 100%;
+  color: white;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  text-align: center;
+}
+
+img {
+  border-radius: 50%;
+}
+
+table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+option {
+  background-color: black;
+  color: white;
+}
+
+div.nav-buttons {
+  width: 50%;
+  margin: auto;
+  display: flex;
+  justify-content: space-evenly;
+  font-size: 3rem;
+}
+
+div.nav-buttons button.active {
+  color: var(--color1);
+}
+
+.green {
+  color: rgb(0, 255, 0);
+}
+
+.red {
+  color: rgb(255, 0, 0);
 }
