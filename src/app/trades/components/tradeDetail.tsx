@@ -27,6 +27,7 @@ const TradeDetail = ({ trade }: TradeDetailProps) => {
     rosters: trade.rosters,
     season: "2024",
     userRoster: trade.rosters[0],
+    status: "",
   };
 
   const detail =

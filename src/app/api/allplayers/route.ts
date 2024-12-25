@@ -60,8 +60,8 @@ export async function GET() {
         { data: allplayers_array, updatedat: new Date() },
         { status: 200 }
       );
-    } catch (err: any) {
-      console.log(err.message);
+    } catch (err: unknown) {
+      err instanceof Error && console.log(err.message);
       return NextResponse.json(
         { ...allplayers, updatedat: allplayers.updatedat },
         { status: 200 }
