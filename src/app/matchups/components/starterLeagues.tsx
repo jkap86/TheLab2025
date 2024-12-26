@@ -35,31 +35,35 @@ const StarterLeagues = ({
     }
   };
 
-  const data1 = getLeaguesList(starterDetailTab1).map((league_id) => {
-    return {
-      id: league_id,
-      columns: [
-        {
-          text: leagues?.[league_id].name || league_id,
-          colspan: 1,
-          classname: "",
-        },
-      ],
-    };
-  });
+  const data1 = getLeaguesList(starterDetailTab1)
+    .sort((a, b) => (leagues && leagues[a].index - leagues[b].index) || 0)
+    .map((league_id) => {
+      return {
+        id: league_id,
+        columns: [
+          {
+            text: leagues?.[league_id].name || league_id,
+            colspan: 1,
+            classname: "",
+          },
+        ],
+      };
+    });
 
-  const data2 = getLeaguesList(starterDetailTab2).map((league_id) => {
-    return {
-      id: league_id,
-      columns: [
-        {
-          text: leagues?.[league_id].name || league_id,
-          colspan: 1,
-          classname: "",
-        },
-      ],
-    };
-  });
+  const data2 = getLeaguesList(starterDetailTab2)
+    .sort((a, b) => (leagues && leagues[a].index - leagues[b].index) || 0)
+    .map((league_id) => {
+      return {
+        id: league_id,
+        columns: [
+          {
+            text: leagues?.[league_id].name || league_id,
+            colspan: 1,
+            classname: "",
+          },
+        ],
+      };
+    });
 
   return (
     <>

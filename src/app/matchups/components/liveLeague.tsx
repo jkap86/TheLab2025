@@ -72,7 +72,7 @@ const LiveLeague = ({ league_id }: { league_id: string }) => {
             const player_id = starters?.[index] || "0";
 
             const pct_left =
-              live_stats?.[league_id].players[player_id]?.pct_left || 1;
+              live_stats?.[league_id].players[player_id]?.pct_left || 0;
             const inprogress =
               pct_left > 0 && pct_left < 1
                 ? "inprogress"
