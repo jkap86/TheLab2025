@@ -21,6 +21,12 @@ export interface MatchupsState {
   column4_s: string;
   page_s: number;
   active_s: string;
+  sortStartersBy: {
+    column: 0 | 1 | 2 | 3 | 4;
+    asc: boolean;
+  };
+  starterDetailTab1: string;
+  starterDetailTab2: string;
 
   column1_l: string;
   column2_l: string;
@@ -54,6 +60,12 @@ const initialState: MatchupsState = {
   column4_s: "Opp Bench",
   page_s: 1,
   active_s: "",
+  sortStartersBy: {
+    column: 1,
+    asc: false,
+  },
+  starterDetailTab1: "Start",
+  starterDetailTab2: "Opp Start",
 
   column1_l: "User Proj",
   column2_l: "User % Left",

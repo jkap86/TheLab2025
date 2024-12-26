@@ -66,7 +66,7 @@ export interface UserState {
         };
       };
     };
-  };
+  } | null;
 }
 
 const initialState: UserState = {
@@ -98,7 +98,7 @@ const initialState: UserState = {
   isSyncingMatchup: false,
   errorSyncingMatchup: null,
 
-  live_stats: {},
+  live_stats: null,
 };
 
 const userSlice = createSlice({

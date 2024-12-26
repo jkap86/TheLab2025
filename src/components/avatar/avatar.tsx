@@ -40,6 +40,8 @@ const Avatar = ({ id, type, text }: AvatarProps) => {
           src={src}
           className="avatar"
           onError={onerror}
+          width={1}
+          height={1}
           unoptimized
         />
         <span>{text}</span>

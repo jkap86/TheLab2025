@@ -10,6 +10,7 @@ ol.page_numbers {
   color: white;
   list-style: none;
   background-color: var(--color4);
+  max-width: 100vmin;
 }
 
 ol.page_numbers > li {
@@ -44,6 +45,7 @@ table.main {
   border-spacing: 0.25rem;
   font-size: 3rem;
   font-family: var(--fontChill);
+  max-width: 100vmin;
 }
 
 th.sort_header {
@@ -126,15 +128,15 @@ td.content.playoffs {
 }
 
 table.one td.content {
-  background-image: radial-gradient(var(--color2) 0%, black 150%);
+  background-image: radial-gradient(var(--color3) -300%, var(--color4) 100%);
 }
 
 table.two td.content {
-  background-image: radial-gradient(rgb(80, 0, 0) 0%, black 150%);
+  background-image: radial-gradient(rgb(80, 0, 0) -100%, var(--color4) 100%);
 }
 
 table.three td.content {
-  background-image: radial-gradient(var(--color6) 0%, black 150%);
+  background-image: radial-gradient(var(--color6) 0%, var(--color4) 100%);
 }
 
 table.half:last-of-type td.content {
@@ -173,6 +175,10 @@ div.nav div.sync {
 
 div.nav div.sync i.fa-arrows-rotate {
   font-size: 5rem;
+}
+
+div.nav select {
+  color: black;
 }
 
 .rotate {

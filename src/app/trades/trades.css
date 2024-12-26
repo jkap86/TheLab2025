@@ -19,6 +19,7 @@ table.trades {
   border-spacing: 0;
   font-size: 3rem;
   font-family: var(--fontChill);
+  max-width: 100vmin;
 }
 
 table.trades table.trade {
