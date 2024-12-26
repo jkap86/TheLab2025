@@ -183,38 +183,41 @@ export const getLiveColumn = (col: string, league_id: string) => {
   const trendColor = {};
   const classname = "";
 
-  switch (col) {
-    case "User Pts":
-      text = live_stats[league_id]?.user_pts?.toLocaleString("en-US", {
-        maximumFractionDigits: 1,
-      });
-      break;
-    case "User Proj":
-      text = live_stats[league_id]?.user_proj?.toLocaleString("en-US", {
-        maximumFractionDigits: 1,
-      });
-      break;
-    case "User % Left":
-      text = live_stats[league_id]?.user_pct_left + "%";
-      break;
-    case "Opp Pts":
-      text = live_stats[league_id]?.opp_pts?.toLocaleString("en-US", {
-        maximumFractionDigits: 1,
-      });
-      break;
-    case "Opp Proj":
-      text = live_stats[league_id]?.opp_proj?.toLocaleString("en-US", {
-        maximumFractionDigits: 1,
-      });
-      break;
-    case "Opp % Left":
-      text = live_stats[league_id]?.opp_pct_left + "%";
-      break;
-    default:
-      text = "-";
-      break;
+  if (live_stats) {
+    switch (col) {
+      case "User Pts":
+        text = live_stats[league_id]?.user_pts?.toLocaleString("en-US", {
+          maximumFractionDigits: 1,
+        });
+        break;
+      case "User Proj":
+        text = live_stats[league_id]?.user_proj?.toLocaleString("en-US", {
+          maximumFractionDigits: 1,
+        });
+        break;
+      case "User % Left":
+        text = live_stats[league_id]?.user_pct_left + "%";
+        break;
+      case "Opp Pts":
+        text = live_stats[league_id]?.opp_pts?.toLocaleString("en-US", {
+          maximumFractionDigits: 1,
+        });
+        break;
+      case "Opp Proj":
+        text = live_stats[league_id]?.opp_proj?.toLocaleString("en-US", {
+          maximumFractionDigits: 1,
+        });
+        break;
+      case "Opp % Left":
+        text = live_stats[league_id]?.opp_pct_left + "%";
+        break;
+      default:
+        text = "-";
+        break;
+    }
+  } else {
+    text = "-";
   }
-
   return { text, trendColor, classname };
 };
 
@@ -247,25 +250,29 @@ export const getLiveDetailColumn = (
   const trendColor = {};
   const classname = "";
 
-  switch (col) {
-    case "Clock":
-      text = live_stats[league_id].players[player_id]?.clock || "";
-      break;
-    case "Pts":
-      text = live_stats[league_id].players[player_id]?.pts?.toLocaleString(
-        "en-US",
-        { maximumFractionDigits: 1 }
-      );
-      break;
-    case "Proj":
-      text = live_stats[league_id].players[player_id]?.proj?.toLocaleString(
-        "en-US",
-        { maximumFractionDigits: 1 }
-      );
-      break;
-    default:
-      text = "-";
-      break;
+  if (live_stats) {
+    switch (col) {
+      case "Clock":
+        text = live_stats[league_id].players[player_id]?.clock || "";
+        break;
+      case "Pts":
+        text = live_stats[league_id].players[player_id]?.pts?.toLocaleString(
+          "en-US",
+          { maximumFractionDigits: 1 }
+        );
+        break;
+      case "Proj":
+        text = live_stats[league_id].players[player_id]?.proj?.toLocaleString(
+          "en-US",
+          { maximumFractionDigits: 1 }
+        );
+        break;
+      default:
+        text = "-";
+        break;
+    }
+  } else {
+    text = "-";
   }
 
   return { text, trendColor, classname };

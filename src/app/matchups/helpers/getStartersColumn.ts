@@ -1,6 +1,5 @@
 import store, { RootState } from "@/redux/store";
 import { filterLeagueIds } from "@/utils/filterLeagues";
-import { useSelector } from "react-redux";
 
 export const starterColumnOptions = [
   { text: "Start", abbrev: "Start" },

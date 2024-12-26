@@ -6,7 +6,6 @@ import { updateMatchupsState } from "../redux/matchupsSlice";
 import { filterLeagueIds } from "@/utils/filterLeagues";
 
 const StarterLeagues = ({
-  player_id,
   player_obj,
 }: {
   player_id: string;

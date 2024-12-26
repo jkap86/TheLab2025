@@ -22,7 +22,7 @@ export const getLcDetailColumn = (
         ) || "0";
       break;
     case "Opp":
-      text = live_stats[league_id].players[player_id].opp;
+      text = live_stats?.[league_id].players[player_id].opp.toString() || "0";
       break;
     default:
       text = "-";

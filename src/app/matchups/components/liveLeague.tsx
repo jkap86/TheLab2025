@@ -71,7 +71,8 @@ const LiveLeague = ({ league_id }: { league_id: string }) => {
               : matchups?.[league_id]?.user.starters;
             const player_id = starters?.[index] || "0";
 
-            const pct_left = live_stats[league_id].players[player_id]?.pct_left;
+            const pct_left =
+              live_stats?.[league_id].players[player_id]?.pct_left || 1;
             const inprogress =
               pct_left > 0 && pct_left < 1
                 ? "inprogress"
@@ -158,7 +159,8 @@ const LiveLeague = ({ league_id }: { league_id: string }) => {
               : matchups?.[league_id]?.opp.starters;
             const player_id = starters?.[index] || "0";
 
-            const pct_left = live_stats[league_id].players[player_id]?.pct_left;
+            const pct_left =
+              live_stats?.[league_id].players[player_id]?.pct_left || 1;
 
             const inprogress =
               pct_left > 0 && pct_left < 1
