@@ -16,12 +16,12 @@ const Avatar = ({ id, type, text }: AvatarProps) => {
 
   if (type === "U") {
     alt = "User Avatar";
-    src = `https://sleepercdn.com/avatars/${id}`;
+    src = `https://sleepercdn.com/avatars/${id || "0"}`;
     onerror = (e: React.SyntheticEvent<HTMLImageElement, Event>) =>
       (e.currentTarget.src = user_avatar.src);
   } else if (type === "L") {
     alt = "League Avatar";
-    src = `https://sleepercdn.com/avatars/${id}`;
+    src = `https://sleepercdn.com/avatars/${id || "0"}`;
     onerror = (e: React.SyntheticEvent<HTMLImageElement, Event>) =>
       (e.currentTarget.src = league_avatar.src);
   } else if (type === "P") {
