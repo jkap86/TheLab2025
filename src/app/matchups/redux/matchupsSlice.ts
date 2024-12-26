@@ -25,6 +25,7 @@ export interface MatchupsState {
     column: 0 | 1 | 2 | 3 | 4;
     asc: boolean;
   };
+  searchedStarter: string;
   starterDetailTab1: string;
   starterDetailTab2: string;
 
@@ -64,6 +65,7 @@ const initialState: MatchupsState = {
     column: 1,
     asc: false,
   },
+  searchedStarter: "",
   starterDetailTab1: "Start",
   starterDetailTab2: "Opp Start",
 

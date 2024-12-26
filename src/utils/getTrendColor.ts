@@ -38,22 +38,9 @@ export const getTrendColor_Range = (
 };
 
 export const getTrendColor_Percentage = (value: number, values: number[]) => {
-  const expected_value =
-    values.reduce((acc, cur) => acc + cur, 0) / values.length;
+  const x = (1 - values.indexOf(value) / values.length) * 255;
 
-  if (value > expected_value) {
-    const x = (value / (expected_value * 2)) * 255;
-
-    return { color: `rgb(${255 - x}, ${255}, ${255 - x})` };
-  } else if (value < expected_value) {
-    const x = (1 - value / expected_value) * 255;
-
-    return {
-      color: `rgb(${255}, ${255 - x}, ${255 - x})`,
-    };
-  } else {
-    return {
-      color: `rgb(255, 255, 255)`,
-    };
-  }
+  return {
+    color: `rgb(${255}, ${255 - x}, ${255 - x})`,
+  };
 };

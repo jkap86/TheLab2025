@@ -22,6 +22,7 @@ export const filterLeagueIds = (league_ids: string[], playoffs = false) => {
       condition2 &&
       (playoffs
         ? leagues &&
+          leagues[league_id].settings.playoff_week_start > 0 &&
           matchups?.[league_id].user.playoffs_alive?.includes(
             leagues[league_id].userRoster.roster_id
           )

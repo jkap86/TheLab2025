@@ -108,10 +108,10 @@ const TableMain = ({
     : data;
 
   useEffect(() => {
-    if (data.length <= 25) {
+    if (search?.searched) {
       if (setPage) setPage(1);
     }
-  }, [data.length, setPage]);
+  }, [search, setPage]);
 
   return (
     <>

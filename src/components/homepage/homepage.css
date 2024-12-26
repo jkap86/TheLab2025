@@ -38,7 +38,7 @@ div#homepage .home-title {
 }
 
 div#homepage select {
-  width: 30%;
+  width: fit-content;
   text-align: center;
   font-size: 5rem;
   opacity: 0.8;

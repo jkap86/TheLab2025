@@ -4,6 +4,7 @@ import {
   getTrendColor_Percentage,
   getTrendColor_Range,
 } from "@/utils/getTrendColor";
+import { getPositionMaxAge } from "@/utils/getPositionMaxAge";
 
 export const standingsColumnOptions = [
   { text: "Record", abbrev: "W/L" },
@@ -137,21 +138,6 @@ export const getTeamColumn = (col: string, player_id: string) => {
   const state: RootState = store.getState();
 
   const { allplayers, ktc_current } = state.common;
-
-  const getPositionMaxAge = (position: string | undefined) => {
-    switch (position) {
-      case "QB":
-        return 37;
-      case "RB":
-        return 29;
-      case "WR":
-        return 31;
-      case "TE":
-        return 34;
-      default:
-        return 0;
-    }
-  };
 
   let text, trendColor, classname;
 

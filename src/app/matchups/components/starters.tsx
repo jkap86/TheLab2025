@@ -24,6 +24,8 @@ const Starters = () => {
     column4_s,
     sortStartersBy,
     active_s,
+    searchedStarter,
+    page_s,
   } = useSelector((state: RootState) => state.matchups);
 
   const starters_obj = useMemo(() => {
@@ -148,6 +150,16 @@ const Starters = () => {
     .map((player_id) => {
       return {
         id: player_id,
+        search: {
+          text: allplayers?.[player_id].full_name || player_id,
+          display: (
+            <Avatar
+              id={player_id}
+              text={allplayers?.[player_id].full_name || "-"}
+              type="P"
+            />
+          ),
+        },
         columns: [
           {
             text: (
@@ -223,6 +235,15 @@ const Starters = () => {
       };
     });
 
+  const search = {
+    searched: searchedStarter,
+    setSearched: (searched: string) =>
+      dispatch(
+        updateMatchupsState({ key: "searchedStarter", value: searched })
+      ),
+
+    placeholder: "Search Players",
+  };
   return (
     <TableMain
       type={1}
@@ -232,6 +253,11 @@ const Starters = () => {
       active={active_s}
       setActive={(id) =>
         dispatch(updateMatchupsState({ key: "active_s", value: id }))
+      }
+      search={search}
+      page={page_s}
+      setPage={(p) =>
+        dispatch(updateMatchupsState({ key: "page_s", value: p }))
       }
     />
   );

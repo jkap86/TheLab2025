@@ -55,9 +55,11 @@ const LineupCheck = () => {
       filterLeagueIds(Object.keys(matchups))
         .sort((a, b) => leagues[a].index - leagues[b].index)
         .map((league_id) => {
-          const playoffs = matchups[league_id].user.playoffs_alive?.includes(
-            leagues[league_id].userRoster.roster_id
-          );
+          const playoffs =
+            leagues[league_id].settings.playoff_week_start > 0 &&
+            matchups[league_id].user.playoffs_alive?.includes(
+              leagues[league_id].userRoster.roster_id
+            );
           return {
             id: league_id,
             columns: [

@@ -30,9 +30,9 @@ export interface PlayersState {
 
 const initialState: PlayersState = {
   column1: "# Own",
-  column2: "KTC",
-  column3: "KTC 7",
-  column4: "KTC 30",
+  column2: "% Own",
+  column3: "KTC",
+  column4: "Age",
   page: 1,
   sortPlayersBy: {
     column: 1,

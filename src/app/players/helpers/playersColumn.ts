@@ -1,5 +1,6 @@
 import store, { RootState } from "@/redux/store";
 import { filterLeagueIds } from "@/utils/filterLeagues";
+import { getPositionMaxAge } from "@/utils/getPositionMaxAge";
 import { getTrendColor_Range } from "@/utils/getTrendColor";
 
 export const columnOptions = [
@@ -18,7 +19,7 @@ export const getPlayersSortValue = (player_id: string) => {
   const state: RootState = store.getState();
 
   const { allplayers, ktc_current } = state.common;
-  const { playershares } = state.user;
+  const { playershares, leagues } = state.user;
   const { column1, column2, column3, column4, sortPlayersBy } = state.players;
 
   let sortbyCol;
@@ -46,6 +47,13 @@ export const getPlayersSortValue = (player_id: string) => {
     case "# Own":
       sort = filterLeagueIds(playershares[player_id].owned).length;
       break;
+    case "% Own":
+      sort =
+        (leagues &&
+          filterLeagueIds(playershares[player_id].owned).length /
+            filterLeagueIds(Object.keys(leagues)).length) ||
+        0;
+      break;
     case "KTC":
       sort = ktc_current?.[player_id] || 0;
       break;
@@ -59,8 +67,8 @@ export const getPlayersSortValue = (player_id: string) => {
 export const getPlayersColumn = (col: string, player_id: string) => {
   const state: RootState = store.getState();
 
-  const { ktc_current } = state.common;
-  const { playershares } = state.user;
+  const { ktc_current, allplayers } = state.common;
+  const { playershares, leagues } = state.user;
 
   const owned = filterLeagueIds(playershares[player_id].owned);
 
@@ -69,7 +77,36 @@ export const getPlayersColumn = (col: string, player_id: string) => {
   switch (col) {
     case "# Own":
       text = owned.length.toString();
-      classname = "";
+      trendColor = getTrendColor_Range(
+        owned.length / filterLeagueIds(Object.keys(leagues || {})).length,
+        0,
+        0.25
+      );
+      classname = "age";
+      break;
+    case "% Own":
+      text =
+        (leagues &&
+          Math.round(
+            (owned.length / filterLeagueIds(Object.keys(leagues)).length) * 100
+          ) + "%") ||
+        "-";
+      trendColor = getTrendColor_Range(
+        owned.length / filterLeagueIds(Object.keys(leagues || {})).length,
+        0,
+        0.25
+      );
+      classname = "ktc";
+      break;
+    case "Age":
+      text = (allplayers && allplayers[player_id]?.age) || "-";
+      trendColor = getTrendColor_Range(
+        parseInt(allplayers?.[player_id]?.age || "0"),
+        21,
+        getPositionMaxAge(allplayers?.[player_id]?.position),
+        true
+      );
+      classname = "age";
       break;
     case "KTC":
       text = ktc_current?.[player_id] || 0;
