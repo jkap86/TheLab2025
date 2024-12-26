@@ -34,8 +34,9 @@ export const useFetchUserAndLeagues = (searched: string | null) => {
           });
 
           dispatch(updateState({ key: "user", value: user_fetched.data }));
-        } catch (err: any) {
-          dispatch(updateState({ key: "errorUser", value: err.response.data }));
+        } catch (err: unknown) {
+          if (err instanceof Error)
+            dispatch(updateState({ key: "errorUser", value: err.message }));
         }
 
         dispatch(updateState({ key: "isLoadingUser", value: false }));
@@ -92,8 +93,8 @@ export const useFetchUserAndLeagues = (searched: string | null) => {
             .forEach((chunk) => {
               try {
                 parsedLeaguesArray.push(...JSON.parse(chunk));
-              } catch (err) {
-                console.log({ chunk });
+              } catch (err: unknown) {
+                console.log({ err, chunk });
               }
             });
 
@@ -134,12 +135,11 @@ export const useFetchUserAndLeagues = (searched: string | null) => {
           dispatch(updateState({ key: "playershares", value: playershares }));
 
           dispatch(updateState({ key: "leaguemates", value: leaguemates }));
-        } catch (err: any) {
+        } catch (err: unknown) {
           console.log({ err });
 
-          dispatch(
-            updateState({ key: "errorLeagues", value: err.response.data })
-          );
+          if (err instanceof Error)
+            dispatch(updateState({ key: "errorLeagues", value: err.message }));
         }
 
         dispatch(updateState({ key: "isLoadingLeagues", value: false }));

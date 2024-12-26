@@ -61,7 +61,7 @@ export async function GET() {
         { status: 200 }
       );
     } catch (err: unknown) {
-      err instanceof Error && console.log(err.message);
+      if (err instanceof Error) console.log(err.message);
       return NextResponse.json(
         { ...allplayers, updatedat: allplayers.updatedat },
         { status: 200 }

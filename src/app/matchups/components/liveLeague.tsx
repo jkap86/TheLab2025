@@ -87,11 +87,11 @@ const LiveLeague = ({ league_id }: { league_id: string }) => {
                   classname: inprogress,
                 },
                 {
-                  text: allplayers?.[player_id]?.full_name,
+                  text: allplayers?.[player_id]?.full_name || "",
                   colspan: 3,
                   classname: inprogress,
                 },
-                ...[column1_l_League, column2_l_League].map((col, index) => {
+                ...[column1_l_League, column2_l_League].map((col) => {
                   const { text, trendColor, classname } = getLiveDetailColumn(
                     col,
                     league_id,
@@ -176,11 +176,11 @@ const LiveLeague = ({ league_id }: { league_id: string }) => {
                   classname: inprogress,
                 },
                 {
-                  text: allplayers?.[player_id]?.full_name,
+                  text: allplayers?.[player_id]?.full_name || "",
                   colspan: 3,
                   classname: inprogress,
                 },
-                ...[column1_l_League, column2_l_League].map((col, index) => {
+                ...[column1_l_League, column2_l_League].map((col) => {
                   const { text, trendColor, classname } = getLiveDetailColumn(
                     col,
                     league_id,

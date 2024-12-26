@@ -11,7 +11,6 @@ export const useFetchLmTrades = () => {
   const { ktc_current } = useSelector((state: RootState) => state.common);
   const { leaguemates, lmTrades, isLoadingLmTrades, errorLmTrades } =
     useSelector((state: RootState) => state.user);
-  const { page_lm } = useSelector((state: RootState) => state.trades);
 
   useEffect(() => {
     const fetchLmTrades = async () => {
@@ -47,7 +46,8 @@ export const useFetchLmTrades = () => {
             },
           })
         );
-      } catch (err: any) {
+      } catch (err: unknown) {
+        console.log({ err });
         dispatch(
           updateState({ key: "errorLmTrades", value: "Error Fetching Trades" })
         );
@@ -64,5 +64,12 @@ export const useFetchLmTrades = () => {
       console.log({ lmTrades });
       fetchLmTrades();
     }
-  }, [leaguemates, isLoadingLmTrades, errorLmTrades, lmTrades, dispatch]);
+  }, [
+    leaguemates,
+    isLoadingLmTrades,
+    errorLmTrades,
+    lmTrades,
+    ktc_current,
+    dispatch,
+  ]);
 };

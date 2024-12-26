@@ -92,8 +92,14 @@ export async function GET(req: NextRequest) {
           }
 
           controller.close();
-        } catch (error: any) {
-          controller.error(error.message);
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            console.log(err.message);
+            controller.error(err.message);
+          } else {
+            console.log({ err });
+            controller.error("unkown error");
+          }
         }
       },
     });
@@ -102,7 +108,13 @@ export async function GET(req: NextRequest) {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (err: any) {
-    return NextResponse.json("Error...", { status: 500 });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.log(err.message);
+      return NextResponse.json(err.message);
+    } else {
+      console.log({ err });
+      return NextResponse.json("unkown error");
+    }
   }
 }

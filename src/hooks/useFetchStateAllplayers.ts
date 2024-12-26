@@ -21,7 +21,7 @@ export const useFetchStateAndAllplayers = () => {
     };
 
     fetchState();
-  }, []);
+  }, [state, dispatch]);
 
   useEffect(() => {
     const fetchAllPlayers = async () => {
@@ -39,7 +39,7 @@ export const useFetchStateAndAllplayers = () => {
     };
 
     fetchAllPlayers();
-  }, []);
+  }, [allplayers, dispatch]);
 
   useEffect(() => {
     const fetchKtcCurrent = async () => {
@@ -57,5 +57,5 @@ export const useFetchStateAndAllplayers = () => {
     };
 
     fetchKtcCurrent();
-  }, []);
+  }, [ktc_current, dispatch]);
 };

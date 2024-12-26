@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import axiosInstance from "@/lib/api/axiosInstance";
 import pool from "@/lib/api/pool";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const state_db = await pool.query("SELECT * FROM common WHERE name = $1;", [
     "state",
   ]);
@@ -39,8 +39,8 @@ export async function GET(req: NextRequest) {
         { ...state, updatedat: new Date() },
         { status: 200 }
       );
-    } catch (err: any) {
-      console.log(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) console.log(err.message);
       return NextResponse.json(
         { ...state, updatedat: state.updatedat },
         { status: 200 }

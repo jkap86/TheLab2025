@@ -16,7 +16,7 @@ const Heading = () => {
 
   useEffect(() => {
     setNavTab(pathname.split("/")[1].toUpperCase());
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (navTab) {

@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
         INSERT INTO matchups (week, matchup_id, roster_id, players, starters, league_id, updatedat, playoffs_alive)
         VALUES ${matchups.data
           .map(
-            (_: any, i: number) =>
+            (_, i: number) =>
               `($${i * 8 + 1}, $${i * 8 + 2}, $${i * 8 + 3}, $${i * 8 + 4}, $${
                 i * 8 + 5
               }, $${i * 8 + 6}, $${i * 8 + 7}, $${i * 8 + 8})`
@@ -86,8 +86,13 @@ export async function GET(req: NextRequest) {
       })),
       { status: 200 }
     );
-  } catch (err: any) {
-    console.log(err.message);
-    return NextResponse.json(err.message);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.log(err.message);
+      return NextResponse.json(err.message);
+    } else {
+      console.log({ err });
+      return NextResponse.json("unkown error");
+    }
   }
 }

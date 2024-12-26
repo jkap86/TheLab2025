@@ -3,9 +3,6 @@ import ColumnDropdown from "@/components/columnDropdown/columnDropdown";
 import TableMain from "@/components/tableMain/tableMain";
 import { AppDispatch, RootState } from "@/redux/store";
 import { filterLeagueIds } from "@/utils/filterLeagues";
-import { getPlayerTotal } from "@/utils/getPlayerStatProjTotal";
-import axios from "axios";
-import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateMatchupsState } from "../redux/matchupsSlice";
 import { columnOptionsLive, getLiveColumn } from "../helpers/getLiveColumn";
@@ -13,10 +10,7 @@ import LiveLeague from "./liveLeague";
 
 const Live = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { allplayers } = useSelector((state: RootState) => state.common);
-  const { leagues, matchups, live_stats } = useSelector(
-    (state: RootState) => state.user
-  );
+  const { leagues, matchups } = useSelector((state: RootState) => state.user);
   const { column1_l, column2_l, column3_l, column4_l, active_l, page_l } =
     useSelector((state: RootState) => state.matchups);
 
@@ -30,7 +24,7 @@ const Live = () => {
       { var: column2_l, key: "column2_l" },
       { var: column3_l, key: "column3_l" },
       { var: column4_l, key: "column4_l" },
-    ].map((col, index) => {
+    ].map((col) => {
       return {
         text: (
           <ColumnDropdown
@@ -73,22 +67,21 @@ const Live = () => {
                   />
                 ),
                 colspan: 3,
+                classname: "",
               },
-              ...[column1_l, column2_l, column3_l, column4_l].map(
-                (col, index) => {
-                  const { text, trendColor, classname } = getLiveColumn(
-                    col,
-                    league_id
-                  );
+              ...[column1_l, column2_l, column3_l, column4_l].map((col) => {
+                const { text, trendColor, classname } = getLiveColumn(
+                  col,
+                  league_id
+                );
 
-                  return {
-                    text,
-                    colspan: 1,
-                    style: trendColor,
-                    classname: classname,
-                  };
-                }
-              ),
+                return {
+                  text,
+                  colspan: 1,
+                  style: trendColor,
+                  classname: classname,
+                };
+              }),
             ],
             secondary: <LiveLeague league_id={league_id} />,
           };

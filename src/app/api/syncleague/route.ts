@@ -34,7 +34,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(league_to_send, {
       status: 200,
     });
-  } catch (err: any) {
-    console.log(err.message);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.log(err.message);
+      return NextResponse.json(err.message);
+    } else {
+      console.log({ err });
+      return NextResponse.json("unkown error");
+    }
   }
 }

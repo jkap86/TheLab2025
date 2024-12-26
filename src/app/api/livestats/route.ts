@@ -164,9 +164,14 @@ export async function GET(req: NextRequest) {
         "s-maxage=30, stale-while-revalidate=30"
       );
       return response;
-    } catch (err: any) {
-      console.log(err.message);
-      return NextResponse.json(err, { status: 500 });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.log(err.message);
+        return NextResponse.json(err.message);
+      } else {
+        console.log({ err });
+        return NextResponse.json("unkown error");
+      }
     }
   }
 }

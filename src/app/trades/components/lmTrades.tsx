@@ -1,7 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useFetchLmTrades } from "@/hooks/useFetchLmTrades";
 import { AppDispatch, RootState } from "@/redux/store";
-import Avatar from "@/components/avatar/avatar";
 import Trade from "./trade";
 import { updateTradesState } from "../redux/tradesSlice";
 

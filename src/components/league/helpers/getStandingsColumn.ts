@@ -15,7 +15,7 @@ export const standingsColumnOptions = [
 export const getStandingsColumnSort = (roster: Roster) => {
   const state: RootState = store.getState();
 
-  const { allplayers, ktc_current } = state.common;
+  const { ktc_current } = state.common;
   const { column1_standings, column2_standings, sortStandingsBy } =
     state.league;
 
@@ -75,11 +75,9 @@ export const getStandingsColumn = (
 ) => {
   const state: RootState = store.getState();
 
-  const { allplayers, ktc_current } = state.common;
+  const { ktc_current } = state.common;
 
   const starters = roster.starters_optimal || roster.starters;
-
-  const winpcts = rosters.map((r) => r.wins / (r.wins + r.losses + r.ties));
 
   let text, trendColor, classname;
 
@@ -94,6 +92,7 @@ export const getStandingsColumn = (
         0,
         1
       );
+      classname = "";
       break;
     case "Fp":
       text = roster.fp.toLocaleString("en-US", { maximumFractionDigits: 1 });
@@ -111,7 +110,7 @@ export const getStandingsColumn = (
           Math.round(
             starters.reduce((acc, cur) => acc + (ktc_current[cur] || 0), 0) /
               starters.length
-          )) ||
+          ).toString()) ||
         "-";
 
       classname = "ktc";
@@ -122,6 +121,7 @@ export const getStandingsColumn = (
     default:
       text = "-";
       trendColor = { color: `rgb(255, 255, 255)` };
+      classname = "";
       break;
   }
 
@@ -157,7 +157,7 @@ export const getTeamColumn = (col: string, player_id: string) => {
 
   switch (col) {
     case "KTC":
-      text = (ktc_current && ktc_current[player_id]) || "0";
+      text = (ktc_current && ktc_current[player_id]?.toString()) || "0";
       trendColor = getTrendColor_Range(
         ktc_current?.[player_id] || 0,
         1000,
@@ -166,7 +166,7 @@ export const getTeamColumn = (col: string, player_id: string) => {
       classname = "ktc";
       break;
     case "Age":
-      text = (allplayers && allplayers[player_id]?.age) || "-";
+      text = (allplayers && allplayers[player_id]?.age?.toString()) || "-";
       trendColor = getTrendColor_Range(
         parseInt(allplayers?.[player_id]?.age || "0"),
         21,
@@ -178,6 +178,7 @@ export const getTeamColumn = (col: string, player_id: string) => {
     default:
       text = "-";
       trendColor = { color: `rgb(255, 255, 255)` };
+      classname = "";
       break;
   }
 

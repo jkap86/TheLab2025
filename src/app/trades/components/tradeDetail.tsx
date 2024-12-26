@@ -1,19 +1,13 @@
 import League from "@/components/league/league";
 import { League as LeagueType, Trade } from "@/lib/types/userTypes";
-import { AppDispatch, RootState } from "@/redux/store";
-import { updateState } from "@/redux/userSlice";
-import { getOptimalStarters } from "@/utils/getOptimalStarters";
-import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
 type TradeDetailProps = {
   trade: Trade;
 };
 
 const TradeDetail = ({ trade }: TradeDetailProps) => {
-  const dispatch: AppDispatch = useDispatch();
-  const { ktc_current } = useSelector((state: RootState) => state.common);
-  const { lmTrades } = useSelector((state: RootState) => state.user);
   const { tab_detail } = useSelector((state: RootState) => state.trades);
 
   const tradeLeague: LeagueType = {

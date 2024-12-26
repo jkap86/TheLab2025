@@ -24,7 +24,7 @@ const LineupCheck = () => {
       { var: column2_lc, key: "column2_lc" },
       { var: column3_lc, key: "column3_lc" },
       { var: column4_lc, key: "column4_lc" },
-    ].map((col, index) => {
+    ].map((col) => {
       return {
         text: (
           <ColumnDropdown
@@ -72,21 +72,19 @@ const LineupCheck = () => {
                 colspan: 3,
                 classname: playoffs ? "playoffs" : "",
               },
-              ...[column1_lc, column2_lc, column3_lc, column4_lc].map(
-                (col, index) => {
-                  const { text, trendColor, classname } = getMatchupsColumn(
-                    col,
-                    league_id
-                  );
+              ...[column1_lc, column2_lc, column3_lc, column4_lc].map((col) => {
+                const { text, trendColor, classname } = getMatchupsColumn(
+                  col,
+                  league_id
+                );
 
-                  return {
-                    text,
-                    colspan: 1,
-                    style: trendColor,
-                    classname: classname,
-                  };
-                }
-              ),
+                return {
+                  text,
+                  colspan: 1,
+                  style: trendColor,
+                  classname: classname,
+                };
+              }),
             ],
             secondary: <LineupCheckLeague league_id={league_id} />,
           };

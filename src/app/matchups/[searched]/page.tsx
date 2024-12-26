@@ -2,7 +2,6 @@
 
 import LoadCommonData from "@/components/loadCommonData/loadCommonData";
 import LoadingIcon from "@/components/loadingIcon/loadingIcon";
-import TableMain from "@/components/tableMain/tableMain";
 import { useFetchMatchupsProjections } from "@/hooks/useFetchMatchupsProjections";
 import { AppDispatch, RootState } from "@/redux/store";
 import { use } from "react";

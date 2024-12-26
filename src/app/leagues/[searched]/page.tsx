@@ -111,7 +111,7 @@ const Leagues = ({ params }: LeaguesProps) => {
             ? 1
             : -1;
         })
-        .map((league_id, index) => {
+        .map((league_id) => {
           const league = leagues[league_id];
           return {
             id: league.league_id,

@@ -2,7 +2,7 @@ export type SleeperLeague = {
   league_id: string;
   name: string;
   avatar: string;
-  settings: { [key: string]: any };
+  settings: { [key: string]: number };
   season: string;
 };
 

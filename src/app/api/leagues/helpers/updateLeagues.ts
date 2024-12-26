@@ -225,8 +225,12 @@ export const updateLeagues = async (
             rosters: rosters_w_username,
             updatedat: new Date(),
           });
-        } catch (err: any) {
-          console.log(err.message);
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            console.log(err.message);
+          } else {
+            console.log({ err });
+          }
         }
       })
     );
@@ -366,7 +370,7 @@ export const getTeamDraftPicks = (
           (u) => u.user_id === original_roster?.owner_id
         );
 
-        original_roster &&
+        if (original_roster) {
           draft_picks_team.push({
             season: parseInt(pick.season),
             round: pick.round,
@@ -383,6 +387,7 @@ export const getTeamDraftPicks = (
                 draft_order[original_user?.user_id]) ||
               null,
           });
+        }
       });
 
     traded_picks
@@ -461,7 +466,7 @@ export const getTrades = async (
           };
         });
 
-        t.adds &&
+        if (t.adds) {
           Object.keys(t.adds).forEach((add) => {
             const manager = rosters_w_username.find(
               (ru) => ru.roster_id === t.adds[add]
@@ -478,8 +483,9 @@ export const getTrades = async (
               price_check.push(add);
             }
           });
+        }
 
-        t.drops &&
+        if (t.drops) {
           Object.keys(t.drops).forEach((drop) => {
             const manager = rosters_w_username.find(
               (ru) => ru.roster_id === t.drops[drop]
@@ -487,6 +493,7 @@ export const getTrades = async (
 
             drops[drop] = manager?.user_id || "0";
           });
+        }
 
         return {
           ...t,
@@ -547,8 +554,12 @@ export const upsertLeagues = async (db: Pool, updatedLeagues: LeagueDb[]) => {
         JSON.stringify(league.rosters),
         league.updatedat,
       ]);
-    } catch (err: any) {
-      console.log(err.message + " LEAGUES");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      } else {
+        console.log({ err });
+      }
     }
   }
 };
@@ -579,8 +590,12 @@ export const upsertUsers = async (db: Pool, users: UserDb[]) => {
         user.updatedAt,
         user.createdAt,
       ]);
-    } catch (err: any) {
-      console.log(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      } else {
+        console.log({ err });
+      }
     }
   }
 };
@@ -601,8 +616,12 @@ export const upsertUserLeagues = async (
         userLeague.user_id,
         userLeague.league_id,
       ]);
-    } catch (err: any) {
-      console.log(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      } else {
+        console.log({ err });
+      }
     }
   }
 };
@@ -641,8 +660,12 @@ export const upsertMatchups = async (db: Pool, matchups: Matchup[]) => {
 
   try {
     await db.query(upsertMatchupsQuery, values);
-  } catch (err: any) {
-    console.log(err.message + " MATCHUPS");
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.log(err.message);
+    } else {
+      console.log({ err });
+    }
   }
 };
 
@@ -683,7 +706,11 @@ export const upsertTrades = async (db: Pool, trades: Trade[]) => {
 
   try {
     await db.query(upsertTradesQuery, values);
-  } catch (err: any) {
-    console.log(err.message + " TRADES");
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.log(err.message);
+    } else {
+      console.log({ err });
+    }
   }
 };

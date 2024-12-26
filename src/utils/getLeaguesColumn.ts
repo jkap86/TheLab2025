@@ -131,6 +131,8 @@ export const getLeaguesColumn = (col: string, league: League) => {
         true
       );
 
+      text = text.toString();
+
       classname = "rank";
       break;
     case "Pts Rk":
@@ -146,6 +148,7 @@ export const getLeaguesColumn = (col: string, league: League) => {
         true
       );
 
+      text = text.toString();
       classname = "rank";
       break;
     case "KTC S Rk":
@@ -165,6 +168,7 @@ export const getLeaguesColumn = (col: string, league: League) => {
         true
       );
 
+      text = text.toString();
       classname = "rank";
       break;
     case "KTC T Rk":
@@ -183,6 +187,7 @@ export const getLeaguesColumn = (col: string, league: League) => {
         league.rosters.length + 1,
         true
       );
+      text = text.toString();
 
       classname = "rank";
       break;
@@ -191,6 +196,8 @@ export const getLeaguesColumn = (col: string, league: League) => {
 
       trendColor = getTrendColor_Range(text, 1000, 8000);
       classname = "ktc";
+
+      text = text.toString();
       break;
     case "KTC Pk Rk":
       text =
@@ -209,6 +216,7 @@ export const getLeaguesColumn = (col: string, league: League) => {
         true
       );
 
+      text = text.toString();
       classname = "rank";
       break;
     case "Trade D":
@@ -227,9 +235,12 @@ export const getLeaguesColumn = (col: string, league: League) => {
             ? "green"
             : ""
           : "") + (league.settings.trade_deadline === 99 ? " infinity" : "");
+
+      text = text.toString();
       break;
     default:
       text = "-";
+      classname = "";
       break;
   }
 

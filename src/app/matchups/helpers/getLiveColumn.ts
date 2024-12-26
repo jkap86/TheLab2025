@@ -1,7 +1,4 @@
-import { getOptimalStarters } from "@/utils/getOptimalStarters";
-import { getPlayerTotal } from "@/utils/getPlayerStatProjTotal";
 import store, { RootState } from "@/redux/store";
-import { League, Matchup } from "@/lib/types/userTypes";
 
 export const columnOptionsLive = [
   { text: "User Projection", abbrev: "User Proj" },
@@ -182,7 +179,9 @@ export const getLiveColumn = (col: string, league_id: string) => {
   }
   */
 
-  let text, trendColor, classname;
+  let text;
+  const trendColor = {};
+  const classname = "";
 
   switch (col) {
     case "User Pts":
@@ -243,11 +242,14 @@ export const getLiveDetailColumn = (
 
   const { live_stats } = state.user;
 
-  let text, trendColor, classname;
+  let text;
+
+  const trendColor = {};
+  const classname = "";
 
   switch (col) {
     case "Clock":
-      text = live_stats[league_id].players[player_id]?.clock;
+      text = live_stats[league_id].players[player_id]?.clock || "";
       break;
     case "Pts":
       text = live_stats[league_id].players[player_id]?.pts?.toLocaleString(

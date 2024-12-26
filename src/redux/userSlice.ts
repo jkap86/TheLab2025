@@ -111,7 +111,7 @@ const userSlice = createSlice({
     ) {
       state[action.payload.key] = action.payload.value;
     },
-    resetState(state: Draft<UserState>) {
+    resetState() {
       return initialState;
     },
   },

@@ -10,6 +10,7 @@ type LoadingIconProps = {
 const LoadingIcon = ({ message }: LoadingIconProps) => {
   return (
     <div className="load-container">
+      <h1>{message}</h1>
       <Image src={loadingFlask} alt="loading" className="flask" />
       <Image src={bubble} alt="bubble" className="bubble1" />
       <Image src={bubble} alt="bubble" className="bubble2" />

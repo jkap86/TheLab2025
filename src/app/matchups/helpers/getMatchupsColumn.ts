@@ -3,7 +3,6 @@ import store, { RootState } from "@/redux/store";
 export const getMatchupsColumn = (col: string, league_id: string) => {
   const state: RootState = store.getState();
 
-  const { projections_week } = state.common;
   const { matchups } = state.user;
 
   const user_matchup = matchups?.[league_id].user;
@@ -43,6 +42,7 @@ export const getMatchupsColumn = (col: string, league_id: string) => {
       break;
     default:
       text = "-";
+      classname = "";
       break;
   }
 

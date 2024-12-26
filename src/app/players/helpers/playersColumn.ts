@@ -68,16 +68,20 @@ export const getPlayersColumn = (col: string, player_id: string) => {
 
   switch (col) {
     case "# Own":
-      text = owned.length;
+      text = owned.length.toString();
+      classname = "";
       break;
     case "KTC":
       text = ktc_current?.[player_id] || 0;
       trendColor = getTrendColor_Range(text, 1000, 8000);
+
+      text = text.toString();
       classname = "ktc";
       break;
     default:
       text = "-";
       trendColor = { color: `rgb(255, 255, 255)` };
+      classname = "";
       break;
   }
 

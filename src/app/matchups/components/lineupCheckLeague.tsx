@@ -34,7 +34,7 @@ const LineupCheckLeague = ({ league_id }: { league_id: string }) => {
     ) || [];
 
   const handleSync = () => {
-    leagues &&
+    if (leagues) {
       dispatch(
         syncMatchup({
           league_id: league_id,
@@ -42,6 +42,7 @@ const LineupCheckLeague = ({ league_id }: { league_id: string }) => {
           playoff_week_start: leagues[league_id]?.settings.playoff_week_start,
         })
       );
+    }
   };
 
   return (
@@ -130,7 +131,7 @@ const LineupCheckLeague = ({ league_id }: { league_id: string }) => {
                   colspan: 3,
                   classname: optimal,
                 },
-                ...[column1_lcd, column2_lcd].map((col, index) => {
+                ...[column1_lcd, column2_lcd].map((col) => {
                   const { text, trendColor, classname } = getLcDetailColumn(
                     col,
                     league_id,
@@ -168,7 +169,7 @@ const LineupCheckLeague = ({ league_id }: { league_id: string }) => {
             ...[
               { var: column3_lcd, key: "column3_lcd" },
               { var: column4_lcd, key: "column4_lcd" },
-            ].map((col, index) => {
+            ].map((col) => {
               return {
                 text: (
                   <ColumnDropdown
@@ -193,8 +194,9 @@ const LineupCheckLeague = ({ league_id }: { league_id: string }) => {
               id: player_id,
               columns: [
                 {
-                  text: allplayers?.[player_id].position,
+                  text: allplayers?.[player_id].position || "",
                   colspan: 1,
+                  classname: "",
                 },
                 {
                   text: (
@@ -205,8 +207,9 @@ const LineupCheckLeague = ({ league_id }: { league_id: string }) => {
                     />
                   ),
                   colspan: 3,
+                  classname: "",
                 },
-                ...[column3_lcd, column4_lcd].map((col, index) => {
+                ...[column3_lcd, column4_lcd].map((col) => {
                   const { text, trendColor, classname } = getLcDetailColumn(
                     col,
                     league_id,

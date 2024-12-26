@@ -135,15 +135,6 @@ const Trade = ({ trade, activeTrade, setActiveTrade }: TradeProps) => {
                     {trade.draft_picks
                       .filter((dp) => dp.new === manager_roster?.user_id)
                       .map((dp) => {
-                        const ktc_pick_type =
-                          (dp.order &&
-                            (dp.order <= 4
-                              ? "Early"
-                              : dp.order >= 9
-                              ? "Late"
-                              : "Mid")) ||
-                          "Mid";
-
                         return (
                           <tr
                             key={`${dp.season}_${dp.round}_${dp.original}_${index}`}

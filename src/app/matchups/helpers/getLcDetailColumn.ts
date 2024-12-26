@@ -9,7 +9,9 @@ export const getLcDetailColumn = (
 
   const { matchups, live_stats } = state.user;
 
-  let text, trendColor, classname;
+  let text;
+  const trendColor = {};
+  const classname = "";
 
   switch (col) {
     case "Proj":
@@ -17,7 +19,7 @@ export const getLcDetailColumn = (
         matchups?.[league_id].user.players_points?.[player_id]?.toLocaleString(
           "en-US",
           { maximumFractionDigits: 1 }
-        ) || 0;
+        ) || "0";
       break;
     case "Opp":
       text = live_stats[league_id].players[player_id].opp;

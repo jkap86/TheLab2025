@@ -44,7 +44,10 @@ export async function GET(req: NextRequest) {
     } else {
       return NextResponse.json(result.rows[0], { status: 200 });
     }
-  } catch (err: any) {
-    return NextResponse.json("Username not found", { status: 404 });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.log(err.message);
+      return NextResponse.json("Username not found", { status: 404 });
+    }
   }
 }

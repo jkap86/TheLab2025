@@ -1,4 +1,4 @@
-import { User, League, Playershare } from "@/lib/types/userTypes";
+import { League, Playershare } from "@/lib/types/userTypes";
 
 export const getPlayerShares = (leagues: League[]) => {
   const playershares: {

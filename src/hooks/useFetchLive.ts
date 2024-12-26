@@ -237,5 +237,5 @@ export const useFetchLive = () => {
     return () => {
       clearTimeout(updateLive);
     };
-  }, [state, projections_week, matchups]);
+  }, [state, projections_week, matchups, leagues, dispatch]);
 };

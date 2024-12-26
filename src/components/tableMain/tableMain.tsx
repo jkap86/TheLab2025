@@ -2,17 +2,11 @@ import Search from "../search/search";
 import React, { useEffect } from "react";
 import "./tableMain.css";
 
-type ClickHandler = (id: any) => void;
+type ClickHandler = (id: string) => void;
 
 type SetPage = (page: number) => void;
 
 type SetSearched = (searched: string) => void;
-
-type Option = {
-  id: string;
-  text: string;
-  display: JSX.Element;
-};
 
 type TableMainProps = {
   type: number;
@@ -26,9 +20,19 @@ type TableMainProps = {
     colspan: number;
     classname?: string;
   }[];
-  data: any[];
+  data: {
+    id: string;
+    search?: { text: string; display: JSX.Element };
+    columns: {
+      text: string | JSX.Element;
+      colspan: number;
+      classname: string;
+      style?: { [key: string]: string };
+    }[];
+    secondary?: JSX.Element;
+  }[];
   half?: boolean;
-  active?: any;
+  active?: string;
   setActive?: ClickHandler;
   caption?: JSX.Element;
   page?: number;
@@ -47,7 +51,17 @@ const PageNumbers = ({
   page,
   setPage,
 }: {
-  data: any[];
+  data: {
+    id: string;
+    search?: { text: string; display: JSX.Element };
+    columns: {
+      text: string | JSX.Element;
+      colspan: number;
+      classname: string;
+      style?: { [key: string]: string };
+    }[];
+    secondary?: JSX.Element;
+  }[];
   page: number;
   setPage: SetPage;
 }) => {
@@ -95,9 +109,9 @@ const TableMain = ({
 
   useEffect(() => {
     if (data.length <= 25) {
-      setPage && setPage(1);
+      if (setPage) setPage(1);
     }
-  }, [data.length]);
+  }, [data.length, setPage]);
 
   return (
     <>
@@ -118,14 +132,16 @@ const TableMain = ({
             <div key={search.placeholder}>
               <Search
                 searched={
-                  data.find((d) => d.id === search.searched)?.search.text || ""
+                  data.find((d) => d.id === search.searched)?.search?.text || ""
                 }
                 setSearched={search.setSearched}
-                options={data.map((d) => ({
-                  id: d.id,
-                  text: d.search.text,
-                  display: d.search.display,
-                }))}
+                options={data
+                  .filter((d) => d.search)
+                  .map((d) => ({
+                    id: d.id,
+                    text: d.search?.text || "",
+                    display: d.search?.display || <></>,
+                  }))}
                 placeholder={search.placeholder}
               />
             </div>
@@ -196,7 +212,7 @@ const TableMain = ({
                 >
                   <td
                     colSpan={row.columns.reduce(
-                      (acc: number, cur: typeof row) => acc + cur.colspan,
+                      (acc, cur) => acc + cur.colspan,
                       0
                     )}
                   >
@@ -211,36 +227,25 @@ const TableMain = ({
                               : setActive(row.id))
                           }
                         >
-                          {row.columns.map(
-                            (
-                              col: {
-                                text: string;
-                                colspan: number;
-                                classname: string;
-                                style?: { [key: string]: any };
-                              },
-                              index: number
-                            ) => {
-                              return (
-                                <td
-                                  key={index}
-                                  colSpan={col.colspan}
-                                  className={"content " + col.classname}
-                                  style={col.style}
-                                >
-                                  <div>{col.text}</div>
-                                </td>
-                              );
-                            }
-                          )}
+                          {row.columns.map((col, index: number) => {
+                            return (
+                              <td
+                                key={index}
+                                colSpan={col.colspan}
+                                className={"content " + col.classname}
+                                style={col.style}
+                              >
+                                <div>{col.text}</div>
+                              </td>
+                            );
+                          })}
                         </tr>
                         {active === row.id && (
                           <tr>
                             <td
                               className="secondaryComponent"
                               colSpan={row.columns.reduce(
-                                (acc: number, cur: typeof row) =>
-                                  acc + cur.colspan,
+                                (acc, cur) => acc + cur.colspan,
                                 0
                               )}
                             >

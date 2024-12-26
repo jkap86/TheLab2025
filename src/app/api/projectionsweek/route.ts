@@ -107,9 +107,14 @@ export async function GET(req: NextRequest) {
       );
 
       return NextResponse.json(result);
-    } catch (err: any) {
-      console.log(err.message);
-      return NextResponse.json(err, { status: 500 });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.log(err.message);
+        return NextResponse.json(err.message);
+      } else {
+        console.log({ err });
+        return NextResponse.json("unkown error");
+      }
     }
   }
 }
