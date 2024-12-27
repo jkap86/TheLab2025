@@ -20,7 +20,8 @@ export async function GET(req: NextRequest) {
 
   const current_values_obj = ktc_dates[current_date];
 
-  const current_values_array = Object.entries(current_values_obj);
+  const current_values_array =
+    (current_values_obj && Object.entries(current_values_obj)) || [];
 
   return NextResponse.json(
     {

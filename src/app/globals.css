@@ -77,3 +77,8 @@ div.nav-buttons button.active {
 .red {
   color: rgb(255, 0, 0);
 }
+
+input[type="date"] {
+  font-size: 3rem;
+  color: black;
+}

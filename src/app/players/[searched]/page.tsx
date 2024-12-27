@@ -2,9 +2,10 @@
 
 import TableMain from "@/components/tableMain/tableMain";
 import { AppDispatch, RootState } from "@/redux/store";
-import { use } from "react";
+import { use, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { updateState } from "../redux/playersSlice";
+import { updateState as updatePlayersState } from "../redux/playersSlice";
+import { updateState } from "@/redux/commonSlice";
 import ColumnDropdown from "@/components/columnDropdown/columnDropdown";
 import {
   columnOptions,
@@ -15,6 +16,7 @@ import SortIcon from "@/components/sortIcon/sortIcon";
 import Avatar from "@/components/avatar/avatar";
 import PlayerLeagues from "../components/playerLeagues/playerLeagues";
 import LoadCommonData from "@/components/loadCommonData/loadCommonData";
+import axios from "axios";
 
 interface PlayersProps {
   params: Promise<{ searched: string }>;
@@ -23,7 +25,9 @@ interface PlayersProps {
 const Players = ({ params }: PlayersProps) => {
   const dispatch: AppDispatch = useDispatch();
   const { searched } = use(params);
-  const { allplayers } = useSelector((state: RootState) => state.common);
+  const { allplayers, ktc_previous } = useSelector(
+    (state: RootState) => state.common
+  );
   const { playershares } = useSelector((state: RootState) => state.user);
   const {
     column1,
@@ -34,7 +38,34 @@ const Players = ({ params }: PlayersProps) => {
     sortPlayersBy,
     activePlayer,
     searchedPlayer,
+    trendDate,
   } = useSelector((state: RootState) => state.players);
+
+  const fetchKTCPrev = async () => {
+    if (trendDate && ktc_previous.date !== trendDate) {
+      const ms = new Date().getTime() - new Date(trendDate).getTime();
+
+      const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+
+      const ktc_previous_raw = await axios.get("/api/ktc", {
+        params: {
+          days: days.toString(),
+        },
+      });
+
+      const obj = Object.fromEntries(ktc_previous_raw.data.values);
+
+      dispatch(
+        updateState({
+          key: "ktc_previous",
+          value: {
+            date: ktc_previous_raw.data.date,
+            values: obj,
+          },
+        })
+      );
+    }
+  };
 
   const headers_sort = [0, 1, 2, 3, 4].map((key, index) => {
     const colnum = key as 0 | 1 | 2 | 3 | 4;
@@ -45,7 +76,7 @@ const Players = ({ params }: PlayersProps) => {
           sortBy={sortPlayersBy}
           setSortBy={(colNum, asc) =>
             dispatch(
-              updateState({
+              updatePlayersState({
                 key: "sortPlayersBy",
                 value: { column: colNum, asc: asc },
               })
@@ -76,7 +107,7 @@ const Players = ({ params }: PlayersProps) => {
             columnText={col.var}
             setColumnText={(value) =>
               dispatch(
-                updateState({
+                updatePlayersState({
                   key: col.key as "column1" | "column2" | "column3" | "column4",
                   value,
                 })
@@ -150,31 +181,44 @@ const Players = ({ params }: PlayersProps) => {
     );
 
   const setPage = (p: number) =>
-    dispatch(updateState({ key: "page", value: p }));
+    dispatch(updatePlayersState({ key: "page", value: p }));
 
   const setActive = (player_id: string) =>
-    dispatch(updateState({ key: "activePlayer", value: player_id }));
+    dispatch(updatePlayersState({ key: "activePlayer", value: player_id }));
 
   const search = {
     searched: searchedPlayer,
     setSearched: (searched: string) =>
-      dispatch(updateState({ key: "searchedPlayer", value: searched })),
+      dispatch(updatePlayersState({ key: "searchedPlayer", value: searched })),
 
     placeholder: "Search Players",
   };
 
   const component = (
-    <TableMain
-      type={1}
-      headers_sort={headers_sort}
-      headers={headers}
-      data={data}
-      page={page}
-      setPage={setPage}
-      active={activePlayer}
-      setActive={setActive}
-      search={search}
-    />
+    <>
+      <h1>
+        <input
+          type="date"
+          value={trendDate}
+          onChange={(e) =>
+            dispatch(
+              updatePlayersState({ key: "trendDate", value: e.target.value })
+            )
+          }
+        />
+      </h1>
+      <TableMain
+        type={1}
+        headers_sort={headers_sort}
+        headers={headers}
+        data={data}
+        page={page}
+        setPage={setPage}
+        active={activePlayer}
+        setActive={setActive}
+        search={search}
+      />
+    </>
   );
 
   return <LoadCommonData searched={searched} component={component} />;

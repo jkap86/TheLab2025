@@ -6,6 +6,7 @@ export interface CommonState {
   state: { [key: string]: string | number } | null;
   allplayers: { [player_id: string]: Allplayer } | null;
   ktc_current: { [player_id: string]: number } | null;
+  ktc_previous: { date: string; values: { [player_id: string]: number } };
   projections_week: { [player_id: string]: PlayerProjection } | null;
 
   type1: "Redraft" | "All" | "Dynasty";
@@ -16,6 +17,7 @@ const initialState: CommonState = {
   state: null,
   allplayers: null,
   ktc_current: null,
+  ktc_previous: { date: "", values: {} },
   projections_week: null,
 
   type1: "All",

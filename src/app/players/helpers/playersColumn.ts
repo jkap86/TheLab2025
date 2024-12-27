@@ -10,8 +10,7 @@ export const columnOptions = [
   { text: "# Available", abbrev: "# Avail" },
   { text: "Age", abbrev: "Age" },
   { text: "KTC Dynasty Value", abbrev: "KTC" },
-  { text: "KTC 7 Day Trend", abbrev: "KTC 7" },
-  { text: "KTC 30 Day Trend", abbrev: "KTC 30" },
+  { text: "KTC Trend", abbrev: "KTC T" },
   { text: "KTC Season Trend", abbrev: "KTC Szn" },
 ];
 
@@ -70,7 +69,7 @@ export const getPlayersSortValue = (player_id: string) => {
 export const getPlayersColumn = (col: string, player_id: string) => {
   const state: RootState = store.getState();
 
-  const { ktc_current, allplayers } = state.common;
+  const { ktc_current, ktc_previous, allplayers } = state.common;
   const { playershares, leagues } = state.user;
 
   const owned = filterLeagueIds(playershares[player_id].owned);
@@ -115,6 +114,18 @@ export const getPlayersColumn = (col: string, player_id: string) => {
       text = ktc_current?.[player_id] || 0;
       trendColor = getTrendColor_Range(text, 1000, 8000);
 
+      text = text.toString();
+      classname = "ktc";
+      break;
+    case "KTC T":
+      text =
+        (ktc_previous.date &&
+          (ktc_current?.[player_id] || 0) -
+            (ktc_previous.values?.[player_id] || 0)) ||
+        "-";
+      trendColor =
+        (typeof text === "number" && getTrendColor_Range(text, -500, 500)) ||
+        {};
       text = text.toString();
       classname = "ktc";
       break;

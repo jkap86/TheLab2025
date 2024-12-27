@@ -12,6 +12,7 @@ export interface PlayersState {
   };
   searchedPlayer: string;
   activePlayer: string;
+  trendDate: string;
 
   playerLeaguesTab: string;
 
@@ -40,6 +41,7 @@ const initialState: PlayersState = {
   },
   searchedPlayer: "",
   activePlayer: "",
+  trendDate: "",
 
   playerLeaguesTab: "Owned",
 

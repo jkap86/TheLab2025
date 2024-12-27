@@ -6,6 +6,8 @@ export const getTrendColor_Range = (
 ) => {
   const median = (max - min) / 2 + min;
 
+  console.log({ median });
+
   if (!reverse && value > median) {
     const x = ((value - median) / (max - median)) * 255;
 
@@ -15,6 +17,7 @@ export const getTrendColor_Range = (
   } else if (!reverse && value < median) {
     const x = ((median - value) / (median - min)) * 255;
 
+    if (value === -879) console.log({ x });
     return {
       color: `rgb(${255}, ${255 - x}, ${255 - x})`,
     };
