@@ -57,6 +57,9 @@ export const getPlayersSortValue = (player_id: string) => {
     case "KTC":
       sort = ktc_current?.[player_id] || 0;
       break;
+    case "Age":
+      sort = allplayers?.[player_id].age || 999;
+      break;
     default:
       sort = allplayers?.[player_id].full_name || "";
       break;

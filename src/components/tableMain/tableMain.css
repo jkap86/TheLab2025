@@ -106,10 +106,15 @@ td.content.age {
   letter-spacing: 0.5rem;
 }
 
-td.content.shrink1 {
-  font-size: 90%;
+td.content.fp {
+  font-family: var(--fontScore);
+  font-size: 110%;
 }
 
+td.content.record1 {
+  letter-spacing: 0.25rem;
+  font-weight: 900;
+}
 td.content.pregame {
   color: gray;
 }
@@ -125,6 +130,10 @@ td.content.infinity > div {
 }
 td.content.playoffs {
   box-shadow: inset 0 0 5rem rgb(0, 255, 0);
+}
+
+td.content.slot {
+  font-size: 80%;
 }
 
 table.one td.content {

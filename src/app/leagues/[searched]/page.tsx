@@ -100,8 +100,16 @@ const Leagues = ({ params }: LeaguesProps) => {
     (leagues &&
       filterLeagueIds(Object.keys(leagues))
         .sort((a, b) => {
-          const a_sortValue = getLeaguesColumnSortValue(leagues[a]);
-          const b_sortValue = getLeaguesColumnSortValue(leagues[b]);
+          const a_sortValue = getLeaguesColumnSortValue(
+            leagues[a],
+            sortLeaguesBy,
+            [column1, column2, column3, column4]
+          );
+          const b_sortValue = getLeaguesColumnSortValue(
+            leagues[b],
+            sortLeaguesBy,
+            [column1, column2, column3, column4]
+          );
 
           return a_sortValue === b_sortValue
             ? leagues[a].index > leagues[b].index
@@ -115,7 +123,6 @@ const Leagues = ({ params }: LeaguesProps) => {
           const league = leagues[league_id];
           return {
             id: league.league_id,
-            sortby: getLeaguesColumnSortValue(league),
             search: {
               text: league.name,
               display: (

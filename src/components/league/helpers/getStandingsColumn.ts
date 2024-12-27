@@ -93,16 +93,17 @@ export const getStandingsColumn = (
         0,
         1
       );
-      classname = "";
+      classname = "record1";
       break;
     case "Fp":
-      text = roster.fp.toLocaleString("en-US", { maximumFractionDigits: 1 });
+      text = roster.fp.toLocaleString("en-US", { maximumFractionDigits: 0 });
 
-      trendColor = getTrendColor_Percentage(
+      trendColor = getTrendColor_Range(
         roster.fp,
-        rosters.map((r) => r.fp)
+        Math.min(...rosters.map((r) => r.fp)),
+        Math.max(...rosters.map((r) => r.fp))
       );
-      classname = "shrink1";
+      classname = "fp";
       break;
     case "KTC S":
       text =
@@ -117,7 +118,7 @@ export const getStandingsColumn = (
       classname = "ktc";
 
       trendColor =
-        typeof text === "number" && getTrendColor_Range(text, 1000, 8000);
+        parseInt(text) && getTrendColor_Range(parseInt(text), 1000, 8000);
       break;
     default:
       text = "-";

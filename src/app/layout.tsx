@@ -24,6 +24,7 @@ export default function RootLayout({
         <link href="https://fonts.cdnfonts.com/css/d-dredex" rel="stylesheet" />
         <link href="https://fonts.cdnfonts.com/css/hugmate" rel="stylesheet" />
         <link href="https://fonts.cdnfonts.com/css/kwizi" rel="stylesheet" />
+        <link href="https://fonts.cdnfonts.com/css/maria-2" rel="stylesheet" />
 
         <link
           rel="stylesheet"

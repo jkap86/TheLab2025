@@ -155,7 +155,7 @@ const TableMain = ({
           })}
         </span>
       )}
-      {page && setPage ? (
+      {page && setPage && data.length > 25 && !search?.searched ? (
         <PageNumbers
           data={data.filter(
             (d) => !search?.searched || d.id === search?.searched

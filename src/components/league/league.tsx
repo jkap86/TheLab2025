@@ -16,6 +16,8 @@ import {
 import { updateLeagueState } from "./redux/leagueSlice";
 import SortIcon from "../sortIcon/sortIcon";
 import { syncLeague } from "@/redux/userActions";
+import { getDraftPickId } from "@/utils/getPickId";
+import { getSlotAbbrev } from "@/utils/getOptimalStarters";
 
 type LeagueProps = {
   type: number;
@@ -25,9 +27,11 @@ type LeagueProps = {
 const League = ({ league, type }: LeagueProps) => {
   const pathname = usePathname();
   const dispatch: AppDispatch = useDispatch();
-  const { allplayers, state: stateState } = useSelector(
-    (state: RootState) => state.common
-  );
+  const {
+    allplayers,
+    state: stateState,
+    ktc_current,
+  } = useSelector((state: RootState) => state.common);
   const { isSyncingLeague } = useSelector((state: RootState) => state.user);
   const {
     column1_standings,
@@ -41,6 +45,7 @@ const League = ({ league, type }: LeagueProps) => {
     (r) => r.roster_id.toString() === activeRosterId
   );
 
+  console.log({ ktc_current });
   useEffect(() => {
     if (league?.userRoster)
       setActiveRosterId(league.userRoster.roster_id.toString());
@@ -249,9 +254,9 @@ const League = ({ league, type }: LeagueProps) => {
                 id: `${rp}__${index}`,
                 columns: [
                   {
-                    text: rp,
+                    text: getSlotAbbrev(rp),
                     colspan: 1,
-                    classname: "",
+                    classname: "slot",
                   },
                   {
                     text:
@@ -275,6 +280,94 @@ const League = ({ league, type }: LeagueProps) => {
                 ],
               };
             }),
+          ...(activeRoster?.players
+            ?.filter(
+              (player_id) => !activeRoster.starters_optimal?.includes(player_id)
+            )
+            ?.map((player_id) => {
+              const { text, trendColor, classname } = getTeamColumn(
+                column1_team,
+                player_id
+              );
+
+              return {
+                id: player_id,
+                columns: [
+                  {
+                    text: "BN",
+                    colspan: 1,
+                    classname: "slot",
+                  },
+                  {
+                    text:
+                      (allplayers && player_id && allplayers[player_id] && (
+                        <Avatar
+                          id={player_id}
+                          text={allplayers[player_id].full_name}
+                          type="P"
+                        />
+                      )) ||
+                      "-",
+                    colspan: 3,
+                    classname: "",
+                  },
+                  {
+                    text,
+                    colspan: 2,
+                    style: trendColor || {},
+                    classname,
+                  },
+                ],
+              };
+            }) || []),
+          ...([...(activeRoster?.draftpicks || [])]
+            ?.sort(
+              (a, b) =>
+                a.season - b.season ||
+                a.round - b.round ||
+                (a.order || 0) - (b.order || 0) ||
+                (b.roster_id === activeRoster?.roster_id ? 1 : 0) -
+                  (a.roster_id === activeRoster?.roster_id ? 1 : 0)
+            )
+            ?.map((pick) => {
+              const pick_id = getDraftPickId(pick);
+
+              const { text, trendColor, classname } = getTeamColumn(
+                column1_team,
+                pick_id
+              );
+
+              return {
+                id: `${pick.season}_${pick.round}_${pick.roster_id}`,
+                columns: [
+                  {
+                    text: "PK",
+                    colspan: 1,
+                    classname: "slot",
+                  },
+                  {
+                    text: pick.order
+                      ? `${pick.season} ${
+                          pick.round
+                        }.${pick.order.toLocaleString("en-US", {
+                          minimumIntegerDigits: 2,
+                        })}`
+                      : `${pick.season} Round ${pick.round}` +
+                        (pick.roster_id === activeRoster?.roster_id
+                          ? ""
+                          : ` ${pick.original_user.username}`),
+                    colspan: 3,
+                    classname: "",
+                  },
+                  {
+                    text,
+                    colspan: 2,
+                    style: trendColor || {},
+                    classname,
+                  },
+                ],
+              };
+            }) || []),
         ]}
       />
     </>

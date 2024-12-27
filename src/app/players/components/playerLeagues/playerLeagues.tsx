@@ -4,11 +4,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { updateState } from "../../redux/playersSlice";
 import TableMain from "@/components/tableMain/tableMain";
-import { getLeaguesColumn } from "@/utils/getLeaguesColumn";
+import {
+  getLeaguesColumn,
+  getLeaguesColumnSortValue,
+  leaguesColumnOptions,
+} from "@/utils/getLeaguesColumn";
 import Avatar from "@/components/avatar/avatar";
 import SortIcon from "@/components/sortIcon/sortIcon";
 import ColumnDropdown from "@/components/columnDropdown/columnDropdown";
 import League from "@/components/league/league";
+import { filterLeagueIds } from "@/utils/filterLeagues";
 
 type PlayerLeaguesProps = {
   player_obj: {
@@ -64,6 +69,7 @@ const Owned = ({ league_ids }: OwnedProps) => {
     column4_owned,
     sortOwnedBy,
     activeOwned,
+    page_owned,
   } = useSelector((state: RootState) => state.players);
 
   const headers_sort = [0, 1, 2, 3, 4].map((key, index) => {
@@ -117,7 +123,7 @@ const Owned = ({ league_ids }: OwnedProps) => {
                 })
               )
             }
-            options={[]}
+            options={leaguesColumnOptions}
           />
         ),
         colspan: 1,
@@ -128,24 +134,49 @@ const Owned = ({ league_ids }: OwnedProps) => {
 
   const data =
     (leagues &&
-      league_ids.map((league_id) => {
-        return {
-          id: league_id,
-          columns: [
-            {
-              text: (
-                <Avatar
-                  id={leagues?.[league_id].avatar}
-                  text={leagues?.[league_id].name || "-"}
-                  type="L"
-                />
-              ),
-              colspan: 3,
-              classname: sortOwnedBy.column === 0 ? "sort" : "",
-            },
-            ...[column1_owned, column2_owned, column3_owned, column4_owned].map(
-              (col, index) => {
-                const { text, trendColor } = getLeaguesColumn(
+      filterLeagueIds(league_ids)
+        .sort((a, b) => {
+          const a_sortValue = getLeaguesColumnSortValue(
+            leagues[a],
+            sortOwnedBy,
+            [column1_owned, column2_owned, column3_owned, column4_owned]
+          );
+          const b_sortValue = getLeaguesColumnSortValue(
+            leagues[b],
+            sortOwnedBy,
+            [column1_owned, column2_owned, column3_owned, column4_owned]
+          );
+
+          return a_sortValue === b_sortValue
+            ? leagues[a].index > leagues[b].index
+              ? 1
+              : -1
+            : a_sortValue > b_sortValue
+            ? 1
+            : -1;
+        })
+        .map((league_id) => {
+          return {
+            id: league_id,
+            columns: [
+              {
+                text: (
+                  <Avatar
+                    id={leagues?.[league_id].avatar}
+                    text={leagues?.[league_id].name || "-"}
+                    type="L"
+                  />
+                ),
+                colspan: 3,
+                classname: sortOwnedBy.column === 0 ? "sort" : "",
+              },
+              ...[
+                column1_owned,
+                column2_owned,
+                column3_owned,
+                column4_owned,
+              ].map((col, index) => {
+                const { text, trendColor, classname } = getLeaguesColumn(
                   col,
                   leagues[league_id]
                 );
@@ -154,14 +185,17 @@ const Owned = ({ league_ids }: OwnedProps) => {
                   text,
                   colspan: 1,
                   style: trendColor,
-                  classname: sortOwnedBy.column === index + 1 ? "sort" : "",
+                  classname:
+                    (sortOwnedBy.column === index + 1 ? "sort " : "") +
+                    classname,
                 };
-              }
+              }),
+            ],
+            secondary: leagues && (
+              <League league={leagues[league_id]} type={3} />
             ),
-          ],
-          secondary: leagues && <League league={leagues[league_id]} type={3} />,
-        };
-      })) ||
+          };
+        })) ||
     [];
 
   const setActive = (league_id: string) => {
@@ -176,6 +210,8 @@ const Owned = ({ league_ids }: OwnedProps) => {
       data={data}
       active={activeOwned}
       setActive={setActive}
+      page={page_owned}
+      setPage={(p) => dispatch(updateState({ key: "page_owned", value: p }))}
     />
   );
 };

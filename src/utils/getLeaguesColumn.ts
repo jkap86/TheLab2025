@@ -1,6 +1,7 @@
 import { Draftpick, League } from "@/lib/types/userTypes";
 import store, { RootState } from "@/redux/store";
 import { getTrendColor_Range } from "./getTrendColor";
+import { getDraftPickId } from "./getPickId";
 
 const getKtcAvgValue = (players: string[]) => {
   if (players.length === 0) return 0;
@@ -30,16 +31,8 @@ const getKtcTotValue = (players: string[], picks: Draftpick[]) => {
   );
 
   const picks_total = picks.reduce((acc, cur) => {
-    const id_exact = `${cur.season} ${cur.round}.${cur.order?.toLocaleString(
-      "en-US",
-      { minimumIntegerDigits: 2, maximumFractionDigits: 0 }
-    )}`;
-    const id_range = `${cur.season} ${
-      (cur.order &&
-        (cur.order <= 4 ? "Early" : cur.order > 8 ? "Late" : "Mid")) ||
-      "Mid"
-    }`;
-    return acc + (ktc_current?.[id_exact] || ktc_current?.[id_range] || 0);
+    const pick_id = getDraftPickId(cur);
+    return acc + (ktc_current?.[pick_id] || ktc_current?.[pick_id] || 0);
   }, 0);
 
   return players_total + picks_total;
@@ -55,29 +48,12 @@ export const leaguesColumnOptions = [
   { text: "Trade Deadline", abbrev: "Trade D" },
 ];
 
-export const getLeaguesColumnSortValue = (league: League) => {
-  const state: RootState = store.getState();
-
-  const { column1, column2, column3, column4, sortLeaguesBy } = state.leagues;
-
-  let sortbyCol;
-
-  switch (sortLeaguesBy.column) {
-    case 1:
-      sortbyCol = column1;
-      break;
-    case 2:
-      sortbyCol = column2;
-      break;
-    case 3:
-      sortbyCol = column3;
-      break;
-    case 4:
-      sortbyCol = column4;
-      break;
-    default:
-      break;
-  }
+export const getLeaguesColumnSortValue = (
+  league: League,
+  sortby: { column: number; asc: boolean },
+  columns: string[]
+) => {
+  let sortbyCol = columns[sortby.column - 1];
 
   let sortValue;
 
@@ -89,21 +65,66 @@ export const getLeaguesColumnSortValue = (league: League) => {
           .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
 
       break;
+    case "Pts Rk":
+      sortValue =
+        [...league.rosters]
+          .sort((a, b) => b.fp - a.fp)
+          .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
+
+      break;
+    case "KTC S Rk":
+      sortValue =
+        [...league.rosters]
+          .sort(
+            (a, b) =>
+              getKtcAvgValue(b.starters_optimal || []) -
+              getKtcAvgValue(a.starters_optimal || [])
+          )
+          .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
+
+      break;
+    case "KTC T Rk":
+      sortValue =
+        [...league.rosters]
+          .sort(
+            (a, b) =>
+              getKtcTotValue(b.players || [], b.draftpicks) -
+              getKtcTotValue(a.players || [], a.draftpicks)
+          )
+          .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
+
+      break;
+    case "KTC S Avg":
+      sortValue = -getKtcAvgValue(league.userRoster.starters_optimal || []);
+
+      break;
+    case "KTC Pk Rk":
+      sortValue =
+        [...league.rosters]
+          .sort(
+            (a, b) =>
+              getKtcTotValue([], b.draftpicks) -
+              getKtcTotValue([], a.draftpicks)
+          )
+          .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
+
+      break;
+
     case "Trade D":
       sortValue = league.settings.disable_trades
         ? 0
-        : league.settings.trade_deadline;
+        : -league.settings.trade_deadline;
       break;
 
     default:
-      if (sortLeaguesBy.asc) {
+      if (sortby.asc) {
         return league.name;
       } else {
         return league.index;
       }
   }
 
-  if (sortLeaguesBy.asc) sortValue *= -1;
+  if (sortby.asc) sortValue *= -1;
 
   return sortValue;
 };
