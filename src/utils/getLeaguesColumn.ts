@@ -53,7 +53,7 @@ export const getLeaguesColumnSortValue = (
   sortby: { column: number; asc: boolean },
   columns: string[]
 ) => {
-  let sortbyCol = columns[sortby.column - 1];
+  const sortbyCol = columns[sortby.column - 1];
 
   let sortValue;
 
