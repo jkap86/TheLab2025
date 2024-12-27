@@ -248,5 +248,5 @@ export const useFetchLive = () => {
 
       return () => clearTimeout(timeout);
     }
-  }, [live_stats]);
+  }, [live_stats, fetchLive]);
 };
