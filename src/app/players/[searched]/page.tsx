@@ -68,7 +68,7 @@ const Players = ({ params }: PlayersProps) => {
       }
     };
     fetchKTCPrev();
-  }, [trendDate]);
+  }, [trendDate, dispatch]);
 
   const headers_sort = [0, 1, 2, 3, 4].map((key, index) => {
     const colnum = key as 0 | 1 | 2 | 3 | 4;
