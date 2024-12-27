@@ -41,31 +41,34 @@ const Players = ({ params }: PlayersProps) => {
     trendDate,
   } = useSelector((state: RootState) => state.players);
 
-  const fetchKTCPrev = async () => {
-    if (trendDate && ktc_previous.date !== trendDate) {
-      const ms = new Date().getTime() - new Date(trendDate).getTime();
+  useEffect(() => {
+    const fetchKTCPrev = async () => {
+      if (trendDate && ktc_previous.date !== trendDate) {
+        const ms = new Date().getTime() - new Date(trendDate).getTime();
 
-      const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+        const days = Math.floor(ms / (1000 * 60 * 60 * 24));
 
-      const ktc_previous_raw = await axios.get("/api/ktc", {
-        params: {
-          days: days.toString(),
-        },
-      });
-
-      const obj = Object.fromEntries(ktc_previous_raw.data.values);
-
-      dispatch(
-        updateState({
-          key: "ktc_previous",
-          value: {
-            date: ktc_previous_raw.data.date,
-            values: obj,
+        const ktc_previous_raw = await axios.get("/api/ktc", {
+          params: {
+            days: days.toString(),
           },
-        })
-      );
-    }
-  };
+        });
+
+        const obj = Object.fromEntries(ktc_previous_raw.data.values);
+
+        dispatch(
+          updateState({
+            key: "ktc_previous",
+            value: {
+              date: ktc_previous_raw.data.date,
+              values: obj,
+            },
+          })
+        );
+      }
+    };
+    fetchKTCPrev();
+  }, [trendDate]);
 
   const headers_sort = [0, 1, 2, 3, 4].map((key, index) => {
     const colnum = key as 0 | 1 | 2 | 3 | 4;
