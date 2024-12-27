@@ -223,7 +223,7 @@ export const useFetchLive = () => {
 
       dispatch(updateState({ key: "live_stats", value: leagues_live_obj }));
     }
-  }, [state, projections_week, matchups, leagues]);
+  }, [state, projections_week, matchups, leagues, dispatch]);
 
   useEffect(() => {
     if (!initialRenderRef.current || !live_stats) {
