@@ -1,9 +1,6 @@
 import store, { RootState } from "@/redux/store";
 import { Roster } from "@/lib/types/userTypes";
-import {
-  getTrendColor_Percentage,
-  getTrendColor_Range,
-} from "@/utils/getTrendColor";
+import { getTrendColor_Range } from "@/utils/getTrendColor";
 import { getPositionMaxAge } from "@/utils/getPositionMaxAge";
 
 export const standingsColumnOptions = [
