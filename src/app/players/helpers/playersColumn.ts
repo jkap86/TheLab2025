@@ -17,7 +17,7 @@ export const columnOptions = [
 export const getPlayersSortValue = (player_id: string) => {
   const state: RootState = store.getState();
 
-  const { allplayers, ktc_current } = state.common;
+  const { allplayers, ktc_current, ktc_previous } = state.common;
   const { playershares, leagues } = state.user;
   const { column1, column2, column3, column4, sortPlayersBy } = state.players;
 
@@ -55,6 +55,13 @@ export const getPlayersSortValue = (player_id: string) => {
       break;
     case "KTC":
       sort = ktc_current?.[player_id] || 0;
+      break;
+    case "KTC T":
+      sort =
+        (ktc_previous.date &&
+          (ktc_current?.[player_id] || 0) -
+            (ktc_previous.values?.[player_id] || 0)) ||
+        0;
       break;
     case "Age":
       sort = allplayers?.[player_id].age || 999;

@@ -44,6 +44,10 @@ h5 {
   text-align: center;
 }
 
+h1 {
+  font-size: 2rem;
+}
+
 img {
   border-radius: 50%;
 }
@@ -80,5 +84,9 @@ div.nav-buttons button.active {
 
 input[type="date"] {
   font-size: 3rem;
-  color: black;
+  text-align: center;
+  background-color: lightslategray;
+  color: gold;
+  font-weight: 900;
+  letter-spacing: 0.25rem;
 }

@@ -199,17 +199,21 @@ const Players = ({ params }: PlayersProps) => {
 
   const component = (
     <>
-      <h1>
-        <input
-          type="date"
-          value={trendDate}
-          onChange={(e) =>
-            dispatch(
-              updatePlayersState({ key: "trendDate", value: e.target.value })
-            )
-          }
-        />
-      </h1>
+      {[column1, column2, column3, column4].includes("KTC T") && (
+        <h1>
+          {trendDate === "" && "Select Date for Historical Values/Trends"}
+          <br />
+          <input
+            type="date"
+            value={trendDate}
+            onChange={(e) =>
+              dispatch(
+                updatePlayersState({ key: "trendDate", value: e.target.value })
+              )
+            }
+          />
+        </h1>
+      )}
       <TableMain
         type={1}
         headers_sort={headers_sort}

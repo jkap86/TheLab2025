@@ -6,8 +6,6 @@ export const getTrendColor_Range = (
 ) => {
   const median = (max - min) / 2 + min;
 
-  console.log({ median });
-
   if (!reverse && value > median) {
     const x = ((value - median) / (max - median)) * 255;
 
