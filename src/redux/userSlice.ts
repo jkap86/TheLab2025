@@ -70,6 +70,18 @@ export interface UserState {
     };
   } | null;
   live_stats_updatedat: number;
+  players_live_obj: {
+    [key: string]: {
+      opp: string;
+      player_id: string;
+      quarter_num: number;
+      team: string;
+      time_remaining: string;
+      percent_game_remaining: number;
+      proj_obj: { [cat: string]: number };
+      stats_obj: { [cat: string]: number };
+    };
+  };
 }
 
 const initialState: UserState = {
@@ -103,6 +115,7 @@ const initialState: UserState = {
 
   live_stats: null,
   live_stats_updatedat: 0,
+  players_live_obj: {},
 };
 
 const userSlice = createSlice({

@@ -173,10 +173,14 @@ const Starters = () => {
             classname: "",
           },
           ...[column1_s, column2_s, column3_s, column4_s].map((col, index) => {
-            const { text, trendColor, classname } = getStartersColumn(col, {
-              user: starters_obj.user[player_id],
-              opp: starters_obj.opp[player_id],
-            });
+            const { text, trendColor, classname } = getStartersColumn(
+              col,
+              player_id,
+              {
+                user: starters_obj.user[player_id],
+                opp: starters_obj.opp[player_id],
+              }
+            );
 
             return {
               text,

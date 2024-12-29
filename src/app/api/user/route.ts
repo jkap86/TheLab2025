@@ -26,7 +26,9 @@ export async function GET(req: NextRequest) {
       const insertQuery = `
         INSERT INTO users (user_id, username, avatar, type, createdat, updatedat) 
         VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING *;
+        ON CONFLICT (user_id) DO UPDATE SET
+          username = EXCLUDED.username,
+          avatar = EXCLUDED.avatar;
       `;
 
       const values = [

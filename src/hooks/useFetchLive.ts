@@ -226,6 +226,9 @@ export const useFetchLive = () => {
       });
 
       dispatch(updateState({ key: "live_stats", value: leagues_live_obj }));
+      dispatch(
+        updateState({ key: "players_live_obj", value: players_live_obj })
+      );
     }
   }, [state, projections_week, matchups, leagues, dispatch]);
 

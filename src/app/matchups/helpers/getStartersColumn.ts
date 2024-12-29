@@ -10,6 +10,7 @@ export const starterColumnOptions = [
   { text: "Bench P", abbrev: "Bench P" },
   { text: "Opp Start P", abbrev: "Opp Start P" },
   { text: "Opp Bench P", abbrev: "Opp Bench P" },
+  { text: "Ppr Fp", abbrev: "Ppr Fp" },
 ];
 
 export const getStartersSortValue = (
@@ -22,6 +23,7 @@ export const getStartersSortValue = (
   const state: RootState = store.getState();
 
   const { allplayers } = state.common;
+  const { players_live_obj } = state.user;
   const { sortStartersBy, column1_s, column2_s, column3_s, column4_s } =
     state.matchups;
 
@@ -71,6 +73,10 @@ export const getStartersSortValue = (
     case "Opp Bench P":
       sort = filterLeagueIds(player_obj.opp?.bench || [], true).length;
       break;
+    case "Ppr Fp":
+      sort = players_live_obj[player_id]?.stats_obj?.pts_ppr || 0;
+
+      break;
     default:
       return allplayers?.[player_id].full_name || "";
   }
@@ -81,11 +87,16 @@ export const getStartersSortValue = (
 
 export const getStartersColumn = (
   col: string,
+  player_id: string,
   player_obj: {
     user: { start: string[]; bench: string[] };
     opp: { start: string[]; bench: string[] };
   }
 ) => {
+  const state: RootState = store.getState();
+
+  const { players_live_obj } = state.user;
+
   let text, trendColor, classname;
 
   switch (col) {
@@ -138,6 +149,11 @@ export const getStartersColumn = (
         player_obj.opp?.bench || [],
         true
       ).length.toString();
+      trendColor = {};
+      classname = "";
+      break;
+    case "Ppr Fp":
+      text = (players_live_obj[player_id]?.stats_obj?.pts_ppr || 0).toString();
       trendColor = {};
       classname = "";
       break;
