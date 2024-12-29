@@ -1,21 +1,24 @@
 import store, { RootState } from "@/redux/store";
 
+export const getTotal = (
+  players_array: string[] | undefined,
+  players_points: { [key: string]: number } | undefined
+) => {
+  return (
+    players_array?.reduce(
+      (acc, cur) => acc + (players_points?.[cur] || 0),
+      0
+    ) || 0
+  );
+};
+
 export const getMatchupsColumn = (col: string, league_id: string) => {
   const state: RootState = store.getState();
 
   const { matchups } = state.user;
 
   const user_matchup = matchups?.[league_id].user;
-  const user_value_obj = user_matchup?.players_points;
-
-  const getTotal = (players_array: string[] | undefined) => {
-    return (
-      players_array?.reduce(
-        (acc, cur) => acc + (user_value_obj?.[cur] || 0),
-        0
-      ) || 0
-    );
-  };
+  const players_points = user_matchup?.players_points;
 
   const isOptimal = !(
     user_matchup?.starters?.some(
@@ -26,7 +29,8 @@ export const getMatchupsColumn = (col: string, league_id: string) => {
     )
   );
   const delta =
-    getTotal(user_matchup?.starters_optimal) - getTotal(user_matchup?.starters);
+    getTotal(user_matchup?.starters_optimal, players_points) -
+    getTotal(user_matchup?.starters, players_points);
 
   let text, trendColor, classname;
 

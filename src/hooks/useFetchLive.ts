@@ -57,6 +57,8 @@ export const useFetchLive = () => {
               pct_left: number;
             };
           };
+          starters_optimal_user?: string[];
+          starters_optimal_opp?: string[];
         };
       } = {};
 
@@ -218,6 +220,8 @@ export const useFetchLive = () => {
               ]
             )
           ),
+          starters_optimal_user: user_starters_proj,
+          starters_optimal_opp: opp_starters_proj,
         };
       });
 

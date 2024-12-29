@@ -11,7 +11,7 @@ export const useFetchMatchupsProjections = () => {
   const { state, projections_week } = useSelector(
     (state: RootState) => state.common
   );
-  const { leagues } = useSelector((state: RootState) => state.user);
+  const { leagues, matchups } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     if (!projections_week && state) {
@@ -30,8 +30,8 @@ export const useFetchMatchupsProjections = () => {
       };
 
       fetchProjWeek();
-    } else if (projections_week && state && leagues) {
+    } else if (projections_week && state && leagues && !matchups) {
       dispatch(fetchMatchups());
     }
-  }, [state, projections_week, leagues, dispatch]);
+  }, [state, projections_week, leagues, matchups, dispatch]);
 };

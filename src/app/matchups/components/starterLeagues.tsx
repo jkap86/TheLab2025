@@ -30,6 +30,10 @@ const StarterLeagues = ({
         return filterLeagueIds(player_obj.user.start, true);
       case "Opp Start P":
         return filterLeagueIds(player_obj.opp.start, true);
+      case "Bench P":
+        return filterLeagueIds(player_obj.user.bench, true);
+      case "Opp Bench P":
+        return filterLeagueIds(player_obj.opp.bench, true);
       default:
         return [];
     }

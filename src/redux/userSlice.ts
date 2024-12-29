@@ -65,8 +65,11 @@ export interface UserState {
           pct_left: number;
         };
       };
+      starters_optimal_user?: string[];
+      starters_optimal_opp?: string[];
     };
   } | null;
+  live_stats_updatedat: number;
 }
 
 const initialState: UserState = {
@@ -99,6 +102,7 @@ const initialState: UserState = {
   errorSyncingMatchup: null,
 
   live_stats: null,
+  live_stats_updatedat: 0,
 };
 
 const userSlice = createSlice({
