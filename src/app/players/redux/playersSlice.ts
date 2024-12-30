@@ -39,6 +39,18 @@ export interface PlayersState {
   };
   searchedTaken: string;
   activeTaken: string;
+
+  column1_available: string;
+  column2_available: string;
+  column3_available: string;
+  column4_available: string;
+  page_available: number;
+  sortAvailableBy: {
+    column: 0 | 1 | 2 | 3 | 4;
+    asc: boolean;
+  };
+  searchedAvailable: string;
+  activeAvailable: string;
 }
 
 const initialState: PlayersState = {
@@ -80,6 +92,18 @@ const initialState: PlayersState = {
   },
   searchedTaken: "",
   activeTaken: "",
+
+  column1_available: "Rk",
+  column2_available: "Pts Rk",
+  column3_available: "KTC S Rk",
+  column4_available: "KTC T Rk",
+  page_available: 1,
+  sortAvailableBy: {
+    column: 0,
+    asc: false,
+  },
+  searchedAvailable: "",
+  activeAvailable: "",
 };
 
 const playersSlice = createSlice({

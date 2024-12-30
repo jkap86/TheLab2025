@@ -115,13 +115,6 @@ const TableMain = ({
 
   return (
     <>
-      {filters1 && (
-        <span className="filters1">
-          {filters1.map((filter, index) => {
-            return <span key={index}>{filter}</span>;
-          })}
-        </span>
-      )}
       {search && (
         <div className="searches">
           {filters1 &&
@@ -146,14 +139,11 @@ const TableMain = ({
               />
             </div>
           }
+          {filters2 &&
+            filters2.map((filter, index) => {
+              return <span key={index}>{filter}</span>;
+            })}
         </div>
-      )}
-      {filters2 && (
-        <span>
-          {filters2.map((filter, index) => {
-            return <span key={index}>{filter}</span>;
-          })}
-        </span>
       )}
       {page && setPage && data.length > 25 && !search?.searched ? (
         <PageNumbers

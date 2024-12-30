@@ -18,14 +18,6 @@ pool.on("error", (err) => {
   console.log("Database pool error: " + err.message);
 });
 
-pool.on("acquire", () => {
-  console.log("A client has been acquired from the pool.");
-});
-
-pool.on("release", () => {
-  console.log("A client has been released from the pool.");
-});
-
 pool.on("remove", () => {
   console.log("A client has been removed from the pool.");
 });
