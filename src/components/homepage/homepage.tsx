@@ -13,7 +13,7 @@ const Homepage = () => {
   const [leagueId, setLeagueId] = useState("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (tab === "Picktracker") {
+    if (tab === "PICKTRACKER") {
       setLeagueId(e.target.value);
     } else {
       setUsername_searched(e.target.value);
@@ -58,8 +58,8 @@ const Homepage = () => {
           <div className="user-input">
             <input
               type="text"
-              value={tab === "Picktracker" ? leagueId : username_searched}
-              placeholder={tab === "Picktracker" ? "League ID" : "Username"}
+              value={tab === "PICKTRACKER" ? leagueId : username_searched}
+              placeholder={tab === "PICKTRACKER" ? "League ID" : "Username"}
               onChange={handleInputChange}
             />
             <button

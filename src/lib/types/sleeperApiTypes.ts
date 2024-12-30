@@ -87,3 +87,13 @@ export type SleeperWinnersBracket = {
   t1: number | null;
   t2: number | null;
 }[];
+
+export type SleeperDraftpickPicktracker = {
+  player_id: string;
+  picked_by: string;
+  metadata: {
+    first_name: string;
+    last_name: string;
+    position: string;
+  };
+};
