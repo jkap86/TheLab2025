@@ -12,8 +12,10 @@ const Homepage = () => {
   const [username_searched, setUsername_searched] = useState("");
   const [leagueId, setLeagueId] = useState("");
 
+  const leagueTabs = ["PICKTRACKER", "PLAYOFFS"];
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (tab === "PICKTRACKER") {
+    if (leagueTabs.includes(tab)) {
       setLeagueId(e.target.value);
     } else {
       setUsername_searched(e.target.value);
@@ -49,7 +51,7 @@ const Homepage = () => {
               "LEAGUEMATES",
               "TRADES",
               "MATCHUPS",
-              "PICKTRACKER",
+              ...leagueTabs,
             ].map((option) => {
               return <option key={option}>{option}</option>;
             })}
@@ -58,14 +60,20 @@ const Homepage = () => {
           <div className="user-input">
             <input
               type="text"
-              value={tab === "PICKTRACKER" ? leagueId : username_searched}
-              placeholder={tab === "PICKTRACKER" ? "League ID" : "Username"}
+              value={leagueTabs.includes(tab) ? leagueId : username_searched}
+              placeholder={leagueTabs.includes(tab) ? "League ID" : "Username"}
               onChange={handleInputChange}
             />
             <button
               type="button"
               onClick={() =>
-                router.push(`/${tab.toLowerCase()}/${username_searched.trim()}`)
+                router.push(
+                  `/${tab.toLowerCase()}/${
+                    leagueTabs.includes(tab)
+                      ? leagueId.trim()
+                      : username_searched.trim()
+                  }`
+                )
               }
             >
               Go

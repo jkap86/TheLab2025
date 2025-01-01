@@ -1,0 +1,14 @@
+.rounds-buttons {
+  width: 100vmin;
+  margin: 3rem auto;
+  display: flex;
+  justify-content: space-evenly;
+  font-size: 3rem;
+}
+
+.rounds-buttons > div {
+}
+
+.rounds-buttons > div.active {
+  background-color: var(--color3);
+}

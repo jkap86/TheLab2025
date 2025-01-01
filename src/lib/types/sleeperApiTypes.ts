@@ -97,3 +97,15 @@ export type SleeperDraftpickPicktracker = {
     position: string;
   };
 };
+
+export type SleeperScheduleGame = {
+  game_id: string;
+  metadata: {
+    quarter_num: number;
+    time_remaining: string;
+    home_team: string;
+    away_team: string;
+  };
+  start_time: number;
+  status: string;
+};

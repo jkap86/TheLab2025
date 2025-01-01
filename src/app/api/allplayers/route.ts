@@ -11,7 +11,7 @@ export async function GET() {
 
   const allplayers = allplayers_db.rows[0];
 
-  if (new Date().getTime() - allplayers.updatedat < 1000 * 60 * 60 * 24) {
+  if (new Date().getTime() - allplayers?.updatedat < 1000 * 60 * 60 * 24) {
     return NextResponse.json(
       { ...allplayers, updatedat: allplayers.updatedat },
       { status: 200 }

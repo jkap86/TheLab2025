@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     new Date().getTime() - livestats?.updatedat < 1000 * 60 * 15 &&
     livestats?.data?.week === week
   ) {
-    return NextResponse.json(livestats, { status: 200 });
+    return NextResponse.json(livestats.data.stats, { status: 200 });
   } else {
     try {
       const graphqlQuery = {
@@ -157,6 +157,19 @@ export async function GET(req: NextRequest) {
           team,
         };
       });
+
+      await pool.query(
+        `
+          INSERT INTO common (name, data, updatedat) 
+          VALUES ($1, $2, $3)
+          ON CONFLICT (name) 
+          DO UPDATE SET 
+            data = EXCLUDED.data,
+            updatedat = EXCLUDED.updatedat
+          RETURNING *;
+        `,
+        ["livestats", { week, stats: result, teams_obj }, new Date()]
+      );
 
       const response = NextResponse.json(result);
       response.headers.set(

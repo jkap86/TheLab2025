@@ -6,7 +6,6 @@ import {
   SleeperUser,
   SleeperDraftpickPicktracker,
 } from "@/lib/types/sleeperApiTypes";
-import { Allplayer } from "@/lib/types/commonTypes";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -71,6 +70,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json("no draft found", { status: 200 });
     }
   } catch (err) {
-    return NextResponse.json("ERROR", { status: 200 });
+    return NextResponse.json(err, { status: 200 });
   }
 }
