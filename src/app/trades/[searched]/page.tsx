@@ -57,23 +57,23 @@ const Trades = ({ params }: TradesProps) => {
             <LoadingIcon message={"Loading Trades"} />
           ) : (
             <>
-              <div className="trade-nav-buttons">
-                <div
+              <div className="nav-buttons">
+                <button
                   className={tab === "Lm" ? "active" : ""}
                   onClick={() =>
                     dispatch(updateTradesState({ key: "tab", value: "Lm" }))
                   }
                 >
                   Leaguemate
-                </div>
-                <div
+                </button>
+                <button
                   className={tab === "Pc" ? "active" : ""}
                   onClick={() =>
                     dispatch(updateTradesState({ key: "tab", value: "Pc" }))
                   }
                 >
                   Price Check
-                </div>
+                </button>
               </div>
               {tab === "Lm" ? <LmTrades /> : tab === "Pc" ? <PcTrades /> : null}
             </>

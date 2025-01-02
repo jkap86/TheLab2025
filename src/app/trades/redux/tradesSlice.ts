@@ -5,6 +5,8 @@ export interface TradesState {
 
   page_lm: number;
   activeTrade_lm: string;
+  searched_manager_lm: string;
+  searched_player_lm: string;
 
   page_pc: number;
   activeTrade_pc: string;
@@ -17,6 +19,8 @@ const initialState: TradesState = {
 
   page_lm: 1,
   activeTrade_lm: "",
+  searched_manager_lm: "",
+  searched_player_lm: "",
 
   page_pc: 1,
   activeTrade_pc: "",

@@ -172,17 +172,22 @@ const Leagues = ({ params }: LeaguesProps) => {
   };
 
   const component = (
-    <TableMain
-      type={1}
-      headers_sort={headers_sort}
-      headers={headers}
-      data={data}
-      page={page}
-      setPage={setPage}
-      active={activeLeague}
-      setActive={setActive}
-      search={search}
-    />
+    <>
+      {leagues && (
+        <h1>{filterLeagueIds(Object.keys(leagues || {})).length} Leagues</h1>
+      )}
+      <TableMain
+        type={1}
+        headers_sort={headers_sort}
+        headers={headers}
+        data={data}
+        page={page}
+        setPage={setPage}
+        active={activeLeague}
+        setActive={setActive}
+        search={search}
+      />
+    </>
   );
 
   return <LoadCommonData searched={searched} component={component} />;

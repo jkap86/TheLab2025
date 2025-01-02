@@ -34,6 +34,12 @@ export interface UserState {
     count: number;
     trades: Trade[] | null;
   };
+  lmTradeSearches: {
+    manager: string | undefined;
+    player: string | undefined;
+    count: number;
+    trades: Trade[];
+  }[];
   errorLmTrades: string | null;
 
   isLoadingMatchups: boolean;
@@ -105,6 +111,7 @@ const initialState: UserState = {
     count: 0,
     trades: null,
   },
+  lmTradeSearches: [],
   errorLmTrades: null,
 
   isLoadingMatchups: false,

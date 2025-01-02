@@ -88,8 +88,8 @@ export const getLeaguesColumnSortValue = (
         [...league.rosters]
           .sort(
             (a, b) =>
-              getKtcTotValue(b.players || [], b.draftpicks) -
-              getKtcTotValue(a.players || [], a.draftpicks)
+              getKtcTotValue(b.players || [], b.draftpicks || []) -
+              getKtcTotValue(a.players || [], a.draftpicks || [])
           )
           .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
 
@@ -103,8 +103,8 @@ export const getLeaguesColumnSortValue = (
         [...league.rosters]
           .sort(
             (a, b) =>
-              getKtcTotValue([], b.draftpicks) -
-              getKtcTotValue([], a.draftpicks)
+              getKtcTotValue([], b.draftpicks || []) -
+              getKtcTotValue([], a.draftpicks || [])
           )
           .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
 
@@ -197,8 +197,8 @@ export const getLeaguesColumn = (col: string, league: League) => {
         [...league.rosters]
           .sort(
             (a, b) =>
-              getKtcTotValue(b.players || [], b.draftpicks) -
-              getKtcTotValue(a.players || [], a.draftpicks)
+              getKtcTotValue(b.players || [], b.draftpicks || []) -
+              getKtcTotValue(a.players || [], a.draftpicks || [])
           )
           .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
 
@@ -225,8 +225,8 @@ export const getLeaguesColumn = (col: string, league: League) => {
         [...league.rosters]
           .sort(
             (a, b) =>
-              getKtcTotValue([], b.draftpicks) -
-              getKtcTotValue([], a.draftpicks)
+              getKtcTotValue([], b.draftpicks || []) -
+              getKtcTotValue([], a.draftpicks || [])
           )
           .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
 
