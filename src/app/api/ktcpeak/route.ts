@@ -28,7 +28,11 @@ export async function GET(req: NextRequest) {
     let max_value = 0;
 
     let min_date = trendDate;
-    let min_value = 0;
+    let min_value = Object.entries(ktc_players[player_id].values)
+      .filter(([d]) => new Date(d) >= new Date(trendDate))
+      .sort(
+        (a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime()
+      )[0][1];
 
     Object.entries(ktc_players[player_id].values)
       .filter(([d]) => new Date(d) >= new Date(trendDate))
