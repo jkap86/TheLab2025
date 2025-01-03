@@ -29,6 +29,7 @@ export const syncLeague = createAsyncThunk(
       params: {
         league_id,
         roster_id,
+        season,
         week,
       },
     });

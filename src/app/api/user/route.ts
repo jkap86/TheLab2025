@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
         new Date(),
       ];
 
-      const result = await pool.query(insertQuery, values);
+      await pool.query(insertQuery, values);
 
       return NextResponse.json(
         { user_id, username: display_name, avatar },
