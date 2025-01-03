@@ -5,7 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateLeaguematesState } from "../../redux/leaguematesSlice";
 import ColumnDropdown from "@/components/columnDropdown/columnDropdown";
 import Avatar from "@/components/avatar/avatar";
-import { getLeaguesColumn } from "@/utils/getLeaguesColumn";
+import {
+  getLeaguesColumn,
+  leaguesColumnOptions,
+} from "@/utils/getLeaguesColumn";
 import League from "@/components/league/league";
 
 type LeaguemateLeaguesProps = {
@@ -54,10 +57,10 @@ const LeaguemateLeagues = ({ league_ids }: LeaguemateLeaguesProps) => {
       classname: sortLeaguemateLeaguesBy.column === 0 ? "sort" : "",
     },
     ...[
-      { var: column1_lmLeagues, key: "column1_owned" },
-      { var: column2_lmLeagues, key: "column2_owned" },
-      { var: column3_lmLeagues, key: "column3_owned" },
-      { var: column4_lmLeagues, key: "column4_owned" },
+      { var: column1_lmLeagues, key: "column1_lmLeagues" },
+      { var: column2_lmLeagues, key: "column2_lmLeagues" },
+      { var: column3_lmLeagues, key: "column3_lmLeagues" },
+      { var: column4_lmLeagues, key: "column4_lmLeagues" },
     ].map((col, index) => {
       return {
         text: (
@@ -75,7 +78,7 @@ const LeaguemateLeagues = ({ league_ids }: LeaguemateLeaguesProps) => {
                 })
               )
             }
-            options={[]}
+            options={leaguesColumnOptions}
           />
         ),
         colspan: 1,
@@ -107,7 +110,7 @@ const LeaguemateLeagues = ({ league_ids }: LeaguemateLeaguesProps) => {
               column3_lmLeagues,
               column4_lmLeagues,
             ].map((col, index) => {
-              const { text, trendColor } = getLeaguesColumn(
+              const { text, trendColor, classname } = getLeaguesColumn(
                 col,
                 leagues[league_id]
               );
@@ -116,7 +119,9 @@ const LeaguemateLeagues = ({ league_ids }: LeaguemateLeaguesProps) => {
                 colspan: 1,
                 style: trendColor,
                 classname:
-                  sortLeaguemateLeaguesBy.column === index + 1 ? "sort" : "",
+                  sortLeaguemateLeaguesBy.column === index + 1
+                    ? "sort " + classname
+                    : classname,
               };
             }),
           ],

@@ -136,6 +136,11 @@ td.content.slot {
   font-size: 80%;
 }
 
+td.content.date {
+  font-family: var(--fontScore);
+  font-size: 90%;
+}
+
 table.one td.content {
   background-image: radial-gradient(var(--color3) -300%, var(--color4) 100%);
 }

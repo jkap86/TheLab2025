@@ -8,7 +8,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateLeaguematesState } from "../redux/leaguematesSlice";
 import ColumnDropdown from "@/components/columnDropdown/columnDropdown";
 import Avatar from "@/components/avatar/avatar";
-import { getLeaguematesColumn } from "../helpers/leaguematesColumns";
+import {
+  getLeaguematesColumn,
+  getLeaguematesSortby,
+  leaguematesColumnOptions,
+} from "../helpers/leaguematesColumns";
 import LeaguemateLeagues from "../components/leaguemateLeagues/leaguemateLeagues";
 import LoadCommonData from "@/components/loadCommonData/loadCommonData";
 
@@ -77,7 +81,7 @@ const Leaguemates = ({ params }: LeaguematesProps) => {
                 })
               )
             }
-            options={[]}
+            options={leaguematesColumnOptions}
           />
         ),
         colspan: 1,
@@ -86,33 +90,50 @@ const Leaguemates = ({ params }: LeaguematesProps) => {
     }),
   ];
 
-  const data = Object.values(leaguemates).map((lm) => {
-    return {
-      id: lm.user_id,
-      search: {
-        text: lm.username,
-        display: <Avatar id={lm.avatar} text={lm.username} type="U" />,
-      },
-      columns: [
-        {
-          text: <Avatar id={lm.avatar} text={lm.username} type="U" />,
-          colspan: 3,
-          classname: sortLeaguematesBy.column === 0 ? "sort" : "",
+  const data = Object.values(leaguemates)
+    .map((lm) => {
+      return {
+        id: lm.user_id,
+        sortby: getLeaguematesSortby(lm),
+        search: {
+          text: lm.username,
+          display: <Avatar id={lm.avatar} text={lm.username} type="U" />,
         },
-        ...[column1, column2, column3, column4].map((col, index) => {
-          const { text, trendColor } = getLeaguematesColumn(col, lm);
+        columns: [
+          {
+            text: <Avatar id={lm.avatar} text={lm.username} type="U" />,
+            colspan: 3,
+            classname: sortLeaguematesBy.column === 0 ? "sort" : "",
+          },
+          ...[column1, column2, column3, column4].map((col, index) => {
+            const { text, trendColor, classname } = getLeaguematesColumn(
+              col,
+              lm
+            );
 
-          return {
-            text,
-            colspan: 1,
-            style: trendColor,
-            classname: sortLeaguematesBy.column === index + 1 ? "sort" : "",
-          };
-        }),
-      ],
-      secondary: <LeaguemateLeagues league_ids={lm.leagues} />,
-    };
-  });
+            return {
+              text,
+              colspan: 1,
+              style: trendColor,
+              classname:
+                sortLeaguematesBy.column === index + 1
+                  ? "sort " + classname
+                  : classname,
+            };
+          }),
+        ],
+        secondary: <LeaguemateLeagues league_ids={lm.leagues} />,
+      };
+    })
+    .sort((a, b) =>
+      sortLeaguematesBy.asc
+        ? a.sortby > b.sortby
+          ? 1
+          : -1
+        : a.sortby < b.sortby
+        ? 1
+        : -1
+    );
 
   const setPage = (pageNum: number) =>
     dispatch(updateLeaguematesState({ key: "page", value: pageNum }));

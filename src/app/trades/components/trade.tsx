@@ -3,6 +3,8 @@ import { Trade as TradeType } from "@/lib/types/userTypes";
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
 import TradeDetail from "./tradeDetail";
+import { getTrendColor_Range } from "@/utils/getTrendColor";
+import { getDraftPickId } from "@/utils/getPickId";
 
 type setActiveTrade = (transaction_id: string) => void;
 
@@ -13,7 +15,9 @@ interface TradeProps {
 }
 
 const Trade = ({ trade, activeTrade, setActiveTrade }: TradeProps) => {
-  const { allplayers } = useSelector((state: RootState) => state.common);
+  const { allplayers, ktc_current } = useSelector(
+    (state: RootState) => state.common
+  );
 
   return (
     <table
@@ -127,7 +131,16 @@ const Trade = ({ trade, activeTrade, setActiveTrade }: TradeProps) => {
                                 {allplayers && allplayers[add]?.full_name}
                               </div>
                             </td>
-                            <td></td>
+                            <td
+                              className="content ktc"
+                              style={getTrendColor_Range(
+                                ktc_current?.[add] || 0,
+                                1000,
+                                8000
+                              )}
+                            >
+                              {ktc_current?.[add] || "0"}
+                            </td>
                           </tr>
                         );
                       })}
@@ -148,7 +161,16 @@ const Trade = ({ trade, activeTrade, setActiveTrade }: TradeProps) => {
                                   })}`
                                 : `${dp.season} Round ${dp.round}`}
                             </td>
-                            <td></td>
+                            <td
+                              className="content ktc"
+                              style={getTrendColor_Range(
+                                ktc_current?.[getDraftPickId(dp)] || 0,
+                                1000,
+                                8000
+                              )}
+                            >
+                              {ktc_current?.[getDraftPickId(dp)] || 0}
+                            </td>
                           </tr>
                         );
                       })}

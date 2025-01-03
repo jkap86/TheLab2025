@@ -1,7 +1,10 @@
-import { Draftpick } from "@/lib/types/userTypes";
 import store, { RootState } from "@/redux/store";
 
-export const getDraftPickId = (pick: Draftpick) => {
+export const getDraftPickId = (pick: {
+  season: number | string;
+  round: number;
+  order?: number | null;
+}) => {
   const state: RootState = store.getState();
 
   const { ktc_current } = state.common;

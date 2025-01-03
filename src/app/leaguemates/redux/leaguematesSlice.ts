@@ -32,8 +32,8 @@ const initialState: LeaguematesState = {
   column4: "KTC Picks",
   page: 1,
   sortLeaguematesBy: {
-    column: 0,
-    asc: true,
+    column: 1,
+    asc: false,
   },
   searchedLeaguemate: "",
   activeLeaguemate: "",

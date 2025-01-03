@@ -11,13 +11,16 @@ export const columnOptions = [
   { text: "Age", abbrev: "Age" },
   { text: "KTC Dynasty Value", abbrev: "KTC" },
   { text: "KTC Trend", abbrev: "KTC T" },
-  { text: "KTC Season Trend", abbrev: "KTC Szn" },
+  { text: "KTC Peak", abbrev: "KTC P" },
+  { text: "KTC Peak Date", abbrev: "KTC PD" },
+  { text: "KTC Low", abbrev: "KTC L" },
+  { text: "KTC Low Date", abbrev: "KTC LD" },
 ];
 
-export const getPlayersSortValue = (player_id: string) => {
+export const getPlayersSortValue = (player_id: string, trendDate: string) => {
   const state: RootState = store.getState();
 
-  const { allplayers, ktc_current, ktc_previous } = state.common;
+  const { allplayers, ktc_current, ktc_previous, ktc_peak } = state.common;
   const { playershares, leagues } = state.user;
   const { column1, column2, column3, column4, sortPlayersBy } = state.players;
 
@@ -63,6 +66,30 @@ export const getPlayersSortValue = (player_id: string) => {
             (ktc_previous.values?.[player_id] || 0)) ||
         0;
       break;
+    case "KTC P":
+      sort =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.max_values[player_id]?.value) ||
+        0;
+      break;
+    case "KTC PD":
+      sort =
+        (ktc_peak.date === trendDate &&
+          new Date(ktc_peak.max_values[player_id]?.date)) ||
+        0;
+      break;
+    case "KTC L":
+      sort =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.min_values[player_id]?.value) ||
+        0;
+      break;
+    case "KTC LD":
+      sort =
+        (ktc_peak.date === trendDate &&
+          new Date(ktc_peak.min_values[player_id]?.date)) ||
+        0;
+      break;
     case "Age":
       sort = allplayers?.[player_id].age || 999;
       break;
@@ -73,10 +100,14 @@ export const getPlayersSortValue = (player_id: string) => {
   return sort;
 };
 
-export const getPlayersColumn = (col: string, player_id: string) => {
+export const getPlayersColumn = (
+  col: string,
+  player_id: string,
+  trendDate: string
+) => {
   const state: RootState = store.getState();
 
-  const { ktc_current, ktc_previous, allplayers } = state.common;
+  const { ktc_current, ktc_previous, allplayers, ktc_peak } = state.common;
   const { playershares, leagues } = state.user;
 
   const owned = filterLeagueIds(playershares[player_id].owned);
@@ -126,7 +157,7 @@ export const getPlayersColumn = (col: string, player_id: string) => {
       break;
     case "KTC T":
       text =
-        (ktc_previous.date &&
+        (ktc_previous.date === trendDate &&
           (ktc_current?.[player_id] || 0) -
             (ktc_previous.values?.[player_id] || 0)) ||
         "-";
@@ -135,6 +166,46 @@ export const getPlayersColumn = (col: string, player_id: string) => {
         {};
       text = text.toString();
       classname = "ktc";
+      break;
+    case "KTC P":
+      text =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.max_values[player_id]?.value?.toString()) ||
+        "-";
+      trendColor = getTrendColor_Range(parseInt(text) || 0, 1000, 8000);
+      classname = "ktc";
+      break;
+    case "KTC PD":
+      text =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.max_values[player_id] &&
+          new Date(ktc_peak.max_values[player_id]?.date).toLocaleDateString(
+            "en-US",
+            { year: "2-digit", month: "numeric", day: "numeric" }
+          )) ||
+        "-";
+      trendColor = {};
+      classname = "date";
+      break;
+    case "KTC L":
+      text =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.min_values[player_id]?.value?.toString()) ||
+        "-";
+      trendColor = getTrendColor_Range(parseInt(text) || 0, 1000, 8000);
+      classname = "ktc";
+      break;
+    case "KTC LD":
+      text =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.min_values[player_id] &&
+          new Date(ktc_peak.min_values[player_id]?.date).toLocaleDateString(
+            "en-US",
+            { year: "2-digit", month: "numeric", day: "numeric" }
+          )) ||
+        "-";
+      trendColor = {};
+      classname = "date";
       break;
     default:
       text = "-";

@@ -19,21 +19,39 @@ export async function GET(req: NextRequest) {
     [player_id: string]: { date: string; value: number };
   } = {};
 
+  const min_values_obj: {
+    [player_id: string]: { date: string; value: number };
+  } = {};
+
   Object.keys(ktc_players).forEach((player_id) => {
-    let date = trendDate;
-    let value = 0;
+    let max_date = trendDate;
+    let max_value = 0;
+
+    let min_date = trendDate;
+    let min_value = 0;
+
     Object.entries(ktc_players[player_id].values)
-      .filter(([d, v]) => new Date(d) >= new Date(trendDate) && v > value)
+      .filter(([d]) => new Date(d) >= new Date(trendDate))
       .forEach(([d, v]: [string, number]) => {
-        if (v >= value) {
-          value = v;
-          date = d;
+        if (v >= max_value) {
+          max_value = v;
+          max_date = d;
+        }
+
+        if (v <= min_value) {
+          min_value = v;
+          min_date = d;
         }
       });
 
     max_values_obj[player_id] = {
-      date,
-      value,
+      date: max_date,
+      value: max_value,
+    };
+
+    min_values_obj[player_id] = {
+      date: min_date,
+      value: min_value,
     };
   });
 
@@ -41,6 +59,7 @@ export async function GET(req: NextRequest) {
     {
       date: trendDate,
       max_values_obj,
+      min_values_obj,
     },
     { status: 200 }
   );
