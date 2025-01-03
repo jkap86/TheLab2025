@@ -21,6 +21,7 @@ import axiosInstance from "@/lib/api/axiosInstance";
 
 export const updateLeagues = async (
   leaguesToUpdate: SleeperLeague[],
+  season: string | null,
   week: string | null,
   pool: Pool,
   league_ids_db: string[]
@@ -50,14 +51,21 @@ export const updateLeagues = async (
             `https://api.sleeper.app/v1/league/${leagueToUpdate.league_id}/users`
           );
 
-          if (week && parseInt(week) <= 18) {
+          if (
+            week &&
+            parseInt(week) <= 18 &&
+            league.data.status === "in_season"
+          ) {
             const matchups = await axiosInstance.get(
               `https://api.sleeper.app/v1/league/${leagueToUpdate.league_id}/matchups/${week}`
             );
 
             let playoffs_alive: number[];
 
-            if (league.data.settings.playoff_week_start <= parseInt(week)) {
+            if (
+              league.data.settings.playoff_week_start <= parseInt(week) &&
+              league.data.season === season
+            ) {
               const winners_bracket: {
                 data: SleeperWinnersBracket;
               } = await axiosInstance.get(
@@ -78,19 +86,18 @@ export const updateLeagues = async (
               );
             }
 
-            if (league.data.settings)
-              matchups.data.forEach((matchup: SleeperMatchup) => {
-                matchupsBatch.push({
-                  week: parseInt(week),
-                  league_id: league.data.league_id,
-                  matchup_id: matchup.matchup_id,
-                  roster_id: matchup.roster_id,
-                  players: matchup.players,
-                  starters: matchup.starters,
-                  updatedat: new Date(),
-                  playoffs_alive: playoffs_alive,
-                });
+            matchups.data.forEach((matchup: SleeperMatchup) => {
+              matchupsBatch.push({
+                week: parseInt(week),
+                league_id: league.data.league_id,
+                matchup_id: matchup.matchup_id,
+                roster_id: matchup.roster_id,
+                players: matchup.players,
+                starters: matchup.starters,
+                updatedat: new Date(),
+                playoffs_alive: playoffs_alive,
               });
+            });
           }
 
           let upcoming_draft: SleeperDraft | undefined = undefined;
@@ -149,7 +156,7 @@ export const updateLeagues = async (
           if (week) {
             const trades_current = await getTrades(
               leagueToUpdate,
-              week,
+              season === league.data.season ? week : "1",
               rosters_w_username,
               upcoming_draft
             );
@@ -157,7 +164,8 @@ export const updateLeagues = async (
             tradesBatch.push(...trades_current);
 
             if (!league_ids_db.includes(leagueToUpdate.league_id)) {
-              let prev_week = parseInt(week) - 1;
+              let prev_week =
+                season === league.data.season ? parseInt(week) - 1 : 0;
 
               while (prev_week > 0) {
                 const matchups_prev = await axiosInstance.get(

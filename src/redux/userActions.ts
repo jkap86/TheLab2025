@@ -11,10 +11,12 @@ export const syncLeague = createAsyncThunk(
     {
       league_id,
       roster_id,
+      season,
       week,
     }: {
       league_id: string;
       roster_id: number;
+      season: string;
       week: number;
     },
     { getState }

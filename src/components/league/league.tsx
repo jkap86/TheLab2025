@@ -56,6 +56,7 @@ const League = ({ league, type }: LeagueProps) => {
       syncLeague({
         league_id: league.league_id,
         roster_id: league.userRoster.roster_id,
+        season: stateState?.season as string,
         week: stateState?.week as number,
       })
     );

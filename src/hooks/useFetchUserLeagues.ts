@@ -56,7 +56,7 @@ export const useFetchUserAndLeagues = (searched: string | null) => {
 
         try {
           const response = await fetch(
-            `/api/leagues?user_id=${user.user_id}&week=${state?.week}`
+            `/api/leagues?user_id=${user.user_id}&week=${state?.week}&season=${state.season}`
           );
 
           const reader = response.body?.getReader();

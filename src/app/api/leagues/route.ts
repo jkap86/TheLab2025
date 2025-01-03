@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
 
   const user_id = searchParams.get("user_id");
   const week = searchParams.get("week");
+  const season = searchParams.get("season");
 
   try {
     const leagues = await axiosInstance.get(
@@ -44,6 +45,7 @@ export async function GET(req: NextRequest) {
 
       const updatedLeagues = await updateLeagues(
         leaguesToUpdate,
+        season,
         week,
         pool,
         result.rows.map((r) => r.league_id)

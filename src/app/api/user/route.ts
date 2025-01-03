@@ -42,7 +42,10 @@ export async function GET(req: NextRequest) {
 
       const result = await pool.query(insertQuery, values);
 
-      return NextResponse.json(result.rows[0], { status: 200 });
+      return NextResponse.json(
+        { user_id, username: display_name, avatar },
+        { status: 200 }
+      );
     } else {
       return NextResponse.json(result.rows[0], { status: 200 });
     }
