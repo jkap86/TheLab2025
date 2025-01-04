@@ -6,9 +6,14 @@ export interface CommonState {
   state: { [key: string]: string | number } | null;
   allplayers: { [player_id: string]: Allplayer } | null;
   ktc_current: { [player_id: string]: number } | null;
-  ktc_previous: { date: string; values: { [player_id: string]: number } };
+  ktc_trend: {
+    date1: string;
+    date2: string;
+    values: { [player_id: string]: number };
+  };
   ktc_peak: {
-    date: string;
+    date1: string;
+    date2: string;
     min_values: { [player_id: string]: { date: string; value: number } };
     max_values: { [player_id: string]: { date: string; value: number } };
   };
@@ -22,8 +27,8 @@ const initialState: CommonState = {
   state: null,
   allplayers: null,
   ktc_current: null,
-  ktc_previous: { date: "", values: {} },
-  ktc_peak: { date: "", max_values: {}, min_values: {} },
+  ktc_trend: { date1: "", date2: "", values: {} },
+  ktc_peak: { date1: "", date2: "", max_values: {}, min_values: {} },
   projections_week: null,
 
   type1: "All",

@@ -2,7 +2,7 @@
 
 import TableMain from "@/components/tableMain/tableMain";
 import { AppDispatch, RootState } from "@/redux/store";
-import { use, useEffect } from "react";
+import { use, useCallback, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateState as updatePlayersState } from "../redux/playersSlice";
 import { updateState } from "@/redux/commonSlice";
@@ -17,6 +17,7 @@ import Avatar from "@/components/avatar/avatar";
 import PlayerLeagues from "../components/playerLeagues/playerLeagues";
 import LoadCommonData from "@/components/loadCommonData/loadCommonData";
 import axios from "axios";
+import "../players.css";
 
 interface PlayersProps {
   params: Promise<{ searched: string }>;
@@ -25,7 +26,7 @@ interface PlayersProps {
 const Players = ({ params }: PlayersProps) => {
   const dispatch: AppDispatch = useDispatch();
   const { searched } = use(params);
-  const { allplayers, ktc_previous, ktc_peak } = useSelector(
+  const { allplayers, ktc_trend, ktc_peak } = useSelector(
     (state: RootState) => state.common
   );
   const { playershares } = useSelector((state: RootState) => state.user);
@@ -38,70 +39,85 @@ const Players = ({ params }: PlayersProps) => {
     sortPlayersBy,
     activePlayer,
     searchedPlayer,
-    trendDate,
+    trendDate1,
+    trendDate2,
   } = useSelector((state: RootState) => state.players);
 
+  const fetchKTCPrev = useCallback(async () => {
+    if (
+      trendDate1 &&
+      trendDate2 &&
+      !(ktc_trend.date1 === trendDate1 && ktc_trend.date2 === trendDate2) &&
+      [column1, column2, column3, column4].includes("KTC T")
+    ) {
+      const ktc_previous_raw = await axios.get("/api/ktctrend", {
+        params: {
+          trendDate1,
+          trendDate2,
+        },
+      });
+
+      dispatch(
+        updateState({
+          key: "ktc_trend",
+          value: ktc_previous_raw.data,
+        })
+      );
+    }
+  }, [
+    trendDate1,
+    trendDate2,
+    ktc_trend,
+    column1,
+    column2,
+    column3,
+    column4,
+    dispatch,
+  ]);
+
+  const fetchKTCPeak = useCallback(async () => {
+    if (
+      trendDate1 &&
+      trendDate2 &&
+      !(ktc_peak.date1 === trendDate1 && ktc_peak.date2 === trendDate2) &&
+      [column1, column2, column3, column4].some((col) =>
+        ["KTC P", "KTC PD", "KTC L", "KTC LD"].includes(col)
+      )
+    ) {
+      const ktc_peak_raw = await axios.get("/api/ktcpeak", {
+        params: {
+          trendDate1,
+          trendDate2,
+        },
+      });
+
+      console.log({ ktc_peak_raw });
+
+      dispatch(
+        updateState({
+          key: "ktc_peak",
+          value: ktc_peak_raw.data,
+        })
+      );
+    }
+  }, [
+    trendDate1,
+    trendDate2,
+    ktc_peak,
+    column1,
+    column2,
+    column3,
+    column4,
+    dispatch,
+  ]);
+
   useEffect(() => {
-    const fetchKTCPrev = async () => {
-      if (
-        trendDate &&
-        ktc_previous.date !== trendDate &&
-        [column1, column2, column3, column4].includes("KTC T")
-      ) {
-        const ktc_previous_raw = await axios.get("/api/ktc", {
-          params: {
-            trendDate,
-          },
-        });
-
-        const obj = Object.fromEntries(ktc_previous_raw.data.values);
-
-        dispatch(
-          updateState({
-            key: "ktc_previous",
-            value: {
-              date: ktc_previous_raw.data.date,
-              values: obj,
-            },
-          })
-        );
-      }
-    };
     fetchKTCPrev();
-  }, [trendDate, ktc_previous, column1, column2, column3, column4, dispatch]);
+  }, [fetchKTCPrev]);
 
   useEffect(() => {
-    const fetchKTCPeak = async () => {
-      if (
-        trendDate &&
-        ktc_peak.date !== trendDate &&
-        [column1, column2, column3, column4].some((col) =>
-          ["KTC P", "KTC PD", "KTC L", "KTC LD"].includes(col)
-        )
-      ) {
-        const ktc_peak_raw = await axios.get("/api/ktcpeak", {
-          params: {
-            trendDate,
-          },
-        });
-
-        console.log({ ktc_peak_raw });
-
-        dispatch(
-          updateState({
-            key: "ktc_peak",
-            value: {
-              date: ktc_peak_raw.data.date,
-              max_values: ktc_peak_raw.data.max_values_obj,
-              min_values: ktc_peak_raw.data.min_values_obj,
-            },
-          })
-        );
-      }
-    };
-
     fetchKTCPeak();
-  }, [trendDate, ktc_peak, column1, column2, column3, column4, dispatch]);
+  }, [fetchKTCPeak]);
 
   const headers_sort = [0, 1, 2, 3, 4].map((key, index) => {
     const colnum = key as 0 | 1 | 2 | 3 | 4;
@@ -163,7 +179,7 @@ const Players = ({ params }: PlayersProps) => {
     .map((player_id) => {
       return {
         id: player_id,
-        sortby: getPlayersSortValue(player_id, trendDate),
+        sortby: getPlayersSortValue(player_id, trendDate1, trendDate2),
         search: {
           text: allplayers?.[player_id]?.full_name || player_id,
           display: (allplayers && (
@@ -190,7 +206,8 @@ const Players = ({ params }: PlayersProps) => {
             const { text, trendColor, classname } = getPlayersColumn(
               col,
               player_id,
-              trendDate
+              trendDate1,
+              trendDate2
             );
 
             return {
@@ -236,19 +253,28 @@ const Players = ({ params }: PlayersProps) => {
       {[column1, column2, column3, column4].some((col) =>
         ["KTC T", "KTC P", "KTC PD", "KTC L", "KTC LD"].includes(col)
       ) && (
-        <h1>
-          {trendDate === "" && "Select Date for Historical Values/Trends"}
+        <div className="trendDates">
+          Select Date Range for Historical Values/Trends
           <br />
           <input
             type="date"
-            value={trendDate}
+            value={trendDate1}
             onChange={(e) =>
               dispatch(
-                updatePlayersState({ key: "trendDate", value: e.target.value })
+                updatePlayersState({ key: "trendDate1", value: e.target.value })
               )
             }
           />
-        </h1>
+          <input
+            type="date"
+            value={trendDate2}
+            onChange={(e) =>
+              dispatch(
+                updatePlayersState({ key: "trendDate2", value: e.target.value })
+              )
+            }
+          />
+        </div>
       )}
       <TableMain
         type={1}

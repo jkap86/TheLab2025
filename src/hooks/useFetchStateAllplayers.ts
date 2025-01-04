@@ -44,7 +44,7 @@ export const useFetchStateAndAllplayers = () => {
   useEffect(() => {
     const fetchKtcCurrent = async () => {
       if (!ktc_current) {
-        const ktc_current_new = await axios.get("/api/ktc");
+        const ktc_current_new = await axios.get("/api/ktccurrent");
 
         const ktc_current_new_obj = Object.fromEntries(
           ktc_current_new.data.values
