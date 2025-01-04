@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
                 scores(
                     sport: "nfl"
                     season_type: "regular"
-                    season: "${process.env.SEASON}"
+                    season: "2024"
                     week: ${week}
                 ) {
                     
@@ -46,17 +46,15 @@ export async function GET(req: NextRequest) {
             `,
       };
 
-      const [schedule_week, projectionsweek_db, statsweek] = await Promise.all([
+      const [schedule_week, projectionsweek, statsweek] = await Promise.all([
         await axiosInstance.post("https://sleeper.com/graphql", graphqlQuery),
-        await pool.query("SELECT * FROM common WHERE name = $1;", [
-          "projectionsweek",
-        ]),
         await axiosInstance.get(
-          `https://api.sleeper.com/stats/nfl/${process.env.SEASON}/${week}?season_type=${season_type}`
+          `https://api.sleeper.com/projections/nfl/${2024}/${week}?season_type=${season_type}`
+        ),
+        await axiosInstance.get(
+          `https://api.sleeper.com/stats/nfl/${2024}/${week}?season_type=${season_type}`
         ),
       ]);
-
-      const projectionsweek = projectionsweek_db.rows[0].data.projections || [];
 
       let updatenext: number;
 
@@ -121,7 +119,9 @@ export async function GET(req: NextRequest) {
 
       const player_ids = Array.from(
         new Set([
-          ...projectionsweek.map((p: SleeperPlayerStat) => p.player_id),
+          ...projectionsweek.data
+            .filter((p: SleeperPlayerStat) => p.stats.pts_ppr)
+            .map((p: SleeperPlayerStat) => p.player_id),
           ...statsweek.data.map((s: SleeperPlayerStat) => s.player_id),
         ])
       );
@@ -131,7 +131,7 @@ export async function GET(req: NextRequest) {
         live_proj: { [cat: string]: number };
       }[] = player_ids.map((player_id) => {
         const proj_obj =
-          projectionsweek.find(
+          projectionsweek.data.find(
             (player_stat: SleeperPlayerStat) =>
               player_stat.player_id === player_id
           ) || {};

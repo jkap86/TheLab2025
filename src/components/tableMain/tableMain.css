@@ -169,6 +169,9 @@ table.half {
   width: 50%;
   display: inline-table;
   vertical-align: top;
+}
+
+table.two table.half {
   font-size: 85%;
 }
 

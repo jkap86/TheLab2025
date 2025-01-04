@@ -10,19 +10,25 @@ import "./playoffs.css";
 import { getPlayerTotal } from "@/utils/getPlayerStatProjTotal";
 import TableMain from "@/components/tableMain/tableMain";
 import Avatar from "@/components/avatar/avatar";
+import { getOptimalStarters } from "@/utils/getOptimalStarters";
 
 interface PlayoffsProps {
   params: Promise<{ league_id: string }>;
 }
 
 const Playoffs = ({ params }: PlayoffsProps) => {
-  const { state } = useSelector((state: RootState) => state.common);
+  const { state, allplayers } = useSelector((state: RootState) => state.common);
   const { league_id } = use(params);
   const [league, setLeague] = useState<League | null>(null);
-  const [weeks, setWeeks] = useState<number[]>([]);
-  const [playoffData, setPlayoffData] = useState<{
+  const [weeks, setWeeks] = useState<number[]>([18]);
+  const [pointsObj, setPointsObj] = useState<{
     [week: string]: {
-      [player_id: string]: { points: number; projection: number };
+      [player_id: string]: number;
+    };
+  }>({});
+  const [projObj, setProjObj] = useState<{
+    [week: string]: {
+      [player_id: string]: number;
     };
   }>({});
   const [activeRosterId, setActiveRosterId] = useState("");
@@ -67,6 +73,7 @@ const Playoffs = ({ params }: PlayoffsProps) => {
                 live_proj: { [cat: string]: number };
                 stats: { [cat: string]: number };
               }[];
+              schedule: { start_time: number; status: string }[];
             };
           };
         } = await axios.get("/api/playoffprojstat", {
@@ -75,37 +82,49 @@ const Playoffs = ({ params }: PlayoffsProps) => {
           },
         });
 
-        console.log({ playoffProjStat });
+        const obj_points: {
+          [week: string]: {
+            [player_id: string]: number;
+          };
+        } = {};
+        const obj_proj: {
+          [week: string]: {
+            [player_id: string]: number;
+          };
+        } = {};
 
-        const data = Object.fromEntries(
-          Object.keys(playoffProjStat.data).map((week) => [
-            week,
-            Object.fromEntries(
-              playoffProjStat.data[week].players.map((player) => {
-                const points = getPlayerTotal(
-                  league?.scoring_settings || {},
-                  player.stats || {}
-                );
+        Object.keys(playoffProjStat.data).forEach((week) => {
+          obj_points[week] = {};
+          obj_proj[week] = {};
 
-                const projection = getPlayerTotal(
-                  league?.scoring_settings || {},
-                  player.live_proj || {}
-                );
+          playoffProjStat.data[week].players.forEach((player) => {
+            const points = getPlayerTotal(
+              league?.scoring_settings || {},
+              player.stats || {}
+            );
 
-                return [
-                  player.player_id,
-                  {
-                    points,
-                    projection,
-                  },
-                ];
-              })
-            ),
-          ])
-        );
+            const projection = getPlayerTotal(
+              league?.scoring_settings || {},
+              player.live_proj || {}
+            );
 
-        console.log({ data });
-        setPlayoffData(data);
+            obj_points[week][player.player_id] = points;
+            obj_proj[week][player.player_id] = projection;
+          });
+        });
+
+        setPointsObj(obj_points);
+        setProjObj(obj_proj);
+
+        if (
+          playoffProjStat.data[state.week].schedule.some((g) =>
+            g.status.includes("prog")
+          )
+        ) {
+          const timeout = setTimeout(fetchPlayoffProjStats, 60000);
+
+          return () => clearTimeout(timeout);
+        }
       }
     };
 
@@ -114,18 +133,39 @@ const Playoffs = ({ params }: PlayoffsProps) => {
 
   const dataStandings = (league?.rosters || [])
     .map((roster, index) => {
-      const roster_total = weeks.reduce((acc, cur) => {
-        const roster_week = (roster.players || []).reduce(
-          (acc_p, cur_p) => acc_p + (playoffData[cur]?.[cur_p]?.points || 0),
+      const roster_points = weeks.reduce((acc, cur) => {
+        const optimal_week = getOptimalStarters(
+          league?.roster_positions || [],
+          roster.players || [],
+          pointsObj[cur] || {}
+        );
+
+        const week_total = optimal_week.reduce(
+          (acc_w, cur_w) => acc_w + (pointsObj[cur]?.[cur_w] || 0),
           0
         );
 
-        return acc + roster_week;
+        return acc + week_total;
+      }, 0);
+
+      const roster_projection = weeks.reduce((acc, cur) => {
+        const optimal_week = getOptimalStarters(
+          league?.roster_positions || [],
+          roster.players || [],
+          projObj[cur] || {}
+        );
+
+        const week_total = optimal_week.reduce(
+          (acc_w, cur_w) => acc_w + (projObj[cur]?.[cur_w] || 0),
+          0
+        );
+
+        return acc + week_total;
       }, 0);
 
       return {
         id: roster.roster_id.toString(),
-        sortby: roster_total,
+        sortby: roster_points,
         columns: [
           {
             text: (index + 1).toString(),
@@ -138,7 +178,16 @@ const Playoffs = ({ params }: PlayoffsProps) => {
             classname: "",
           },
           {
-            text: roster_total.toString(),
+            text: roster_points.toLocaleString("en-US", {
+              maximumFractionDigits: 1,
+            }),
+            colspan: 2,
+            classname: "",
+          },
+          {
+            text: roster_projection.toLocaleString("en-US", {
+              maximumFractionDigits: 1,
+            }),
             colspan: 2,
             classname: "",
           },
@@ -151,7 +200,110 @@ const Playoffs = ({ params }: PlayoffsProps) => {
     (r) => r.roster_id.toString() === activeRosterId
   );
 
-  console.log({ activeRoster });
+  const active_optimal_starters =
+    (league &&
+      activeRoster &&
+      weeks.length === 1 &&
+      getOptimalStarters(
+        league.roster_positions,
+        activeRoster.players || [],
+        projObj[weeks[0]]
+      )) ||
+    [];
+
+  const dataTeam =
+    (league &&
+      activeRoster &&
+      weeks.length === 1 &&
+      weeks[0] === state?.week && [
+        ...league.roster_positions
+          .filter((rp) => rp !== "BN")
+          .map((rp, index) => {
+            const player_id = active_optimal_starters[index];
+            return {
+              id: `${rp}__${index}`,
+              columns: [
+                {
+                  text: rp,
+                  colspan: 1,
+                  classname: "",
+                },
+                {
+                  text: (
+                    <Avatar
+                      id={player_id}
+                      text={allplayers?.[player_id]?.full_name || player_id}
+                      type="P"
+                    />
+                  ),
+                  classname: "",
+                  colspan: 3,
+                },
+                {
+                  text: pointsObj[weeks[0]][player_id].toLocaleString("en-US", {
+                    maximumFractionDigits: 1,
+                  }),
+                  colspan: 1,
+                  classname: "",
+                },
+                {
+                  text: projObj[weeks[0]][player_id].toLocaleString("en-US", {
+                    maximumFractionDigits: 1,
+                  }),
+                  colspan: 1,
+                  classname: "",
+                },
+              ],
+            };
+          }),
+
+        ...(activeRoster.players || [])
+          .filter((player_id) => !active_optimal_starters.includes(player_id))
+          .map((player_id) => {
+            return {
+              id: player_id,
+              columns: [
+                {
+                  text: "BN",
+                  colspan: 1,
+                  classname: "",
+                },
+                {
+                  text: (
+                    <Avatar
+                      id={player_id}
+                      text={allplayers?.[player_id]?.full_name || player_id}
+                      type="P"
+                    />
+                  ),
+                  classname: "",
+                  colspan: 3,
+                },
+                {
+                  text: (pointsObj[weeks[0]][player_id] || 0).toLocaleString(
+                    "en-US",
+                    {
+                      maximumFractionDigits: 1,
+                    }
+                  ),
+                  colspan: 1,
+                  classname: "",
+                },
+                {
+                  text: (projObj[weeks[0]][player_id] || 0).toLocaleString(
+                    "en-US",
+                    {
+                      maximumFractionDigits: 1,
+                    }
+                  ),
+                  colspan: 1,
+                  classname: "",
+                },
+              ],
+            };
+          }),
+      ]) ||
+    [];
   return (
     <>
       <h1>{league?.name}</h1>
@@ -182,7 +334,7 @@ const Playoffs = ({ params }: PlayoffsProps) => {
         active={activeRosterId}
         setActive={setActiveRosterId}
       />
-      <TableMain type={1} half={true} headers={[]} data={[]} />
+      <TableMain type={1} half={true} headers={[]} data={dataTeam} />
     </>
   );
 };
