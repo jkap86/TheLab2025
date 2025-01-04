@@ -1,14 +1,28 @@
+h1 {
+  font-size: 4rem;
+  color: var(--color1);
+  padding: 2rem;
+}
+
 .rounds-buttons {
-  width: 100vmin;
-  margin: 3rem auto;
   display: flex;
-  justify-content: space-evenly;
   font-size: 3rem;
+  justify-content: space-evenly;
 }
 
 .rounds-buttons > div {
 }
 
-.rounds-buttons > div.active {
+.rounds-buttons > button.active {
   background-color: var(--color3);
+}
+
+table.main.one.half {
+  position: sticky;
+  top: 0rem;
+  z-index: 10;
+}
+
+td.content.bench {
+  filter: opacity(0.75);
 }
