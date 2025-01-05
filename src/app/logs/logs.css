@@ -1,5 +1,6 @@
 table.logs {
   font-size: 3rem;
+  table-layout: auto;
 }
 
 table.logs td {
