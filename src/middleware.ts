@@ -35,5 +35,7 @@ export async function middleware(request: NextRequest) {
 
 // Define the routes this middleware applies to
 export const config = {
-  matcher: ["/((?!api|_next/static|favicon.ico|picktracker|playoffs).*)"], // Adjust paths as necessary
+  matcher: [
+    "/((?!api|_next/static|favicon.ico|picktracker|playoffs|logs|$).*)",
+  ], // Adjust paths as necessary
 };
