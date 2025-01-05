@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
 
   // Log details
 
-  const redirectUrl = new URL("/api/log", request.url);
+  const redirectUrl = new URL("/api/log", "https://the-lab.southharmonff.com");
 
   redirectUrl.searchParams.set("ip", ipAddress);
   redirectUrl.searchParams.set("route", request.nextUrl.pathname);

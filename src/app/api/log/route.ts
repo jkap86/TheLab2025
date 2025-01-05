@@ -12,7 +12,11 @@ export async function GET(req: NextRequest) {
     VALUES ($1, $2);
   `;
 
-  await pool.query(insertLogQuery, [ip, route]);
+  try {
+    await pool.query(insertLogQuery, [ip, route]);
+  } catch (err: unknown) {
+    if (err instanceof Error) console.log(err.message);
+  }
 
   return NextResponse.json("logged");
 }
