@@ -4,8 +4,7 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   // Extract IP address from the request
-  const ipAddress =
-    request.headers.get("x-forwarded-for")?.split("ffff:")[1] || "Unknown IP";
+  const ipAddress = request.headers.get("x-forwarded-for") || "Unknown IP";
 
   console.log({ ipAddress });
 
