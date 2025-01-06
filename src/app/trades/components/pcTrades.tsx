@@ -54,6 +54,40 @@ const PcTrades = () => {
     [pcTrades, searched_player_pc, dispatch]
   );
 
+  const fetchMoreTrades = async () => {
+    const player = searched_player_pc;
+    dispatch(updateState({ key: "isLoadingPcTrades", value: true }));
+
+    try {
+      const moreTrades = await axios.post("/api/pctrades", {
+        player,
+        offset: (
+          pcTrades.find((s) => s.player === searched_player_pc)?.trades || []
+        ).length,
+        limit: 125,
+      });
+
+      dispatch(
+        updateState({
+          key: "pcTrades",
+          value: [
+            ...pcTrades.filter((s) => !(s.player === searched_player_pc)),
+            {
+              player,
+              count: parseInt(moreTrades.data.count),
+              trades: moreTrades.data.rows,
+            },
+          ],
+        })
+      );
+    } catch {
+      dispatch(
+        updateState({ key: "errorPcTrades", value: "Error Fetching Trades" })
+      );
+    }
+    dispatch(updateState({ key: "isLoadingPcTrades", value: false }));
+  };
+
   useEffect(() => {
     if (
       (searched_manager_pc || searched_player_pc) &&
@@ -65,6 +99,10 @@ const PcTrades = () => {
 
   const tradesDisplay =
     pcTrades.find((s) => s.player === searched_player_pc)?.trades || [];
+
+  const tradesCount = pcTrades.find(
+    (s) => s.player === searched_player_pc
+  )?.count;
 
   const page_numbers = (
     <div className="page_numbers_wrapper">
@@ -84,9 +122,9 @@ const PcTrades = () => {
             </li>
           );
         })}
-        {/*(tradesDisplay?.length || 0) < tradesCount ? (
-         <li onClick={() => fetchMoreTrades()}>...</li>
-       ) : null*/}
+        {tradesCount && (tradesDisplay?.length || 0) < tradesCount ? (
+          <li onClick={() => fetchMoreTrades()}>...</li>
+        ) : null}
       </ol>
     </div>
   );
