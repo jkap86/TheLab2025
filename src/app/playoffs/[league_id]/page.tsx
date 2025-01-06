@@ -11,7 +11,6 @@ import { getPlayerTotal } from "@/utils/getPlayerStatProjTotal";
 import TableMain from "@/components/tableMain/tableMain";
 import Avatar from "@/components/avatar/avatar";
 import { getOptimalStarters } from "@/utils/getOptimalStarters";
-import SortIcon from "@/components/sortIcon/sortIcon";
 
 interface PlayoffsProps {
   params: Promise<{ league_id: string }>;
@@ -36,17 +35,13 @@ const Playoffs = ({ params }: PlayoffsProps) => {
     {}
   );
   const [activeRosterId, setActiveRosterId] = useState("");
-  const [sortStandingsBy, setSortStandingsBy] = useState({
-    column: 1 as 1 | 2,
-    asc: false,
-  });
 
   const rounds = [
     { display: "Week 18", week: 18 },
-    { display: "Wildcard", week: 19 },
-    { display: "Division", week: 20 },
-    { display: "Conference", week: 21 },
-    { display: "Super Bowl", week: 22 },
+    { display: "Wildcard", week: 1 },
+    { display: "Division", week: 2 },
+    { display: "Conference", week: 3 },
+    { display: "Super Bowl", week: 4 },
   ];
 
   useFetchStateAndAllplayers();
@@ -89,6 +84,7 @@ const Playoffs = ({ params }: PlayoffsProps) => {
         } = await axios.get("/api/playoffprojstat", {
           params: {
             week: state.week,
+            season_type: state.season_type,
           },
         });
 
@@ -151,7 +147,7 @@ const Playoffs = ({ params }: PlayoffsProps) => {
     };
 
     if (league) fetchPlayoffProjStats();
-  }, [state?.week, league]);
+  }, [state?.week, state?.season_type, league]);
 
   const dataStandings = (league?.rosters || [])
     .sort((a, b) => {
@@ -164,21 +160,6 @@ const Playoffs = ({ params }: PlayoffsProps) => {
 
         const week_total = optimal_week.reduce(
           (acc_w, cur_w) => acc_w + (pointsObj[cur]?.[cur_w] || 0),
-          0
-        );
-
-        return acc + week_total;
-      }, 0);
-
-      const roster_projection_a = weeks.reduce((acc, cur) => {
-        const optimal_week = getOptimalStarters(
-          league?.roster_positions || [],
-          a.players || [],
-          projObj[cur] || {}
-        );
-
-        const week_total = optimal_week.reduce(
-          (acc_w, cur_w) => acc_w + (projObj[cur]?.[cur_w] || 0),
           0
         );
 
@@ -200,26 +181,7 @@ const Playoffs = ({ params }: PlayoffsProps) => {
         return acc + week_total;
       }, 0);
 
-      const roster_projection_b = weeks.reduce((acc, cur) => {
-        const optimal_week = getOptimalStarters(
-          league?.roster_positions || [],
-          b.players || [],
-          projObj[cur] || {}
-        );
-
-        const week_total = optimal_week.reduce(
-          (acc_w, cur_w) => acc_w + (projObj[cur]?.[cur_w] || 0),
-          0
-        );
-
-        return acc + week_total;
-      }, 0);
-
-      if (sortStandingsBy.column === 2) {
-        return roster_projection_b - roster_projection_a;
-      } else {
-        return roster_points_b - roster_points_a;
-      }
+      return roster_points_b - roster_points_a;
     })
     .map((roster, index) => {
       const roster_points = weeks.reduce((acc, cur) => {
@@ -231,21 +193,6 @@ const Playoffs = ({ params }: PlayoffsProps) => {
 
         const week_total = optimal_week.reduce(
           (acc_w, cur_w) => acc_w + (pointsObj[cur]?.[cur_w] || 0),
-          0
-        );
-
-        return acc + week_total;
-      }, 0);
-
-      const roster_projection = weeks.reduce((acc, cur) => {
-        const optimal_week = getOptimalStarters(
-          league?.roster_positions || [],
-          roster.players || [],
-          projObj[cur] || {}
-        );
-
-        const week_total = optimal_week.reduce(
-          (acc_w, cur_w) => acc_w + (projObj[cur]?.[cur_w] || 0),
           0
         );
 
@@ -276,16 +223,7 @@ const Playoffs = ({ params }: PlayoffsProps) => {
               maximumFractionDigits: 1,
             }),
             colspan: 2,
-            classname:
-              sortStandingsBy.column === 1 ? inprogress + " sort" : inprogress,
-          },
-          {
-            text: roster_projection.toLocaleString("en-US", {
-              maximumFractionDigits: 1,
-            }),
-            colspan: 2,
-            classname:
-              sortStandingsBy.column === 2 ? inprogress + " sort" : inprogress,
+            classname: inprogress,
           },
         ],
       };
@@ -307,83 +245,135 @@ const Playoffs = ({ params }: PlayoffsProps) => {
     [];
 
   const dataTeam =
-    (league &&
-      activeRoster &&
-      weeks.length === 1 &&
-      weeks[0] === state?.week && [
-        ...league.roster_positions
-          .filter((rp) => rp !== "BN")
-          .map((rp, index) => {
-            const player_id = active_optimal_starters[index];
-            return {
-              id: `${rp}__${index}`,
-              columns: [
-                {
-                  text: rp,
-                  colspan: 1,
-                  classname: scheduleObj[allplayers?.[player_id].team || ""]
-                    ? "inprogress"
-                    : "",
-                },
-                {
-                  text: (
-                    <Avatar
-                      id={player_id}
-                      text={allplayers?.[player_id]?.full_name || player_id}
-                      type="P"
-                    />
-                  ),
-                  classname: scheduleObj[allplayers?.[player_id].team || ""]
-                    ? "inprogress"
-                    : "",
-                  colspan: 3,
-                },
-                {
-                  text: (pointsObj[weeks[0]]?.[player_id] || 0).toLocaleString(
-                    "en-US",
-                    {
+    league && activeRoster && weeks.length === 1
+      ? [
+          ...league.roster_positions
+            .filter((rp) => rp !== "BN")
+            .map((rp, index) => {
+              const player_id = active_optimal_starters[index];
+              return {
+                id: `${rp}__${index}`,
+                columns: [
+                  {
+                    text: rp,
+                    colspan: 1,
+                    classname: scheduleObj[allplayers?.[player_id]?.team || ""]
+                      ? "inprogress"
+                      : "",
+                  },
+                  {
+                    text: (
+                      <Avatar
+                        id={player_id}
+                        text={allplayers?.[player_id]?.full_name || player_id}
+                        type="P"
+                      />
+                    ),
+                    classname: scheduleObj[allplayers?.[player_id]?.team || ""]
+                      ? "inprogress"
+                      : "",
+                    colspan: 5,
+                  },
+                  {
+                    text: (
+                      pointsObj[weeks[0]]?.[player_id] || 0
+                    ).toLocaleString("en-US", {
                       maximumFractionDigits: 1,
-                    }
-                  ),
-                  colspan: 1,
-                  classname: scheduleObj[allplayers?.[player_id].team || ""]
-                    ? "inprogress"
-                    : "",
-                },
-                {
-                  text: (projObj[weeks[0]]?.[player_id] || 0).toLocaleString(
-                    "en-US",
-                    {
-                      maximumFractionDigits: 1,
-                    }
-                  ),
-                  colspan: 1,
-                  classname: scheduleObj[allplayers?.[player_id].team || ""]
-                    ? "inprogress"
-                    : "",
-                },
-              ],
-            };
-          }),
+                    }),
+                    colspan: 2,
+                    classname: scheduleObj[allplayers?.[player_id]?.team || ""]
+                      ? "inprogress"
+                      : "",
+                  },
+                ],
+              };
+            }),
 
-        ...(activeRoster.players || [])
-          .sort(
-            (a, b) =>
-              (projObj[state.week][b] || 0) - (projObj[state.week][a] || 0)
-          )
-          .filter((player_id) => !active_optimal_starters.includes(player_id))
+          ...(activeRoster.players || [])
+            .sort(
+              (a, b) =>
+                (projObj[weeks[0]]?.[b] || 0) - (projObj[weeks[0]]?.[a] || 0)
+            )
+            .filter((player_id) => !active_optimal_starters.includes(player_id))
+            .map((player_id) => {
+              return {
+                id: player_id,
+                columns: [
+                  {
+                    text: "BN",
+                    colspan: 1,
+                    classname:
+                      "bench " +
+                      (scheduleObj[allplayers?.[player_id].team || ""]
+                        ? "inprogress"
+                        : ""),
+                  },
+                  {
+                    text: (
+                      <Avatar
+                        id={player_id}
+                        text={allplayers?.[player_id]?.full_name || player_id}
+                        type="P"
+                      />
+                    ),
+                    classname:
+                      "bench " +
+                      (scheduleObj[allplayers?.[player_id].team || ""]
+                        ? "inprogress"
+                        : ""),
+                    colspan: 5,
+                  },
+                  {
+                    text: (
+                      pointsObj[weeks[0]]?.[player_id] || 0
+                    ).toLocaleString("en-US", {
+                      maximumFractionDigits: 1,
+                    }),
+                    colspan: 2,
+                    classname:
+                      "bench " +
+                      (scheduleObj[allplayers?.[player_id].team || ""]
+                        ? "inprogress"
+                        : ""),
+                  },
+                ],
+              };
+            }),
+        ]
+      : (activeRoster?.players || [])
           .map((player_id) => {
+            const playerPoints = weeks.reduce(
+              (acc, cur) => {
+                const optimal_starters_week = getOptimalStarters(
+                  league?.roster_positions || [],
+                  activeRoster?.players || [],
+                  pointsObj[cur]
+                );
+
+                if (optimal_starters_week.includes(player_id)) {
+                  return {
+                    lineup: acc.lineup + (pointsObj[cur]?.[player_id] || 0),
+                    bench: acc.bench,
+                  };
+                } else {
+                  return {
+                    lineup: acc.lineup,
+                    bench: acc.bench + (pointsObj[cur]?.[player_id] || 0),
+                  };
+                }
+              },
+              { lineup: 0, bench: 0 }
+            );
             return {
               id: player_id,
+              sortby: parseFloat(
+                playerPoints.lineup + "." + playerPoints.bench
+              ),
               columns: [
                 {
-                  text: "BN",
+                  text: allplayers?.[player_id]?.position || "",
                   colspan: 1,
-                  classname:
-                    "bench " +
-                    (scheduleObj[allplayers?.[player_id].team || ""]
-                      ? "inprogress"
-                      : ""),
+                  classname: "",
                 },
                 {
                   text: (
@@ -393,35 +383,21 @@ const Playoffs = ({ params }: PlayoffsProps) => {
                       type="P"
                     />
                   ),
-                  classname:
-                    "bench " +
-                    (scheduleObj[allplayers?.[player_id].team || ""]
-                      ? "inprogress"
-                      : ""),
-                  colspan: 3,
+                  classname: "",
+                  colspan: 5,
                 },
                 {
-                  text: (pointsObj[weeks[0]][player_id] || 0).toLocaleString(
-                    "en-US",
-                    {
-                      maximumFractionDigits: 1,
-                    }
-                  ),
-                  colspan: 1,
-                  classname:
-                    "bench " +
-                    (scheduleObj[allplayers?.[player_id].team || ""]
-                      ? "inprogress"
-                      : ""),
+                  text: playerPoints.lineup.toLocaleString("en-US", {
+                    maximumFractionDigits: 1,
+                  }),
+                  colspan: 2,
+                  classname: "",
                 },
                 {
-                  text: (projObj[weeks[0]][player_id] || 0).toLocaleString(
-                    "en-US",
-                    {
-                      maximumFractionDigits: 1,
-                    }
-                  ),
-                  colspan: 1,
+                  text: playerPoints.bench.toLocaleString("en-US", {
+                    maximumFractionDigits: 1,
+                  }),
+                  colspan: 2,
                   classname:
                     "bench " +
                     (scheduleObj[allplayers?.[player_id].team || ""]
@@ -430,9 +406,8 @@ const Playoffs = ({ params }: PlayoffsProps) => {
                 },
               ],
             };
-          }),
-      ]) ||
-    [];
+          })
+          .sort((a, b) => (b.sortby = a.sortby));
   return (
     <>
       <h1>
@@ -462,40 +437,10 @@ const Playoffs = ({ params }: PlayoffsProps) => {
       <TableMain
         type={1}
         half={true}
-        headers_sort={[
-          { text: "", colspan: 1 },
-          { text: "", colspan: 5 },
-
-          {
-            text: (
-              <SortIcon
-                colNum={1}
-                sortBy={sortStandingsBy}
-                setSortBy={(column) =>
-                  setSortStandingsBy({ column: column as 1 | 2, asc: false })
-                }
-              />
-            ),
-            colspan: 2,
-          },
-          {
-            text: (
-              <SortIcon
-                colNum={2}
-                sortBy={sortStandingsBy}
-                setSortBy={(column) =>
-                  setSortStandingsBy({ column: column as 1 | 2, asc: false })
-                }
-              />
-            ),
-            colspan: 2,
-          },
-        ]}
         headers={[
           { text: "Rk", colspan: 1 },
           { text: "Manager", colspan: 5 },
           { text: "Pts", colspan: 2 },
-          { text: "Proj", colspan: 2 },
         ]}
         data={dataStandings}
         active={activeRosterId}
@@ -506,9 +451,13 @@ const Playoffs = ({ params }: PlayoffsProps) => {
         half={true}
         headers={[
           { text: "Slot", colspan: 1 },
-          { text: "Player", colspan: 3 },
-          { text: "Pts", colspan: 1 },
-          { text: "Proj", colspan: 1 },
+          { text: "Player", colspan: 5 },
+          ...(weeks.length === 1
+            ? [{ text: "Pts", colspan: 2 }]
+            : [
+                { text: "Lineup", colspan: 2 },
+                { text: "Bench", colspan: 2 },
+              ]),
         ]}
         data={dataTeam}
       />

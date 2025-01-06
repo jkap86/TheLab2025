@@ -10,9 +10,9 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
   const week_param = searchParams.get("week") as string;
+  const season_type = searchParams.get("season_type");
 
   const week = week_param;
-  const season_type = parseInt(week) <= 18 ? "regular" : "post";
 
   const playoffs_db = await pool.query(
     "SELECT * FROM common WHERE name = $1;",
