@@ -11,7 +11,7 @@ export const leaguesColumnOptions = [
   { text: "KTC Total Value Rank", abbrev: "KTC T Rk" },
   { text: "KTC Draft Picks Value Rank", abbrev: "KTC Pk Rk" },
   { text: "KTC Starter Average Value", abbrev: "KTC S Avg" },
-  { text: "KTC Bench Average Value", abbrev: "KTC S Avg" },
+  { text: "KTC Bench Average Value", abbrev: "KTC B Avg" },
   { text: "Trade Deadline", abbrev: "Trade D" },
 ];
 
