@@ -13,14 +13,12 @@ const PcTrades = () => {
   const { allplayers, pcTrades } = useSelector(
     (state: RootState) => state.common
   );
-  const { playershares, leaguemates } = useSelector(
-    (state: RootState) => state.user
-  );
+  const { playershares } = useSelector((state: RootState) => state.user);
   const { searched_player_pc, searched_manager_pc, page_pc, activeTrade_pc } =
     useSelector((state: RootState) => state.trades);
 
   const fetchPcTrades = useCallback(
-    async (manager?: string, player?: string) => {
+    async (player?: string) => {
       try {
         dispatch(updateState({ key: "isLoadingPcTrades", value: true }));
 
@@ -28,7 +26,6 @@ const PcTrades = () => {
           params: {
             offset: 0,
             limit: 125,
-            manager,
             player,
           },
         });
@@ -37,15 +34,8 @@ const PcTrades = () => {
           updateState({
             key: "pcTrades",
             value: [
-              ...pcTrades.filter(
-                (s) =>
-                  !(
-                    s.manager === searched_manager_pc &&
-                    s.player === searched_player_pc
-                  )
-              ),
+              ...pcTrades.filter((s) => !(s.player === searched_player_pc)),
               {
-                manager,
                 player,
                 count: parseInt(pcTrades_raw.data.count),
                 trades: pcTrades_raw.data.rows,
@@ -61,26 +51,20 @@ const PcTrades = () => {
       }
       dispatch(updateState({ key: "isLoadingPcTrades", value: false }));
     },
-    []
+    [pcTrades, searched_player_pc, dispatch]
   );
 
   useEffect(() => {
     if (
       (searched_manager_pc || searched_player_pc) &&
-      !pcTrades.some(
-        (s) =>
-          s.manager === searched_manager_pc && s.player === searched_player_pc
-      )
+      !pcTrades.some((s) => s.player === searched_player_pc)
     ) {
-      fetchPcTrades(searched_manager_pc, searched_player_pc);
+      fetchPcTrades(searched_player_pc);
     }
   }, [searched_manager_pc, searched_player_pc, pcTrades, fetchPcTrades]);
 
   const tradesDisplay =
-    pcTrades.find(
-      (s) =>
-        s.player === searched_player_pc && s.manager === searched_manager_pc
-    )?.trades || [];
+    pcTrades.find((s) => s.player === searched_player_pc)?.trades || [];
 
   const page_numbers = (
     <div className="page_numbers_wrapper">
