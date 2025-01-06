@@ -7,7 +7,8 @@ export const standingsColumnOptions = [
   { text: "Record", abbrev: "W/L" },
   { text: "Fantasy Points", abbrev: "Fp" },
   { text: "Avg Starter KTC Value", abbrev: "KTC S" },
-  { text: "Avg Player KTC Value", abbrev: "KTC" },
+  { text: "Avg Bench KTC Value", abbrev: "KTC B" },
+  { text: "Avg Player KTC Value", abbrev: "KTC P" },
 ];
 
 export const getStandingsColumnSort = (roster: Roster) => {
@@ -56,6 +57,16 @@ export const getStandingsColumnSort = (roster: Roster) => {
             starters.length) ||
         0;
       break;
+    case "KTC B":
+      sort =
+        (ktc_current &&
+          starters.length > 0 &&
+          (roster.players || [])
+            .filter((player_id) => !starters.includes(player_id))
+            .reduce((acc, cur) => acc + (ktc_current[cur] || 0), 0) /
+            starters.length) ||
+        0;
+      break;
     default:
       sort = 0;
       break;
@@ -76,6 +87,9 @@ export const getStandingsColumn = (
   const { ktc_current } = state.common;
 
   const starters = roster.starters_optimal || roster.starters;
+  const bench = (roster.players || []).filter(
+    (player_id) => !starters.includes(player_id)
+  );
 
   let text, trendColor, classname;
 
@@ -109,6 +123,38 @@ export const getStandingsColumn = (
           Math.round(
             starters.reduce((acc, cur) => acc + (ktc_current[cur] || 0), 0) /
               starters.length
+          ).toString()) ||
+        "-";
+
+      classname = "ktc";
+
+      trendColor =
+        parseInt(text) && getTrendColor_Range(parseInt(text), 1000, 8000);
+      break;
+    case "KTC B":
+      text =
+        (ktc_current &&
+          bench.length > 0 &&
+          Math.round(
+            bench.reduce((acc, cur) => acc + (ktc_current[cur] || 0), 0) /
+              bench.length
+          ).toString()) ||
+        "-";
+
+      classname = "ktc";
+
+      trendColor =
+        parseInt(text) && getTrendColor_Range(parseInt(text), 1000, 8000);
+      break;
+    case "KTC P":
+      text =
+        (ktc_current &&
+          (roster.players || []).length > 0 &&
+          Math.round(
+            (roster.players || []).reduce(
+              (acc, cur) => acc + (ktc_current[cur] || 0),
+              0
+            ) / (roster.players || []).length
           ).toString()) ||
         "-";
 

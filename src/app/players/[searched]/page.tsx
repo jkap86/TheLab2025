@@ -50,6 +50,8 @@ const Players = ({ params }: PlayersProps) => {
       !(ktc_trend.date1 === trendDate1 && ktc_trend.date2 === trendDate2) &&
       [column1, column2, column3, column4].includes("KTC T")
     ) {
+      dispatch(updateState({ key: "isLoadingKtcTrend", value: true }));
+
       const ktc_previous_raw = await axios.get("/api/ktctrend", {
         params: {
           trendDate1,
@@ -63,6 +65,8 @@ const Players = ({ params }: PlayersProps) => {
           value: ktc_previous_raw.data,
         })
       );
+
+      dispatch(updateState({ key: "isLoadingKtcTrend", value: false }));
     }
   }, [
     trendDate1,
@@ -84,6 +88,8 @@ const Players = ({ params }: PlayersProps) => {
         ["KTC P", "KTC PD", "KTC L", "KTC LD"].includes(col)
       )
     ) {
+      dispatch(updateState({ key: "isLoadingKtcPeak", value: true }));
+
       const ktc_peak_raw = await axios.get("/api/ktcpeak", {
         params: {
           trendDate1,
@@ -99,6 +105,8 @@ const Players = ({ params }: PlayersProps) => {
           value: ktc_peak_raw.data,
         })
       );
+
+      dispatch(updateState({ key: "isLoadingKtcPeak", value: false }));
     }
   }, [
     trendDate1,

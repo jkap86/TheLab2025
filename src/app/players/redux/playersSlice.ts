@@ -56,9 +56,9 @@ export interface PlayersState {
 
 const initialState: PlayersState = {
   column1: "# Own",
-  column2: "% Own",
-  column3: "KTC",
-  column4: "Age",
+  column2: "KTC",
+  column3: "KTC T",
+  column4: "KTC P",
   page: 1,
   sortPlayersBy: {
     column: 1,
@@ -66,8 +66,10 @@ const initialState: PlayersState = {
   },
   searchedPlayer: "",
   activePlayer: "",
-  trendDate1: "",
-  trendDate2: "",
+  trendDate1: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0],
+  trendDate2: new Date().toISOString().split("T")[0],
 
   playerLeaguesTab: "Owned",
 

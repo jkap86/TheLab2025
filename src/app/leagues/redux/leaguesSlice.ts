@@ -15,8 +15,8 @@ export interface LeaguesState {
 }
 
 const initialState: LeaguesState = {
-  column1: "Rk",
-  column2: "Pts Rk",
+  column1: "KTC S Avg",
+  column2: "KTC B Avg",
   column3: "KTC S Rk",
   column4: "KTC T Rk",
   page: 1,

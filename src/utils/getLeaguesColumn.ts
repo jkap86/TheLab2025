@@ -7,9 +7,11 @@ export const leaguesColumnOptions = [
   { text: "Rank", abbrev: "Rk" },
   { text: "Points Rank", abbrev: "Pts Rk" },
   { text: "KTC Starter Value Rank", abbrev: "KTC S Rk" },
+  { text: "KTC Bench Value Rank", abbrev: "KTC B Rk" },
   { text: "KTC Total Value Rank", abbrev: "KTC T Rk" },
   { text: "KTC Draft Picks Value Rank", abbrev: "KTC Pk Rk" },
   { text: "KTC Starter Average Value", abbrev: "KTC S Avg" },
+  { text: "KTC Bench Average Value", abbrev: "KTC S Avg" },
   { text: "Trade Deadline", abbrev: "Trade D" },
 ];
 
@@ -63,6 +65,16 @@ export const getLeaguesColumnSortValue = (
       sortValue = -getKtcAvgValue(league.userRoster.starters_optimal || []);
 
       break;
+    case "KTC B Avg":
+      sortValue = -getKtcAvgValue(
+        (league.userRoster.players || []).filter(
+          (player_id) =>
+            !league.userRoster.starters_optimal?.includes(player_id)
+        )
+      );
+
+      break;
+
     case "KTC Pk Rk":
       sortValue =
         [...league.rosters]
@@ -185,6 +197,20 @@ export const getLeaguesColumn = (col: string, league: League) => {
 
       text = text.toString();
       break;
+    case "KTC B Avg":
+      text = getKtcAvgValue(
+        (league.userRoster.players || []).filter(
+          (player_id) =>
+            !league.userRoster.starters_optimal?.includes(player_id)
+        )
+      );
+
+      trendColor = getTrendColor_Range(text, 1000, 8000);
+      classname = "ktc";
+
+      text = text.toString();
+      break;
+
     case "KTC Pk Rk":
       text =
         [...league.rosters]

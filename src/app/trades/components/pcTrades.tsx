@@ -7,10 +7,12 @@ import { useCallback, useEffect } from "react";
 import { updateState } from "@/redux/commonSlice";
 import axios from "axios";
 import Trade from "./trade";
+import { Trade as TradeType } from "@/lib/types/userTypes";
+import { getOptimalStarters } from "@/utils/getOptimalStarters";
 
 const PcTrades = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { allplayers, pcTrades } = useSelector(
+  const { allplayers, pcTrades, ktc_current } = useSelector(
     (state: RootState) => state.common
   );
   const { playershares } = useSelector((state: RootState) => state.user);
@@ -38,7 +40,21 @@ const PcTrades = () => {
               {
                 player,
                 count: parseInt(pcTrades_raw.data.count),
-                trades: pcTrades_raw.data.rows,
+                trades: pcTrades_raw.data.rows.map((trade: TradeType) => {
+                  return {
+                    ...trade,
+                    rosters: trade.rosters.map((r) => {
+                      return {
+                        ...r,
+                        starters_optimal: getOptimalStarters(
+                          trade.roster_positions,
+                          r.players || [],
+                          ktc_current
+                        ),
+                      };
+                    }),
+                  };
+                }),
               },
             ],
           })
@@ -75,7 +91,21 @@ const PcTrades = () => {
             {
               player,
               count: parseInt(moreTrades.data.count),
-              trades: moreTrades.data.rows,
+              trades: moreTrades.data.rows.map((trade: TradeType) => {
+                return {
+                  ...trade,
+                  rosters: trade.rosters.map((r) => {
+                    return {
+                      ...r,
+                      starters_optimal: getOptimalStarters(
+                        trade.roster_positions,
+                        r.players || [],
+                        ktc_current
+                      ),
+                    };
+                  }),
+                };
+              }),
             },
           ],
         })
@@ -122,7 +152,7 @@ const PcTrades = () => {
             </li>
           );
         })}
-        {tradesCount && (tradesDisplay?.length || 0) < tradesCount ? (
+        {(tradesDisplay?.length || 0) < (tradesCount || 0) ? (
           <li onClick={() => fetchMoreTrades()}>...</li>
         ) : null}
       </ol>

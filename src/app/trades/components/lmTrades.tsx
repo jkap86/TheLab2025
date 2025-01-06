@@ -51,7 +51,21 @@ const LmTrades = () => {
                 manager,
                 player,
                 count: parseInt(moreTrades.data.count),
-                trades: moreTrades.data.rows,
+                trades: moreTrades.data.rows.map((trade: TradeType) => {
+                  return {
+                    ...trade,
+                    rosters: trade.rosters.map((r) => {
+                      return {
+                        ...r,
+                        starters_optimal: getOptimalStarters(
+                          trade.roster_positions,
+                          r.players || [],
+                          ktc_current
+                        ),
+                      };
+                    }),
+                  };
+                }),
               },
             ],
           })

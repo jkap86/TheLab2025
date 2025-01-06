@@ -6,11 +6,15 @@ export interface CommonState {
   state: { [key: string]: string | number } | null;
   allplayers: { [player_id: string]: Allplayer } | null;
   ktc_current: { [player_id: string]: number } | null;
+
+  isLoadingKtcTrend: boolean;
   ktc_trend: {
     date1: string;
     date2: string;
     values: { [player_id: string]: number };
   };
+
+  isLoadingKtcPeak: boolean;
   ktc_peak: {
     date1: string;
     date2: string;
@@ -35,7 +39,11 @@ const initialState: CommonState = {
   state: null,
   allplayers: null,
   ktc_current: null,
+
+  isLoadingKtcTrend: false,
   ktc_trend: { date1: "", date2: "", values: {} },
+
+  isLoadingKtcPeak: false,
   ktc_peak: { date1: "", date2: "", max_values: {}, min_values: {} },
   projections_week: null,
 

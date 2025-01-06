@@ -225,7 +225,13 @@ const TableMain = ({
                                 className={"content " + col.classname}
                                 style={col.style}
                               >
-                                <div>{col.text}</div>
+                                <div>
+                                  {col.text === "LOADING" ? (
+                                    <i className="fas fa-spinner fa-pulse"></i>
+                                  ) : (
+                                    col.text
+                                  )}
+                                </div>
                               </td>
                             );
                           })}

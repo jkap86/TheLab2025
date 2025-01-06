@@ -13,8 +13,8 @@ export interface LeagueState {
 }
 
 const initialState: LeagueState = {
-  column1_standings: "W/L",
-  column2_standings: "Fp",
+  column1_standings: "KTC S",
+  column2_standings: "KTC B",
   column1_team: "KTC",
   column2_team: "Age",
   sortStandingsBy: {

@@ -116,7 +116,14 @@ export const getPlayersColumn = (
 ) => {
   const state: RootState = store.getState();
 
-  const { ktc_current, ktc_trend, allplayers, ktc_peak } = state.common;
+  const {
+    ktc_current,
+    ktc_trend,
+    allplayers,
+    ktc_peak,
+    isLoadingKtcPeak,
+    isLoadingKtcTrend,
+  } = state.common;
   const { playershares, leagues } = state.user;
 
   const owned = filterLeagueIds(playershares[player_id].owned);
@@ -165,59 +172,67 @@ export const getPlayersColumn = (
       classname = "ktc";
       break;
     case "KTC T":
-      text =
-        (ktc_trend.date1 === trendDate1 &&
-          ktc_trend.date2 === trendDate2 &&
-          (ktc_trend.values?.[player_id] || 0)) ||
-        "-";
-      trendColor =
-        (typeof text === "number" && getTrendColor_Range(text, -500, 500)) ||
-        {};
+      text = isLoadingKtcTrend
+        ? "LOADING"
+        : (ktc_trend.date1 === trendDate1 &&
+            ktc_trend.date2 === trendDate2 &&
+            (ktc_trend.values?.[player_id] || 0)) ||
+          "-";
+      trendColor = isLoadingKtcTrend
+        ? { color: `rgb(100, 255, 255)` }
+        : (typeof text === "number" && getTrendColor_Range(text, -500, 500)) ||
+          {};
       text = text.toString();
       classname = "ktc";
       break;
     case "KTC P":
-      text =
-        (ktc_peak.date1 === trendDate1 &&
-          ktc_peak.date2 === trendDate2 &&
-          ktc_peak.max_values[player_id]?.value?.toString()) ||
-        "-";
-      trendColor = getTrendColor_Range(parseInt(text) || 0, 1000, 8000);
+      text = isLoadingKtcPeak
+        ? "LOADING"
+        : (ktc_peak.date1 === trendDate1 &&
+            ktc_peak.date2 === trendDate2 &&
+            ktc_peak.max_values[player_id]?.value?.toString()) ||
+          "-";
+      trendColor = isLoadingKtcPeak
+        ? { color: `rgb(100, 255, 255)` }
+        : getTrendColor_Range(parseInt(text) || 0, 1000, 8000);
       classname = "ktc";
       break;
     case "KTC PD":
-      text =
-        (ktc_peak.date1 === trendDate1 &&
-          ktc_peak.date2 === trendDate2 &&
-          ktc_peak.max_values[player_id] &&
-          new Date(ktc_peak.max_values[player_id]?.date).toLocaleDateString(
-            "en-US",
-            { year: "2-digit", month: "numeric", day: "numeric" }
-          )) ||
-        "-";
-      trendColor = {};
+      text = isLoadingKtcPeak
+        ? "LOADING"
+        : (ktc_peak.date1 === trendDate1 &&
+            ktc_peak.date2 === trendDate2 &&
+            ktc_peak.max_values[player_id] &&
+            new Date(ktc_peak.max_values[player_id]?.date).toLocaleDateString(
+              "en-US",
+              { year: "2-digit", month: "numeric", day: "numeric" }
+            )) ||
+          "-";
+      trendColor = isLoadingKtcPeak ? { color: `rgb(100, 255, 255)` } : {};
       classname = "date";
       break;
     case "KTC L":
-      text =
-        (ktc_peak.date1 === trendDate1 &&
-          ktc_peak.date2 === trendDate2 &&
-          ktc_peak.min_values[player_id]?.value?.toString()) ||
-        "-";
+      text = isLoadingKtcPeak
+        ? "LOADING"
+        : (ktc_peak.date1 === trendDate1 &&
+            ktc_peak.date2 === trendDate2 &&
+            ktc_peak.min_values[player_id]?.value?.toString()) ||
+          "-";
       trendColor = getTrendColor_Range(parseInt(text) || 0, 1000, 8000);
       classname = "ktc";
       break;
     case "KTC LD":
-      text =
-        (ktc_peak.date1 === trendDate1 &&
-          ktc_peak.date2 === trendDate2 &&
-          ktc_peak.min_values[player_id] &&
-          new Date(ktc_peak.min_values[player_id]?.date).toLocaleDateString(
-            "en-US",
-            { year: "2-digit", month: "numeric", day: "numeric" }
-          )) ||
-        "-";
-      trendColor = {};
+      text = isLoadingKtcPeak
+        ? "LOADING"
+        : (ktc_peak.date1 === trendDate1 &&
+            ktc_peak.date2 === trendDate2 &&
+            ktc_peak.min_values[player_id] &&
+            new Date(ktc_peak.min_values[player_id]?.date).toLocaleDateString(
+              "en-US",
+              { year: "2-digit", month: "numeric", day: "numeric" }
+            )) ||
+          "-";
+      trendColor = isLoadingKtcPeak ? { color: `rgb(100, 255, 255)` } : {};
       classname = "date";
       break;
     default:

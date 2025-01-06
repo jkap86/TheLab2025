@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   const countPcTradesQuery = `
         SELECT COUNT(*) 
         FROM trades
-        WHERE price_check && $1
+        WHERE players && $1
     `;
 
   try {
