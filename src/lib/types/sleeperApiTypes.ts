@@ -20,10 +20,12 @@ export type SleeperMatchup = {
 };
 
 export type SleeperDraft = {
+  draft_id: string;
   season: string;
   draft_order: {
     [key: string]: number;
   };
+  last_picked: number | null;
   status: string;
   settings: {
     rounds: number;
