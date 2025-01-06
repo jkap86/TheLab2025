@@ -1,5 +1,5 @@
 import { Allplayer } from "@/lib/types/commonTypes";
-import { PlayerProjection } from "@/lib/types/userTypes";
+import { PlayerProjection, Trade } from "@/lib/types/userTypes";
 import { createSlice, PayloadAction, Draft } from "@reduxjs/toolkit";
 
 export interface CommonState {
@@ -19,6 +19,15 @@ export interface CommonState {
   };
   projections_week: { [player_id: string]: PlayerProjection } | null;
 
+  isLoadingPcTrades: boolean;
+  pcTrades: {
+    manager: string | undefined;
+    player: string | undefined;
+    count: number;
+    trades: Trade[];
+  }[];
+  errorPcTrades: string | null;
+
   type1: "Redraft" | "All" | "Dynasty";
   type2: "Bestball" | "All" | "Lineup";
 }
@@ -30,6 +39,10 @@ const initialState: CommonState = {
   ktc_trend: { date1: "", date2: "", values: {} },
   ktc_peak: { date1: "", date2: "", max_values: {}, min_values: {} },
   projections_week: null,
+
+  isLoadingPcTrades: false,
+  pcTrades: [],
+  errorPcTrades: null,
 
   type1: "All",
   type2: "All",
