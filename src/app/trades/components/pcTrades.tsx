@@ -67,7 +67,7 @@ const PcTrades = () => {
       }
       dispatch(updateState({ key: "isLoadingPcTrades", value: false }));
     },
-    [pcTrades, searched_player_pc, dispatch]
+    [pcTrades, searched_player_pc, ktc_current, dispatch]
   );
 
   const fetchMoreTrades = async () => {

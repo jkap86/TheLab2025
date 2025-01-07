@@ -27,6 +27,8 @@ export const getSlotAbbrev = (slot: string) => {
       return "W/R";
     case "REC_FLEX":
       return "W/T";
+    case "IDP_FLEX":
+      return "IDP";
     default:
       return slot;
   }

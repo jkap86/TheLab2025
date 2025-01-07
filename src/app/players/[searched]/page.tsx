@@ -18,6 +18,7 @@ import PlayerLeagues from "../components/playerLeagues/playerLeagues";
 import LoadCommonData from "@/components/loadCommonData/loadCommonData";
 import axios from "axios";
 import "../players.css";
+import { getSlotAbbrev, position_map } from "@/utils/getOptimalStarters";
 
 interface PlayersProps {
   params: Promise<{ searched: string }>;
@@ -41,6 +42,9 @@ const Players = ({ params }: PlayersProps) => {
     searchedPlayer,
     trendDate1,
     trendDate2,
+    filterTeam,
+    filterDraftClass,
+    filterPosition,
   } = useSelector((state: RootState) => state.players);
 
   const fetchKTCPrev = useCallback(async () => {
@@ -183,7 +187,17 @@ const Players = ({ params }: PlayersProps) => {
   ];
 
   const data = Object.keys(playershares)
-    .filter((player_id) => allplayers?.[player_id]?.full_name)
+    .filter(
+      (player_id) =>
+        allplayers?.[player_id] &&
+        (!filterPosition ||
+          position_map[filterPosition]?.includes(
+            allplayers?.[player_id]?.position
+          )) &&
+        (!filterTeam || allplayers?.[player_id]?.team === filterTeam) &&
+        (!filterDraftClass ||
+          allplayers?.[player_id].years_exp === parseInt(filterDraftClass))
+    )
     .map((player_id) => {
       return {
         id: player_id,
@@ -242,6 +256,100 @@ const Players = ({ params }: PlayersProps) => {
         : -1
     );
 
+  const teams = Array.from(
+    new Set(
+      (allplayers &&
+        Object.keys(allplayers).map(
+          (player_id) => allplayers?.[player_id]?.team
+        )) ||
+        []
+    )
+  );
+
+  const yearsExps = Array.from(
+    new Set(
+      (allplayers &&
+        Object.keys(playershares).map(
+          (player_id) => allplayers?.[player_id]?.years_exp
+        )) ||
+        []
+    )
+  );
+
+  const slots = Object.keys(position_map);
+
+  const filters = (
+    <div className="players-filters">
+      <div>
+        <label>Team</label>
+        <select
+          value={filterTeam}
+          onChange={(e) =>
+            dispatch(
+              updatePlayersState({ key: "filterTeam", value: e.target.value })
+            )
+          }
+        >
+          <option>All</option>
+          {teams
+            .sort((a, b) => (a < b ? -1 : 1))
+            .map((team) => {
+              return <option key={team}>{team}</option>;
+            })}
+        </select>
+      </div>
+      <div>
+        <label>Draft Class</label>
+        <select
+          value={filterDraftClass}
+          onChange={(e) =>
+            dispatch(
+              updatePlayersState({
+                key: "filterDraftClass",
+                value: e.target.value,
+              })
+            )
+          }
+        >
+          <option value={0}>All</option>
+          {yearsExps
+            .sort((a, b) => (a < b ? -1 : 1))
+            .map((ye) => {
+              return (
+                <option key={ye} value={ye}>
+                  {new Date().getFullYear() - ye}
+                </option>
+              );
+            })}
+        </select>
+      </div>
+      <div>
+        <label>Position</label>
+        <select
+          value={filterPosition}
+          onChange={(e) =>
+            dispatch(
+              updatePlayersState({
+                key: "filterPosition",
+                value: e.target.value,
+              })
+            )
+          }
+        >
+          <option value={""}>All</option>
+          {slots.map((slot) => {
+            return (
+              <option key={slot} value={slot}>
+                {getSlotAbbrev(slot)}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+    </div>
+  );
+
+  console.log({ filterDraftClass });
   const setPage = (p: number) =>
     dispatch(updatePlayersState({ key: "page", value: p }));
 
@@ -258,6 +366,7 @@ const Players = ({ params }: PlayersProps) => {
 
   const component = (
     <>
+      {filters}
       {[column1, column2, column3, column4].some((col) =>
         ["KTC T", "KTC P", "KTC PD", "KTC L", "KTC LD"].includes(col)
       ) && (

@@ -14,6 +14,9 @@ export interface PlayersState {
   activePlayer: string;
   trendDate1: string;
   trendDate2: string;
+  filterTeam: string;
+  filterDraftClass: string;
+  filterPosition: string;
 
   playerLeaguesTab: string;
 
@@ -70,6 +73,9 @@ const initialState: PlayersState = {
     .toISOString()
     .split("T")[0],
   trendDate2: new Date().toISOString().split("T")[0],
+  filterTeam: "",
+  filterDraftClass: "",
+  filterPosition: "",
 
   playerLeaguesTab: "Owned",
 
