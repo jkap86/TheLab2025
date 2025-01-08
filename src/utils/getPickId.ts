@@ -11,13 +11,19 @@ export const getDraftPickId = (pick: {
 
   if (
     pick.order &&
-    Object.keys(ktc_current || {}).find((player_id) => player_id.includes("."))
+    Object.keys(ktc_current || {}).some((player_id) => player_id.includes("."))
   ) {
     return `${pick.season} ${pick.round}.${pick.order.toLocaleString("en-US", {
       minimumIntegerDigits: 2,
     })}`;
   } else {
-    return `${pick.season} Mid ${pick.round + getSuffix(pick.round)}`;
+    if (pick.order && pick.order <= 4) {
+      return `${pick.season} Early ${pick.round + getSuffix(pick.round)}`;
+    } else if (pick.order && pick.order >= 9) {
+      return `${pick.season} Late ${pick.round + getSuffix(pick.round)}`;
+    } else {
+      return `${pick.season} Mid ${pick.round + getSuffix(pick.round)}`;
+    }
   }
 };
 
