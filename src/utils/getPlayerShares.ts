@@ -1,6 +1,6 @@
-import { League, Playershare } from "@/lib/types/userTypes";
+import { League, Playershare, User } from "@/lib/types/userTypes";
 
-export const getPlayerShares = (leagues: League[]) => {
+export const getPlayerShares = (leagues: League[], user: User) => {
   const playershares: {
     [league_id: string]: Playershare;
   } = {};
@@ -12,7 +12,14 @@ export const getPlayerShares = (leagues: League[]) => {
       avatar: string | null;
       leagues: string[];
     };
-  } = {};
+  } = {
+    [user.user_id]: {
+      user_id: user.user_id,
+      username: user.username,
+      avatar: user.avatar,
+      leagues: [],
+    },
+  };
 
   leagues.forEach((league) => {
     league.userRoster.players?.forEach((player_id) => {

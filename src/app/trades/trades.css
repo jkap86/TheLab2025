@@ -1,3 +1,6 @@
+h2 {
+  font-size: 3rem;
+}
 div.trade-nav-buttons {
   display: flex;
   justify-content: space-between;

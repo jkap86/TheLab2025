@@ -127,8 +127,10 @@ export const useFetchUserAndLeagues = (searched: string | null) => {
             })
           );
 
-          const { playershares, leaguemates } =
-            getPlayerShares(parsedLeaguesArray);
+          const { playershares, leaguemates } = getPlayerShares(
+            parsedLeaguesArray,
+            user
+          );
 
           dispatch(updateState({ key: "leagues", value: leagues_obj }));
 

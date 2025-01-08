@@ -25,7 +25,8 @@ export interface CommonState {
 
   isLoadingPcTrades: boolean;
   pcTrades: {
-    player: string | undefined;
+    player1: string | undefined;
+    player2: string | undefined;
     count: number;
     trades: Trade[];
   }[];

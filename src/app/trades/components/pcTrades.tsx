@@ -16,11 +16,11 @@ const PcTrades = () => {
     (state: RootState) => state.common
   );
   const { playershares } = useSelector((state: RootState) => state.user);
-  const { searched_player_pc, searched_manager_pc, page_pc, activeTrade_pc } =
+  const { searched_player1_pc, searched_player2_pc, page_pc, activeTrade_pc } =
     useSelector((state: RootState) => state.trades);
 
   const fetchPcTrades = useCallback(
-    async (player?: string) => {
+    async (player1?: string, player2?: string) => {
       try {
         dispatch(updateState({ key: "isLoadingPcTrades", value: true }));
 
@@ -28,7 +28,8 @@ const PcTrades = () => {
           params: {
             offset: 0,
             limit: 125,
-            player,
+            player1,
+            player2,
           },
         });
 
@@ -36,9 +37,16 @@ const PcTrades = () => {
           updateState({
             key: "pcTrades",
             value: [
-              ...pcTrades.filter((s) => !(s.player === searched_player_pc)),
+              ...pcTrades.filter(
+                (s) =>
+                  !(
+                    s.player1 === searched_player1_pc &&
+                    s.player2 === searched_player2_pc
+                  )
+              ),
               {
-                player,
+                player1: searched_player1_pc,
+                player2: searched_player2_pc,
                 count: parseInt(pcTrades_raw.data.count),
                 trades: pcTrades_raw.data.rows.map((trade: TradeType) => {
                   return {
@@ -67,35 +75,52 @@ const PcTrades = () => {
       }
       dispatch(updateState({ key: "isLoadingPcTrades", value: false }));
     },
-    [pcTrades, searched_player_pc, ktc_current, dispatch]
+    [pcTrades, searched_player1_pc, searched_player2_pc, ktc_current, dispatch]
   );
 
   const fetchMoreTrades = async () => {
-    const player = searched_player_pc;
+    const player1 = searched_player1_pc;
+    const player2 = searched_player2_pc;
+
     dispatch(updateState({ key: "isLoadingPcTrades", value: true }));
 
     try {
       const moreTrades = await axios.get("/api/pctrades", {
         params: {
-          player,
+          player1,
+          player2,
           offset: (
-            pcTrades.find((s) => s.player === searched_player_pc)?.trades || []
+            pcTrades.find(
+              (s) =>
+                s.player1 === searched_player1_pc &&
+                s.player2 === searched_player2_pc
+            )?.trades || []
           ).length,
           limit: 125,
         },
       });
-
+      updatePage();
       dispatch(
         updateState({
           key: "pcTrades",
           value: [
-            ...pcTrades.filter((s) => !(s.player === searched_player_pc)),
+            ...pcTrades.filter(
+              (s) =>
+                !(
+                  s.player1 === searched_player1_pc &&
+                  s.player2 === searched_player2_pc
+                )
+            ),
             {
-              player,
+              player1,
+              player2,
               count: parseInt(moreTrades.data.count),
               trades: [
-                ...(pcTrades.find((s) => s.player === searched_player_pc)
-                  ?.trades || []),
+                ...(pcTrades.find(
+                  (s) =>
+                    s.player1 === searched_player1_pc &&
+                    s.player2 === searched_player2_pc
+                )?.trades || []),
                 ...moreTrades.data.rows.map((trade: TradeType) => {
                   return {
                     ...trade,
@@ -124,21 +149,46 @@ const PcTrades = () => {
     dispatch(updateState({ key: "isLoadingPcTrades", value: false }));
   };
 
+  const updatePage = () => {
+    const prevTradesLength = (
+      pcTrades.find(
+        (s) =>
+          s.player1 === searched_player1_pc && s.player2 === searched_player2_pc
+      )?.trades || []
+    ).length;
+
+    const newPage = Math.ceil((prevTradesLength - 1) / 25) + 1;
+
+    console.log({ newPage });
+    dispatch(updateTradesState({ key: "page_pc", value: newPage }));
+  };
+
   useEffect(() => {
     if (
-      (searched_manager_pc || searched_player_pc) &&
-      !pcTrades.some((s) => s.player === searched_player_pc)
+      (searched_player1_pc || searched_player2_pc) &&
+      !pcTrades.some(
+        (s) =>
+          s.player1 === searched_player1_pc && s.player2 === searched_player2_pc
+      )
     ) {
-      fetchPcTrades(searched_player_pc);
+      fetchPcTrades(searched_player1_pc, searched_player2_pc);
     }
-  }, [searched_manager_pc, searched_player_pc, pcTrades, fetchPcTrades]);
+  }, [searched_player1_pc, searched_player2_pc, pcTrades, fetchPcTrades]);
 
   const tradesDisplay =
-    pcTrades.find((s) => s.player === searched_player_pc)?.trades || [];
+    pcTrades.find(
+      (s) =>
+        s.player1 === searched_player1_pc && s.player2 === searched_player2_pc
+    )?.trades || [];
 
   const tradesCount = pcTrades.find(
-    (s) => s.player === searched_player_pc
+    (s) =>
+      s.player1 === searched_player1_pc && s.player2 === searched_player2_pc
   )?.count;
+
+  useEffect(() => {
+    dispatch(updateTradesState({ key: "page_pc", value: 1 }));
+  }, [searched_player1_pc, searched_player2_pc, dispatch]);
 
   const page_numbers = (
     <div className="page_numbers_wrapper">
@@ -158,9 +208,9 @@ const PcTrades = () => {
             </li>
           );
         })}
-        {tradesDisplay?.length > 0 &&
+        {tradesDisplay?.length > 25 &&
         tradesCount &&
-        (tradesDisplay?.length || 0) <= (tradesCount || 0) ? (
+        (tradesDisplay?.length || 0) < (tradesCount || 0) ? (
           <li onClick={() => fetchMoreTrades()}>...</li>
         ) : null}
       </ol>
@@ -171,10 +221,10 @@ const PcTrades = () => {
     <div className="searches">
       <Search
         searched={
-          allplayers?.[searched_player_pc]?.full_name || searched_player_pc
+          allplayers?.[searched_player1_pc]?.full_name || searched_player1_pc
         }
         setSearched={(value) =>
-          dispatch(updateTradesState({ key: "searched_player_pc", value }))
+          dispatch(updateTradesState({ key: "searched_player1_pc", value }))
         }
         options={Object.keys(playershares || {}).map((player_id) => {
           return {
@@ -191,6 +241,30 @@ const PcTrades = () => {
         })}
         placeholder="Player"
       />
+      {searched_player1_pc ? (
+        <Search
+          searched={
+            allplayers?.[searched_player2_pc]?.full_name || searched_player2_pc
+          }
+          setSearched={(value) =>
+            dispatch(updateTradesState({ key: "searched_player2_pc", value }))
+          }
+          options={Object.keys(playershares || {}).map((player_id) => {
+            return {
+              id: player_id,
+              text: allplayers?.[player_id]?.full_name || player_id,
+              display: (
+                <Avatar
+                  id={player_id}
+                  text={allplayers?.[player_id]?.full_name || player_id}
+                  type="P"
+                />
+              ),
+            };
+          })}
+          placeholder="Player 2"
+        />
+      ) : null}
     </div>
   );
 
@@ -225,6 +299,7 @@ const PcTrades = () => {
   return (
     <>
       {searches}
+      <h2>{tradesCount} Trades</h2>
       {page_numbers}
       {table}
       {page_numbers}

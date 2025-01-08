@@ -10,8 +10,8 @@ export interface TradesState {
 
   page_pc: number;
   activeTrade_pc: string;
-  searched_manager_pc: string;
-  searched_player_pc: string;
+  searched_player1_pc: string;
+  searched_player2_pc: string;
 
   tab_detail: "Tips" | "League";
 }
@@ -26,8 +26,8 @@ const initialState: TradesState = {
 
   page_pc: 1,
   activeTrade_pc: "",
-  searched_manager_pc: "",
-  searched_player_pc: "",
+  searched_player1_pc: "",
+  searched_player2_pc: "",
 
   tab_detail: "League",
 };

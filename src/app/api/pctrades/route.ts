@@ -4,7 +4,8 @@ import pool from "@/lib/api/pool";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
-  const player_id = searchParams.get("player");
+  const player_id1 = searchParams.get("player1");
+  const player_id2 = searchParams.get("player2");
   const limit = searchParams.get("limit");
   const offset = searchParams.get("offset");
 
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
         SELECT t.*, l.name, l.avatar, l.settings, l.scoring_settings, l.roster_positions
         FROM trades t
         JOIN leagues l ON t.league_id = l.league_id
-        WHERE t.players && $1
+        WHERE t.players @> $1
         ORDER BY t.status_updated DESC
         LIMIT $2 OFFSET $3
     `;
@@ -20,17 +21,19 @@ export async function GET(req: NextRequest) {
   const countPcTradesQuery = `
         SELECT COUNT(*) 
         FROM trades
-        WHERE players && $1
+        WHERE players @> $1
     `;
 
-  try {
-    const result = await pool.query(getPcTradesQuery, [
-      [player_id],
-      limit,
-      offset,
-    ]);
+  const players = [player_id1];
 
-    const count = await pool.query(countPcTradesQuery, [[player_id]]);
+  if (player_id2) {
+    players.push(player_id2);
+  }
+
+  try {
+    const result = await pool.query(getPcTradesQuery, [players, limit, offset]);
+
+    const count = await pool.query(countPcTradesQuery, [players]);
 
     return NextResponse.json(
       {

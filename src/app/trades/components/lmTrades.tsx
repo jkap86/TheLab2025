@@ -9,6 +9,7 @@ import { Trade as TradeType } from "@/lib/types/userTypes";
 import { getOptimalStarters } from "@/utils/getOptimalStarters";
 import Search from "@/components/search/search";
 import Avatar from "@/components/avatar/avatar";
+import { useEffect } from "react";
 
 const LmTrades = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -35,6 +36,7 @@ const LmTrades = () => {
         limit: 125,
       });
 
+      updatePage();
       if (manager || player) {
         dispatch(
           updateState({
@@ -109,6 +111,15 @@ const LmTrades = () => {
     );
   };
 
+  const updatePage = () => {
+    const prevTradesLength = tradesDisplay.length;
+
+    const newPage = Math.ceil((prevTradesLength - 1) / 25) + 1;
+
+    console.log({ newPage });
+    dispatch(updateTradesState({ key: "page_lm", value: newPage }));
+  };
+
   const tradesDisplay =
     searched_manager_lm || searched_player_lm
       ? lmTradeSearches.find(
@@ -122,7 +133,9 @@ const LmTrades = () => {
       ? lmTradeSearches.find((s) => s.player === searched_player_lm)?.count || 0
       : lmTrades.count || 0;
 
-  console.log({ searched_player_lm, lmTradeSearches, tradesCount });
+  useEffect(() => {
+    dispatch(updateTradesState({ key: "page_lm", value: 1 }));
+  }, [searched_player_lm, searched_manager_lm]);
 
   const table = (
     <table className="trades">
@@ -202,19 +215,21 @@ const LmTrades = () => {
         setSearched={(value) =>
           dispatch(updateTradesState({ key: "searched_manager_lm", value }))
         }
-        options={Object.keys(leaguemates).map((lm_user_id) => {
-          return {
-            id: lm_user_id,
-            text: leaguemates[lm_user_id].username,
-            display: (
-              <Avatar
-                id={lm_user_id}
-                text={leaguemates[lm_user_id].username}
-                type="U"
-              />
-            ),
-          };
-        })}
+        options={[
+          ...Object.keys(leaguemates).map((lm_user_id) => {
+            return {
+              id: lm_user_id,
+              text: leaguemates[lm_user_id].username,
+              display: (
+                <Avatar
+                  id={leaguemates[lm_user_id].avatar}
+                  text={leaguemates[lm_user_id].username}
+                  type="U"
+                />
+              ),
+            };
+          }),
+        ]}
         placeholder="Manager"
       />
     </div>
@@ -223,6 +238,7 @@ const LmTrades = () => {
   return (
     <>
       {searches}
+      <h2>{tradesCount} Trades</h2>
       {page_numbers}
       {table}
       {page_numbers}
