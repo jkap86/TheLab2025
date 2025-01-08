@@ -27,10 +27,14 @@ interface PlayersProps {
 const Players = ({ params }: PlayersProps) => {
   const dispatch: AppDispatch = useDispatch();
   const { searched } = use(params);
-  const { allplayers, ktc_trend, ktc_peak } = useSelector(
-    (state: RootState) => state.common
-  );
-  const { playershares, pickshares } = useSelector(
+  const {
+    allplayers,
+    ktc_trend,
+    ktc_peak,
+    isLoadingKtcPeak,
+    isLoadingKtcTrend,
+  } = useSelector((state: RootState) => state.common);
+  const { playershares, pickshares, user, leagues } = useSelector(
     (state: RootState) => state.user
   );
   const {
@@ -49,13 +53,17 @@ const Players = ({ params }: PlayersProps) => {
     filterPosition,
   } = useSelector((state: RootState) => state.players);
 
+  console.log({ user, leagues });
+
   const fetchKTCPrev = useCallback(async () => {
     if (
+      !isLoadingKtcTrend &&
       trendDate1 &&
       trendDate2 &&
       !(ktc_trend.date1 === trendDate1 && ktc_trend.date2 === trendDate2) &&
       [column1, column2, column3, column4].includes("KTC T")
     ) {
+      console.log("fetch KTC PREV");
       dispatch(updateState({ key: "isLoadingKtcTrend", value: true }));
 
       const ktc_previous_raw = await axios.get("/api/ktctrend", {
@@ -82,11 +90,13 @@ const Players = ({ params }: PlayersProps) => {
     column2,
     column3,
     column4,
+    isLoadingKtcTrend,
     dispatch,
   ]);
 
   const fetchKTCPeak = useCallback(async () => {
     if (
+      !isLoadingKtcPeak &&
       trendDate1 &&
       trendDate2 &&
       !(ktc_peak.date1 === trendDate1 && ktc_peak.date2 === trendDate2) &&
@@ -122,16 +132,14 @@ const Players = ({ params }: PlayersProps) => {
     column2,
     column3,
     column4,
+    isLoadingKtcPeak,
     dispatch,
   ]);
 
   useEffect(() => {
-    fetchKTCPrev();
-  }, [fetchKTCPrev]);
-
-  useEffect(() => {
     fetchKTCPeak();
-  }, [fetchKTCPeak]);
+    fetchKTCPrev();
+  }, []);
 
   const headers_sort = [0, 1, 2, 3, 4].map((key, index) => {
     const colnum = key as 0 | 1 | 2 | 3 | 4;
@@ -434,6 +442,18 @@ const Players = ({ params }: PlayersProps) => {
                 updatePlayersState({ key: "trendDate1", value: e.target.value })
               )
             }
+            onBlur={() => {
+              fetchKTCPeak();
+              fetchKTCPrev();
+            }}
+            onMouseMove={() => {
+              fetchKTCPeak();
+              fetchKTCPrev();
+            }}
+            onMouseOut={() => {
+              fetchKTCPeak();
+              fetchKTCPrev();
+            }}
           />
           <input
             type="date"
@@ -443,6 +463,18 @@ const Players = ({ params }: PlayersProps) => {
                 updatePlayersState({ key: "trendDate2", value: e.target.value })
               )
             }
+            onBlur={() => {
+              fetchKTCPeak();
+              fetchKTCPrev();
+            }}
+            onMouseMove={() => {
+              fetchKTCPeak();
+              fetchKTCPrev();
+            }}
+            onMouseOut={() => {
+              fetchKTCPeak();
+              fetchKTCPrev();
+            }}
           />
         </div>
       )}
