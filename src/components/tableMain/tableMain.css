@@ -125,8 +125,17 @@ td.content.inprogress {
 td.content.complete {
   font-weight: 900;
 }
+
+td.content.setting {
+  font-family: var(--fontScore);
+  font-size: 4rem;
+}
+
+td.content.setting i {
+  font-size: 75%;
+  vertical-align: middle;
+}
 td.content.infinity > div {
-  transform: scale(2);
 }
 td.content.playoffs {
   box-shadow: inset 0 0 5rem rgb(0, 255, 0);

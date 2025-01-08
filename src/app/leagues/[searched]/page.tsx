@@ -2,7 +2,7 @@
 
 import { AppDispatch, RootState } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
-import { use } from "react";
+import { use, useMemo } from "react";
 import { useFetchStateAndAllplayers } from "@/hooks/useFetchStateAllplayers";
 import { useFetchUserAndLeagues } from "@/hooks/useFetchUserLeagues";
 import TableMain from "@/components/tableMain/tableMain";
@@ -10,7 +10,6 @@ import SortIcon from "@/components/sortIcon/sortIcon";
 import { updateLeaguesState } from "../redux/leaguesSlice";
 import ColumnDropdown from "@/components/columnDropdown/columnDropdown";
 import {
-  getLeaguesColumn,
   getLeaguesColumnSortValue,
   leaguesColumnOptions,
 } from "@/utils/getLeaguesColumn";
@@ -18,14 +17,28 @@ import Avatar from "@/components/avatar/avatar";
 import League from "@/components/league/league";
 import LoadCommonData from "@/components/loadCommonData/loadCommonData";
 import { filterLeagueIds } from "@/utils/filterLeagues";
+import { getKtcAvgValue, getKtcTotValue } from "@/utils/getTeamKtcValues";
+import { getTrendColor_Range } from "@/utils/getTrendColor";
 
 interface LeaguesProps {
   params: Promise<{ searched: string }>;
 }
 
+type colObj = {
+  sort: number | string;
+  text: string | JSX.Element;
+  trendColor: { [key: string]: string };
+  classname: string;
+};
+
+type LeagueObj = {
+  [key: string]: colObj;
+};
+
 const Leagues = ({ params }: LeaguesProps) => {
   const dispatch: AppDispatch = useDispatch();
   const { searched } = use(params);
+  const { state } = useSelector((state: RootState) => state.common);
   const { leagues } = useSelector((state: RootState) => state.user);
   const {
     column1,
@@ -96,6 +109,160 @@ const Leagues = ({ params }: LeaguesProps) => {
     }),
   ];
 
+  const leaguesObj = useMemo(() => {
+    const obj: {
+      [league_id: string]: LeagueObj;
+    } = {};
+
+    Object.values(leagues || {})?.forEach((league) => {
+      const rank =
+        [...league.rosters]
+          .sort((a, b) => b.wins - a.wins || a.losses - b.losses || b.fp - a.fp)
+          .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
+
+      const rank_points =
+        [...league.rosters]
+          .sort((a, b) => b.fp - a.fp)
+          .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
+
+      const ktc_s_rk =
+        [...league.rosters]
+          .sort(
+            (a, b) =>
+              getKtcAvgValue(b.starters_optimal || []) -
+              getKtcAvgValue(a.starters_optimal || [])
+          )
+          .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
+
+      const ktc_pk_rk =
+        [...league.rosters]
+          .sort(
+            (a, b) =>
+              getKtcTotValue([], b.draftpicks || []) -
+              getKtcTotValue([], a.draftpicks || [])
+          )
+          .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
+
+      const ktc_t_rk =
+        [...league.rosters]
+          .sort(
+            (a, b) =>
+              getKtcTotValue(b.players || [], b.draftpicks || []) -
+              getKtcTotValue(a.players || [], a.draftpicks || [])
+          )
+          .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
+
+      const ktc_s_avg = getKtcAvgValue(
+        league.userRoster.starters_optimal || []
+      );
+
+      const ktc_b_avg = getKtcAvgValue(
+        (league.userRoster.players || []).filter(
+          (player_id) =>
+            !league.userRoster.starters_optimal?.includes(player_id)
+        )
+      );
+
+      obj[league.league_id] = {
+        Rk: {
+          sort: rank,
+          text: rank.toString(),
+          trendColor: getTrendColor_Range(
+            rank,
+            1,
+            league.rosters.length + 1,
+            true
+          ),
+          classname: "rank",
+        },
+        "Pts Rk": {
+          sort: rank_points,
+          text: rank_points.toString(),
+          trendColor: getTrendColor_Range(
+            rank_points,
+            1,
+            league.rosters.length + 1,
+            true
+          ),
+          classname: "rank",
+        },
+        "KTC S Rk": {
+          sort: ktc_s_rk,
+          text: ktc_s_rk.toString(),
+          trendColor: getTrendColor_Range(
+            ktc_s_rk,
+            1,
+            league.rosters.length + 1,
+            true
+          ),
+          classname: "rank",
+        },
+        "KTC T Rk": {
+          sort: ktc_t_rk,
+          text: ktc_t_rk.toString(),
+          trendColor: getTrendColor_Range(
+            ktc_t_rk,
+            1,
+            league.rosters.length + 1,
+            true
+          ),
+          classname: "rank",
+        },
+        "KTC Pk Rk": {
+          sort: ktc_pk_rk,
+          text: ktc_pk_rk.toString(),
+          trendColor: getTrendColor_Range(
+            ktc_pk_rk,
+            1,
+            league.rosters.length + 1,
+            true
+          ),
+          classname: "rank",
+        },
+        "KTC S Avg": {
+          sort: -ktc_s_avg,
+          text: ktc_s_avg.toString(),
+          trendColor: getTrendColor_Range(ktc_s_avg, 1000, 8000),
+          classname: "ktc",
+        },
+        "KTC B Avg": {
+          sort: -ktc_b_avg,
+          text: ktc_b_avg.toString(),
+          trendColor: getTrendColor_Range(ktc_b_avg, 1000, 8000),
+          classname: "ktc",
+        },
+        "Trade D": {
+          sort: league.settings.disable_trades
+            ? 0
+            : -league.settings.trade_deadline,
+          text: league.settings.disable_trades ? (
+            "-"
+          ) : league.settings.trade_deadline === 99 ? (
+            <i className="fa-solid fa-infinity"></i>
+          ) : (
+            league.settings.trade_deadline.toString()
+          ),
+          trendColor: {},
+          classname:
+            (typeof state?.week === "number" && typeof state.season === "string"
+              ? state.season === league.season
+                ? league.settings.trade_deadline < state?.week ||
+                  league.settings.disable_trades
+                  ? "red"
+                  : "green"
+                : parseInt(state.season) <= parseInt(league.season)
+                ? "green"
+                : ""
+              : "") +
+            (league.settings.trade_deadline === 99 ? " infinity " : " ") +
+            "setting",
+        },
+      };
+    });
+
+    return obj;
+  }, [leagues, state]);
+
   const data =
     (leagues &&
       filterLeagueIds(Object.keys(leagues))
@@ -136,13 +303,18 @@ const Leagues = ({ params }: LeaguesProps) => {
                 classname: sortLeaguesBy.column === 0 ? "sort" : "",
               },
               ...[column1, column2, column3, column4].map((col, index) => {
+                /*
                 const { text, trendColor, classname } = getLeaguesColumn(
                   col,
                   league
                 );
+                */
+
+                const { text, trendColor, classname } =
+                  leaguesObj[league.league_id][col as keyof LeagueObj] || {};
 
                 return {
-                  text,
+                  text: text || "-",
                   colspan: 1,
                   style: trendColor,
                   classname:
