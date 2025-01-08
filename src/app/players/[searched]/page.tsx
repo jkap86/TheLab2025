@@ -30,7 +30,9 @@ const Players = ({ params }: PlayersProps) => {
   const { allplayers, ktc_trend, ktc_peak } = useSelector(
     (state: RootState) => state.common
   );
-  const { playershares } = useSelector((state: RootState) => state.user);
+  const { playershares, pickshares } = useSelector(
+    (state: RootState) => state.user
+  );
   const {
     column1,
     column2,
@@ -186,75 +188,126 @@ const Players = ({ params }: PlayersProps) => {
     }),
   ];
 
-  const data = Object.keys(playershares)
-    .filter(
-      (player_id) =>
-        allplayers?.[player_id] &&
-        (!filterPosition ||
-          position_map[filterPosition]?.includes(
-            allplayers?.[player_id]?.position
-          )) &&
-        (!filterTeam || allplayers?.[player_id]?.team === filterTeam) &&
-        (!filterDraftClass ||
-          allplayers?.[player_id].years_exp === parseInt(filterDraftClass))
-    )
-    .map((player_id) => {
-      return {
-        id: player_id,
-        sortby: getPlayersSortValue(player_id, trendDate1, trendDate2),
-        search: {
-          text: allplayers?.[player_id]?.full_name || player_id,
-          display: (allplayers && (
-            <Avatar
-              id={player_id}
-              text={allplayers[player_id]?.full_name}
-              type="P"
-            />
-          )) || <>{player_id}</>,
-        },
-        columns: [
-          {
-            text: (
+  const data = [
+    ...Object.keys(playershares)
+      .filter(
+        (player_id) =>
+          allplayers?.[player_id] &&
+          (!filterPosition ||
+            position_map[filterPosition]?.includes(
+              allplayers?.[player_id]?.position
+            )) &&
+          (!filterTeam || allplayers?.[player_id]?.team === filterTeam) &&
+          (!filterDraftClass ||
+            allplayers?.[player_id].years_exp === parseInt(filterDraftClass))
+      )
+      .map((player_id) => {
+        return {
+          id: player_id,
+          sortby: getPlayersSortValue(
+            player_id,
+            trendDate1,
+            trendDate2,
+            "player"
+          ),
+          search: {
+            text: allplayers?.[player_id]?.full_name || player_id,
+            display: (allplayers && (
               <Avatar
                 id={player_id}
-                text={(allplayers && allplayers[player_id].full_name) || "-"}
+                text={allplayers[player_id]?.full_name}
                 type="P"
               />
-            ),
-            colspan: 3,
-            classname: sortPlayersBy.column === 0 ? "sort" : "",
+            )) || <>{player_id}</>,
           },
-          ...[column1, column2, column3, column4].map((col, index) => {
-            const { text, trendColor, classname } = getPlayersColumn(
-              col,
+          columns: [
+            {
+              text: (
+                <Avatar
+                  id={player_id}
+                  text={(allplayers && allplayers[player_id].full_name) || "-"}
+                  type="P"
+                />
+              ),
+              colspan: 3,
+              classname: sortPlayersBy.column === 0 ? "sort" : "",
+            },
+            ...[column1, column2, column3, column4].map((col, index) => {
+              const { text, trendColor, classname } = getPlayersColumn(
+                col,
+                player_id,
+                trendDate1,
+                trendDate2,
+                "player"
+              );
+
+              return {
+                text,
+                colspan: 1,
+                style: trendColor,
+                classname:
+                  sortPlayersBy.column === index + 1
+                    ? "sort " + classname
+                    : classname,
+              };
+            }),
+          ],
+          secondary: <PlayerLeagues player_obj={playershares[player_id]} />,
+        };
+      }),
+    ...(filterPosition === "PI"
+      ? Object.keys(pickshares).map((player_id) => {
+          return {
+            id: player_id,
+            sortby: getPlayersSortValue(
               player_id,
               trendDate1,
-              trendDate2
-            );
+              trendDate2,
+              "pick"
+            ),
+            search: {
+              text: player_id,
+              display: <>{player_id}</>,
+            },
+            columns: [
+              {
+                text: player_id,
+                colspan: 3,
+                classname: sortPlayersBy.column === 0 ? "sort" : "",
+              },
+              ...[column1, column2, column3, column4].map((col, index) => {
+                const { text, trendColor, classname } = getPlayersColumn(
+                  col,
+                  player_id,
+                  trendDate1,
+                  trendDate2,
+                  "pick"
+                );
 
-            return {
-              text,
-              colspan: 1,
-              style: trendColor,
-              classname:
-                sortPlayersBy.column === index + 1
-                  ? "sort " + classname
-                  : classname,
-            };
-          }),
-        ],
-        secondary: <PlayerLeagues player_obj={playershares[player_id]} />,
-      };
-    })
-    .sort((a, b) =>
-      sortPlayersBy.asc
-        ? a.sortby > b.sortby
-          ? 1
-          : -1
-        : a.sortby < b.sortby
+                return {
+                  text,
+                  colspan: 1,
+                  style: trendColor,
+                  classname:
+                    sortPlayersBy.column === index + 1
+                      ? "sort " + classname
+                      : classname,
+                };
+              }),
+            ],
+            secondary: <PlayerLeagues player_obj={playershares[player_id]} />,
+          };
+        })
+      : []),
+  ].sort((a, b) =>
+    sortPlayersBy.asc
+      ? a.sortby > b.sortby
         ? 1
         : -1
-    );
+      : a.sortby < b.sortby
+      ? 1
+      : -1
+  );
 
   const teams = Array.from(
     new Set(
@@ -336,7 +389,8 @@ const Players = ({ params }: PlayersProps) => {
             )
           }
         >
-          <option value={""}>All</option>
+          <option value={""}>Players</option>
+          <option value={"PI"}>Picks</option>
           {slots.map((slot) => {
             return (
               <option key={slot} value={slot}>

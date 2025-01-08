@@ -127,7 +127,7 @@ export const useFetchUserAndLeagues = (searched: string | null) => {
             })
           );
 
-          const { playershares, leaguemates } = getPlayerShares(
+          const { playershares, leaguemates, pickshares } = getPlayerShares(
             parsedLeaguesArray,
             user
           );
@@ -136,6 +136,7 @@ export const useFetchUserAndLeagues = (searched: string | null) => {
 
           dispatch(updateState({ key: "playershares", value: playershares }));
 
+          dispatch(updateState({ key: "pickshares", value: pickshares }));
           dispatch(updateState({ key: "leaguemates", value: leaguemates }));
         } catch (err: unknown) {
           console.log({ err });

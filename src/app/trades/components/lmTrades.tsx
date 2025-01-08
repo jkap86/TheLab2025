@@ -135,7 +135,7 @@ const LmTrades = () => {
 
   useEffect(() => {
     dispatch(updateTradesState({ key: "page_lm", value: 1 }));
-  }, [searched_player_lm, searched_manager_lm]);
+  }, [searched_player_lm, searched_manager_lm, dispatch]);
 
   const table = (
     <table className="trades">

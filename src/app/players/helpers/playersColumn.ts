@@ -20,12 +20,13 @@ export const columnOptions = [
 export const getPlayersSortValue = (
   player_id: string,
   trendDate1: string,
-  trendDate2: string
+  trendDate2: string,
+  type: string
 ) => {
   const state: RootState = store.getState();
 
   const { allplayers, ktc_current, ktc_trend, ktc_peak } = state.common;
-  const { playershares, leagues } = state.user;
+  const { playershares, pickshares, leagues } = state.user;
   const { column1, column2, column3, column4, sortPlayersBy } = state.players;
 
   let sortbyCol;
@@ -51,13 +52,19 @@ export const getPlayersSortValue = (
 
   switch (sortbyCol) {
     case "# Own":
-      sort = filterLeagueIds(playershares[player_id].owned).length;
+      sort =
+        type === "player"
+          ? filterLeagueIds(playershares[player_id].owned).length
+          : filterLeagueIds(pickshares[player_id].owned).length;
       break;
     case "% Own":
       sort =
         (leagues &&
-          filterLeagueIds(playershares[player_id].owned).length /
-            filterLeagueIds(Object.keys(leagues)).length) ||
+          filterLeagueIds(
+            type === "player"
+              ? playershares[player_id].owned
+              : pickshares[player_id].owned
+          ).length / filterLeagueIds(Object.keys(leagues)).length) ||
         0;
       break;
     case "KTC":
@@ -102,7 +109,7 @@ export const getPlayersSortValue = (
       sort = allplayers?.[player_id].age || 999;
       break;
     default:
-      sort = allplayers?.[player_id].full_name || "";
+      sort = allplayers?.[player_id].full_name || player_id;
       break;
   }
   return sort;
@@ -112,7 +119,8 @@ export const getPlayersColumn = (
   col: string,
   player_id: string,
   trendDate1: string,
-  trendDate2: string
+  trendDate2: string,
+  type: string
 ) => {
   const state: RootState = store.getState();
 
@@ -124,9 +132,12 @@ export const getPlayersColumn = (
     isLoadingKtcPeak,
     isLoadingKtcTrend,
   } = state.common;
-  const { playershares, leagues } = state.user;
+  const { playershares, pickshares, leagues } = state.user;
 
-  const owned = filterLeagueIds(playershares[player_id].owned);
+  const owned =
+    type === "player"
+      ? filterLeagueIds(playershares[player_id].owned)
+      : filterLeagueIds(pickshares[player_id].owned);
 
   let text, trendColor, classname;
 

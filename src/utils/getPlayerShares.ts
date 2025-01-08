@@ -1,8 +1,13 @@
 import { League, Playershare, User } from "@/lib/types/userTypes";
+import { getDraftPickId } from "./getPickId";
 
 export const getPlayerShares = (leagues: League[], user: User) => {
   const playershares: {
-    [league_id: string]: Playershare;
+    [player_id: string]: Playershare;
+  } = {};
+
+  const pickshares: {
+    [pick_id: string]: Playershare;
   } = {};
 
   const leaguemates: {
@@ -32,6 +37,26 @@ export const getPlayerShares = (leagues: League[], user: User) => {
       }
 
       playershares[player_id].owned.push(league.league_id);
+    });
+
+    league.userRoster.draftpicks.forEach((draft_pick) => {
+      const pick_id = draft_pick.order
+        ? `${draft_pick.season} ${
+            draft_pick.round
+          }.${draft_pick.order.toLocaleString("en-US", {
+            minimumIntegerDigits: 2,
+          })}`
+        : getDraftPickId(draft_pick);
+
+      if (!pickshares[pick_id]) {
+        pickshares[pick_id] = {
+          owned: [],
+          taken: [],
+          available: [],
+        };
+      }
+
+      pickshares[pick_id].owned.push(league.league_id);
     });
 
     league.rosters
@@ -67,6 +92,34 @@ export const getPlayerShares = (leagues: League[], user: User) => {
             league_id: league.league_id,
           });
         });
+
+        roster.draftpicks.forEach((draft_pick) => {
+          const pick_id = draft_pick.order
+            ? `${draft_pick.season} ${
+                draft_pick.round
+              }.${draft_pick.order.toLocaleString("en-US", {
+                minimumIntegerDigits: 2,
+              })}`
+            : getDraftPickId(draft_pick);
+
+          if (!pickshares[pick_id]) {
+            pickshares[pick_id] = {
+              owned: [],
+              taken: [],
+              available: [],
+            };
+          }
+
+          pickshares[pick_id].taken.push({
+            lm_roster_id: roster.roster_id,
+            lm: {
+              user_id: roster.user_id,
+              username: roster.username,
+              avatar: roster.avatar || "",
+            },
+            league_id: league.league_id,
+          });
+        });
       });
   });
 
@@ -81,5 +134,5 @@ export const getPlayerShares = (leagues: League[], user: User) => {
     });
   });
 
-  return { playershares, leaguemates };
+  return { playershares, leaguemates, pickshares };
 };

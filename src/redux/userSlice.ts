@@ -23,7 +23,10 @@ export interface UserState {
   errorSyncingLeague: string | null;
 
   playershares: {
-    [league_id: string]: Playershare;
+    [player_id: string]: Playershare;
+  };
+  pickshares: {
+    [pick_id: string]: Playershare;
   };
   leaguemates: {
     [lm_user_id: string]: Leaguemate;
@@ -104,6 +107,7 @@ const initialState: UserState = {
   errorSyncingLeague: null,
 
   playershares: {},
+  pickshares: {},
   leaguemates: {},
 
   isLoadingLmTrades: false,

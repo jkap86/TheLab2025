@@ -285,6 +285,31 @@ const League = ({ league, type }: LeagueProps) => {
             ?.filter(
               (player_id) => !activeRoster.starters_optimal?.includes(player_id)
             )
+            ?.sort((a, b) => {
+              const getPositionValue = (player_id: string) => {
+                const position = allplayers && allplayers[player_id]?.position;
+
+                switch (position) {
+                  case "QB":
+                    return 1;
+                  case "RB":
+                    return 2;
+                  case "FB":
+                    return 2;
+                  case "WR":
+                    return 3;
+                  case "TE":
+                    return 4;
+                  default:
+                    return 5;
+                }
+              };
+
+              return (
+                getPositionValue(a) - getPositionValue(b) ||
+                (ktc_current?.[b] || 0) - (ktc_current?.[a] || 0)
+              );
+            })
             ?.map((player_id) => {
               const { text, trendColor, classname } = getTeamColumn(
                 column1_team,
