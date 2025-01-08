@@ -75,6 +75,7 @@ export type SleeperDraftpick = {
 
 export type SleeperPlayerStat = {
   player_id: string;
+  date: string;
   stats: { [key: string]: number };
   player: { injury_status: string };
   team: string;

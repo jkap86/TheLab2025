@@ -349,7 +349,6 @@ const Players = ({ params }: PlayersProps) => {
     </div>
   );
 
-  console.log({ filterDraftClass });
   const setPage = (p: number) =>
     dispatch(updatePlayersState({ key: "page", value: p }));
 

@@ -75,12 +75,14 @@ const PcTrades = () => {
     dispatch(updateState({ key: "isLoadingPcTrades", value: true }));
 
     try {
-      const moreTrades = await axios.post("/api/pctrades", {
-        player,
-        offset: (
-          pcTrades.find((s) => s.player === searched_player_pc)?.trades || []
-        ).length,
-        limit: 125,
+      const moreTrades = await axios.get("/api/pctrades", {
+        params: {
+          player,
+          offset: (
+            pcTrades.find((s) => s.player === searched_player_pc)?.trades || []
+          ).length,
+          limit: 125,
+        },
       });
 
       dispatch(
@@ -91,21 +93,25 @@ const PcTrades = () => {
             {
               player,
               count: parseInt(moreTrades.data.count),
-              trades: moreTrades.data.rows.map((trade: TradeType) => {
-                return {
-                  ...trade,
-                  rosters: trade.rosters.map((r) => {
-                    return {
-                      ...r,
-                      starters_optimal: getOptimalStarters(
-                        trade.roster_positions,
-                        r.players || [],
-                        ktc_current
-                      ),
-                    };
-                  }),
-                };
-              }),
+              trades: [
+                ...(pcTrades.find((s) => s.player === searched_player_pc)
+                  ?.trades || []),
+                ...moreTrades.data.rows.map((trade: TradeType) => {
+                  return {
+                    ...trade,
+                    rosters: trade.rosters.map((r) => {
+                      return {
+                        ...r,
+                        starters_optimal: getOptimalStarters(
+                          trade.roster_positions,
+                          r.players || [],
+                          ktc_current
+                        ),
+                      };
+                    }),
+                  };
+                }),
+              ],
             },
           ],
         })
@@ -152,7 +158,9 @@ const PcTrades = () => {
             </li>
           );
         })}
-        {(tradesDisplay?.length || 0) < (tradesCount || 0) ? (
+        {tradesDisplay?.length > 0 &&
+        tradesCount &&
+        (tradesDisplay?.length || 0) <= (tradesCount || 0) ? (
           <li onClick={() => fetchMoreTrades()}>...</li>
         ) : null}
       </ol>

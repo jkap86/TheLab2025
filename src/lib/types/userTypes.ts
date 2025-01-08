@@ -129,3 +129,8 @@ export type PlayerProjection = {
   injury_status: string;
   game_id: string;
 };
+
+export type PlayerStat = {
+  date: string;
+  stats: { [cat: string]: number };
+};

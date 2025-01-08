@@ -50,8 +50,7 @@ export async function GET() {
           ON CONFLICT (name) 
           DO UPDATE SET 
             data = EXCLUDED.data,
-            updatedat = EXCLUDED.updatedat
-          RETURNING *;
+            updatedat = EXCLUDED.updatedat;
         `,
         ["allplayers", JSON.stringify(allplayers_array), new Date()]
       );
