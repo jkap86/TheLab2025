@@ -19,13 +19,17 @@ export async function GET(req: NextRequest) {
   const obj1 = ktc_dates[trendDate1];
   const obj2 = ktc_dates[trendDate2];
 
-  const result = Object.fromEntries(
-    Array.from(new Set([...Object.keys(obj1), ...Object.keys(obj2)])).map(
-      (player_id) => {
-        return [player_id, (obj2[player_id] || 0) - (obj1[player_id] || 0)];
-      }
-    )
-  );
+  const result =
+    (obj1 &&
+      obj2 &&
+      Object.fromEntries(
+        Array.from(new Set([...Object.keys(obj1), ...Object.keys(obj2)])).map(
+          (player_id) => {
+            return [player_id, (obj2[player_id] || 0) - (obj1[player_id] || 0)];
+          }
+        )
+      )) ||
+    {};
 
   return NextResponse.json(result, { status: 200 });
 }
