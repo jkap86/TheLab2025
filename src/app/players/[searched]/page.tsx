@@ -36,7 +36,7 @@ const Players = ({ params }: PlayersProps) => {
     isLoadingStatsTrend,
     stats_trend,
   } = useSelector((state: RootState) => state.common);
-  const { playershares, pickshares, user, leagues } = useSelector(
+  const { playershares, pickshares } = useSelector(
     (state: RootState) => state.user
   );
   const {
@@ -151,14 +151,24 @@ const Players = ({ params }: PlayersProps) => {
 
       dispatch(updateState({ key: "isLoadingStatsTrend", value: false }));
     }
-  }, [trendDate1, trendDate2, stats_trend, isLoadingStatsTrend, dispatch]);
+  }, [
+    trendDate1,
+    trendDate2,
+    stats_trend,
+    playershares,
+    isLoadingStatsTrend,
+    dispatch,
+  ]);
 
   console.log({ stats_trend });
   useEffect(() => {
     fetchKTCPeak();
     fetchKTCPrev();
-    fetchStatsTrend();
   }, []);
+
+  useEffect(() => {
+    if (Object.keys(playershares).length > 0) fetchStatsTrend();
+  }, [playershares]);
 
   const headers_sort = [0, 1, 2, 3, 4].map((key, index) => {
     const colnum = key as 0 | 1 | 2 | 3 | 4;
@@ -370,7 +380,7 @@ const Players = ({ params }: PlayersProps) => {
             )
           }
         >
-          <option>All</option>
+          <option value={""}>All</option>
           {teams
             .sort((a, b) => (a < b ? -1 : 1))
             .map((team) => {
@@ -391,7 +401,7 @@ const Players = ({ params }: PlayersProps) => {
             )
           }
         >
-          <option value={0}>All</option>
+          <option value={""}>All</option>
           {yearsExps
             .sort((a, b) => (a < b ? -1 : 1))
             .map((ye) => {

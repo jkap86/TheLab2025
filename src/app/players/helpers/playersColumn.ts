@@ -260,13 +260,20 @@ export const getPlayersColumn = (
     case "Ppr Ppg":
       text = isLoadingStatsTrend
         ? "LOADING"
-        : stats_trend.values[player_id]?.total_gp > 0
+        : ktc_peak.date1 === trendDate1 &&
+          ktc_peak.date2 === trendDate2 &&
+          stats_trend.values[player_id]?.total_gp > 0
         ? (
             stats_trend.values[player_id].total_pts_ppr /
             stats_trend.values[player_id].total_gp
-          ).toLocaleString("en-US", { maximumFractionDigits: 1 })
+          ).toLocaleString("en-US", {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+          })
         : "-";
-      trendColor = isLoadingStatsTrend ? { color: `rgb(100, 255, 255)` } : {};
+      trendColor = isLoadingStatsTrend
+        ? { color: `rgb(100, 255, 255)` }
+        : getTrendColor_Range(parseInt(text), 5, 15);
       classname = "fp";
       break;
     default:

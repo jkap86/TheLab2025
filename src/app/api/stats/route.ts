@@ -1,7 +1,4 @@
-import axiosInstance from "@/lib/api/axiosInstance";
 import pool from "@/lib/api/pool";
-import { SleeperPlayerStat } from "@/lib/types/sleeperApiTypes";
-import { PlayerStat } from "@/lib/types/userTypes";
 
 import { NextRequest, NextResponse } from "next/server";
 
