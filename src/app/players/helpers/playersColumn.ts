@@ -9,6 +9,7 @@ export const columnOptions = [
   { text: "# Taken", abbrev: "# Taken" },
   { text: "# Available", abbrev: "# Avail" },
   { text: "Age", abbrev: "Age" },
+  { text: "Ppr Ppg", abbrev: "Ppr Ppg" },
   { text: "KTC Dynasty Value", abbrev: "KTC" },
   { text: "KTC Trend", abbrev: "KTC T" },
   { text: "KTC Peak", abbrev: "KTC P" },
@@ -25,7 +26,8 @@ export const getPlayersSortValue = (
 ) => {
   const state: RootState = store.getState();
 
-  const { allplayers, ktc_current, ktc_trend, ktc_peak } = state.common;
+  const { allplayers, ktc_current, ktc_trend, ktc_peak, stats_trend } =
+    state.common;
   const { playershares, pickshares, leagues } = state.user;
   const { column1, column2, column3, column4, sortPlayersBy } = state.players;
 
@@ -105,6 +107,13 @@ export const getPlayersSortValue = (
           new Date(ktc_peak.min_values[player_id]?.date)) ||
         0;
       break;
+    case "Ppr Ppg":
+      sort =
+        stats_trend.values[player_id]?.total_gp > 0
+          ? stats_trend.values[player_id].total_pts_ppr /
+            stats_trend.values[player_id].total_gp
+          : 0;
+      break;
     case "Age":
       sort = allplayers?.[player_id].age || 999;
       break;
@@ -131,6 +140,8 @@ export const getPlayersColumn = (
     ktc_peak,
     isLoadingKtcPeak,
     isLoadingKtcTrend,
+    stats_trend,
+    isLoadingStatsTrend,
   } = state.common;
   const { playershares, pickshares, leagues } = state.user;
 
@@ -245,6 +256,18 @@ export const getPlayersColumn = (
           "-";
       trendColor = isLoadingKtcPeak ? { color: `rgb(100, 255, 255)` } : {};
       classname = "date";
+      break;
+    case "Ppr Ppg":
+      text = isLoadingStatsTrend
+        ? "LOADING"
+        : stats_trend.values[player_id]?.total_gp > 0
+        ? (
+            stats_trend.values[player_id].total_pts_ppr /
+            stats_trend.values[player_id].total_gp
+          ).toLocaleString("en-US", { maximumFractionDigits: 1 })
+        : "-";
+      trendColor = isLoadingStatsTrend ? { color: `rgb(100, 255, 255)` } : {};
+      classname = "fp";
       break;
     default:
       text = "-";

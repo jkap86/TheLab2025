@@ -23,6 +23,14 @@ export interface CommonState {
   };
   projections_week: { [player_id: string]: PlayerProjection } | null;
 
+  isLoadingStatsTrend: boolean;
+  stats_trend: {
+    date1: string;
+    date2: string;
+    season_type: string;
+    values: { [player_id: string]: { [cat: string]: number } };
+  };
+
   isLoadingPcTrades: boolean;
   pcTrades: {
     player1: string | undefined;
@@ -46,7 +54,16 @@ const initialState: CommonState = {
 
   isLoadingKtcPeak: false,
   ktc_peak: { date1: "", date2: "", max_values: {}, min_values: {} },
+
   projections_week: null,
+
+  isLoadingStatsTrend: false,
+  stats_trend: {
+    date1: "",
+    date2: "",
+    season_type: "",
+    values: {},
+  },
 
   isLoadingPcTrades: false,
   pcTrades: [],
