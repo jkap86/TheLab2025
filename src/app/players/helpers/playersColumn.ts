@@ -10,6 +10,8 @@ export const columnOptions = [
   { text: "# Available", abbrev: "# Avail" },
   { text: "Age", abbrev: "Age" },
   { text: "Ppr Ppg", abbrev: "Ppr Ppg" },
+  { text: "# Games Played", abbrev: "# Gp" },
+  { text: "Snap Percentage", abbrev: "Snp %" },
   { text: "KTC Dynasty Value", abbrev: "KTC" },
   { text: "KTC Trend", abbrev: "KTC T" },
   { text: "KTC Peak", abbrev: "KTC P" },
@@ -109,14 +111,25 @@ export const getPlayersSortValue = (
       break;
     case "Ppr Ppg":
       sort =
-        stats_trend.values[player_id]?.total_gp > 0
-          ? stats_trend.values[player_id].total_pts_ppr /
-            stats_trend.values[player_id].total_gp
+        (stats_trend.values[player_id]?.gp || 0) > 0
+          ? (stats_trend.values[player_id]?.pts_ppr || 0) /
+            stats_trend.values[player_id].gp
           : 0;
+      break;
+    case "# Gp":
+      sort = stats_trend.values[player_id]?.gp || 0;
+      break;
+    case "Snp %":
+      sort =
+        (stats_trend.values[player_id]?.tm_off_snp &&
+          (stats_trend.values[player_id]?.off_snp || 0) /
+            stats_trend.values[player_id].tm_off_snp) ||
+        0;
       break;
     case "Age":
       sort = allplayers?.[player_id].age || 999;
       break;
+
     default:
       sort = allplayers?.[player_id].full_name || player_id;
       break;
@@ -260,12 +273,12 @@ export const getPlayersColumn = (
     case "Ppr Ppg":
       text = isLoadingStatsTrend
         ? "LOADING"
-        : ktc_peak.date1 === trendDate1 &&
-          ktc_peak.date2 === trendDate2 &&
-          stats_trend.values[player_id]?.total_gp > 0
+        : stats_trend.date1 === trendDate1 &&
+          stats_trend.date2 === trendDate2 &&
+          stats_trend.values[player_id]?.gp > 0
         ? (
-            stats_trend.values[player_id].total_pts_ppr /
-            stats_trend.values[player_id].total_gp
+            (stats_trend.values[player_id].pts_ppr || 0) /
+            stats_trend.values[player_id].gp
           ).toLocaleString("en-US", {
             minimumFractionDigits: 1,
             maximumFractionDigits: 1,
@@ -275,6 +288,41 @@ export const getPlayersColumn = (
         ? { color: `rgb(100, 255, 255)` }
         : getTrendColor_Range(parseInt(text), 5, 15);
       classname = "fp";
+      break;
+    case "# Gp":
+      text = isLoadingStatsTrend
+        ? "LOADING"
+        : (
+            (stats_trend.date1 === trendDate1 &&
+              stats_trend.date2 === trendDate2 &&
+              stats_trend.values[player_id]?.gp) ||
+            0
+          ).toLocaleString("en-US");
+      trendColor = isLoadingStatsTrend ? { color: `rgb(100, 255, 255)` } : {};
+      classname = "fp";
+      break;
+    case "Snp %":
+      text = isLoadingStatsTrend
+        ? "LOADING"
+        : (stats_trend.values[player_id]?.tm_off_snp &&
+            stats_trend.values[player_id].tm_off_snp > 0 &&
+            ((stats_trend.values[player_id]?.off_snp || 0) /
+              stats_trend.values[player_id].tm_off_snp) *
+              100) ||
+          false;
+      trendColor =
+        typeof text === "string"
+          ? { color: `rgb(100, 255, 255)` }
+          : (typeof text === "number" && getTrendColor_Range(text, 25, 75)) ||
+            {};
+
+      text =
+        (text === "LOADING"
+          ? (text && text) || "-"
+          : typeof text === "number" &&
+            text.toLocaleString("en-US", { maximumFractionDigits: 0 }) + "%") ||
+        "-";
+      classname = "percentage";
       break;
     default:
       text = "-";

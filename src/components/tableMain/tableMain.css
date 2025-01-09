@@ -150,6 +150,10 @@ td.content.date {
   font-size: 90%;
 }
 
+td.content.percentage {
+  font-size: 120%;
+}
+
 table.one td.content {
   background-image: radial-gradient(var(--color3) -300%, var(--color4) 100%);
 }

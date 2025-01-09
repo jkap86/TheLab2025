@@ -1,4 +1,6 @@
+//import axiosInstance from "@/lib/api/axiosInstance";
 import pool from "@/lib/api/pool";
+//import { SleeperPlayerStat } from "@/lib/types/sleeperApiTypes";
 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,11 +12,9 @@ export async function POST(req: NextRequest) {
 
     const stats_array: {
       player_id: string;
-      gms_active: number;
-      gp: number;
-      pts_ppr: number;
       date: Date;
       season_type: string;
+      stats: { [cat: string]: number };
     }[] = [];
 
     for await (let season of seasons) {
@@ -54,18 +54,14 @@ export async function POST(req: NextRequest) {
             .filter(
               (stat_obj: SleeperPlayerStat) =>
                 parseInt(stat_obj.player_id) &&
-                (stat_obj.stats.pts_ppr ||
-                  stat_obj.stats.gp ||
-                  stat_obj.stats.gms_active)
+                (stat_obj.stats.pts_ppr || stat_obj.stats.gp)
             )
             .forEach((stat_obj: SleeperPlayerStat) => {
               stats_array.push({
                 player_id: stat_obj.player_id,
-                gms_active: stat_obj.stats.gms_active || 0,
-                gp: stat_obj.stats.gp || 0,
-                pts_ppr: stat_obj.stats.pts_ppr || 0,
                 date: new Date(stat_obj.date),
                 season_type: season_type,
+                stats: stat_obj.stats,
               });
             });
         }
@@ -73,23 +69,21 @@ export async function POST(req: NextRequest) {
     }
 
     const insertQuery = `
-        INSERT INTO stats (player_id, gms_active, gp, pts_ppr, date, season_type)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO playergamestats (player_id, date, season_type, stats)
+        VALUES ($1, $2, $3, $4)
         ON CONFLICT (player_id, date) 
         DO UPDATE 
         SET 
-          pts_ppr = EXCLUDED.pts_ppr,
-          season_type = EXCLUDED.season_type;
+          season_type = EXCLUDED.season_type,
+          stats = EXCLUDED.stats;
         `;
 
     for (const stat of stats_array) {
       await pool.query(insertQuery, [
         stat.player_id,
-        stat.gms_active,
-        stat.gp,
-        stat.pts_ppr,
         stat.date,
         stat.season_type,
+        stat.stats,
       ]);
     }
 
@@ -108,17 +102,17 @@ export async function POST(req: NextRequest) {
   const query = `
       SELECT 
           player_id,
-          SUM(pts_ppr) AS total_pts_ppr,
-          SUM(gms_active) AS total_gms_active,
-          SUM(gp) AS total_gp
+          key,
+          SUM(value::NUMERIC) AS total_value
       FROM 
-          stats
+          playergamestats,
+          jsonb_each_text(stats) AS kv(key, value)
       WHERE 
           date BETWEEN $1 AND $2
           AND season_type = $3
           AND player_id = ANY($4)
       GROUP BY 
-          player_id;
+          player_id, key;
     `;
 
   const result = await pool.query(query, [
@@ -128,12 +122,15 @@ export async function POST(req: NextRequest) {
     player_ids,
   ]);
 
-  const response = result.rows.map((row) => ({
-    player_id: row.player_id,
-    total_pts_ppr: parseFloat(row.total_pts_ppr),
-    total_gms_active: parseInt(row.total_gms_active, 10),
-    total_gp: parseInt(row.total_gp, 10),
-  }));
+  const response: { [player_id: string]: { [cat: string]: number } } = {};
+
+  result.rows.forEach((row) => {
+    if (!response[row.player_id]) {
+      response[row.player_id] = {};
+    }
+
+    response[row.player_id][row.key] = parseFloat(row.total_value);
+  });
 
   return NextResponse.json(response);
 }

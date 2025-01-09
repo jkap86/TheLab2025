@@ -126,17 +126,6 @@ const Players = ({ params }: PlayersProps) => {
         player_ids: Object.keys(playershares),
       });
 
-      const stats_obj = Object.fromEntries(
-        stats.data.map(
-          (player_obj: {
-            player_id: string;
-            total_pts_ppr: number;
-            total_gms_active: number;
-            total_gp: number;
-          }) => [player_obj.player_id, player_obj]
-        )
-      );
-
       dispatch(
         updateState({
           key: "stats_trend",
@@ -144,7 +133,7 @@ const Players = ({ params }: PlayersProps) => {
             date1: trendDate1,
             date2: trendDate2,
             season_type: "regular",
-            values: stats_obj,
+            values: stats.data,
           },
         })
       );
