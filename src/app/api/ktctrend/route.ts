@@ -27,12 +27,5 @@ export async function GET(req: NextRequest) {
     )
   );
 
-  return NextResponse.json(
-    {
-      date1: trendDate1,
-      date2: trendDate2,
-      values: result,
-    },
-    { status: 200 }
-  );
+  return NextResponse.json(result, { status: 200 });
 }

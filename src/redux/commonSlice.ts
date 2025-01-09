@@ -9,15 +9,15 @@ export interface CommonState {
 
   isLoadingKtcTrend: boolean;
   ktc_trend: {
-    date1: string;
-    date2: string;
+    date: string;
+    days: number;
     values: { [player_id: string]: number };
   };
 
   isLoadingKtcPeak: boolean;
   ktc_peak: {
-    date1: string;
-    date2: string;
+    date: string;
+    days: number;
     min_values: { [player_id: string]: { date: string; value: number } };
     max_values: { [player_id: string]: { date: string; value: number } };
   };
@@ -25,8 +25,8 @@ export interface CommonState {
 
   isLoadingStatsTrend: boolean;
   stats_trend: {
-    date1: string;
-    date2: string;
+    date: string;
+    days: number;
     season_type: string;
     values: { [player_id: string]: { [cat: string]: number } };
   };
@@ -50,17 +50,17 @@ const initialState: CommonState = {
   ktc_current: null,
 
   isLoadingKtcTrend: false,
-  ktc_trend: { date1: "", date2: "", values: {} },
+  ktc_trend: { date: "", days: 0, values: {} },
 
   isLoadingKtcPeak: false,
-  ktc_peak: { date1: "", date2: "", max_values: {}, min_values: {} },
+  ktc_peak: { date: "", days: 0, max_values: {}, min_values: {} },
 
   projections_week: null,
 
   isLoadingStatsTrend: false,
   stats_trend: {
-    date1: "",
-    date2: "",
+    date: "",
+    days: 0,
     season_type: "",
     values: {},
   },

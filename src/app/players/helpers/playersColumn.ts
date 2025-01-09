@@ -22,8 +22,8 @@ export const columnOptions = [
 
 export const getPlayersSortValue = (
   player_id: string,
-  trendDate1: string,
-  trendDate2: string,
+  trendDate: string,
+  trendDays: number,
   type: string
 ) => {
   const state: RootState = store.getState();
@@ -76,36 +76,36 @@ export const getPlayersSortValue = (
       break;
     case "KTC T":
       sort =
-        (ktc_trend.date1 === trendDate1 &&
-          ktc_trend.date2 === trendDate2 &&
+        (ktc_trend.date === trendDate &&
+          ktc_trend.days === trendDays &&
           (ktc_trend.values?.[player_id] || 0)) ||
         0;
       break;
     case "KTC P":
       sort =
-        (ktc_peak.date1 === trendDate1 &&
-          ktc_peak.date2 === trendDate2 &&
+        (ktc_peak.date === trendDate &&
+          ktc_peak.days === trendDays &&
           ktc_peak.max_values[player_id]?.value) ||
         0;
       break;
     case "KTC PD":
       sort =
-        (ktc_peak.date1 === trendDate1 &&
-          ktc_peak.date2 === trendDate2 &&
+        (ktc_peak.date === trendDate &&
+          ktc_peak.days === trendDays &&
           new Date(ktc_peak.max_values[player_id]?.date)) ||
         0;
       break;
     case "KTC L":
       sort =
-        (ktc_peak.date1 === trendDate1 &&
-          ktc_peak.date2 === trendDate2 &&
+        (ktc_peak.date === trendDate &&
+          ktc_peak.days === trendDays &&
           ktc_peak.min_values[player_id]?.value) ||
         0;
       break;
     case "KTC LD":
       sort =
-        (ktc_peak.date1 === trendDate1 &&
-          ktc_peak.date2 === trendDate2 &&
+        (ktc_peak.date === trendDate &&
+          ktc_peak.days === trendDays &&
           new Date(ktc_peak.min_values[player_id]?.date)) ||
         0;
       break;
@@ -140,8 +140,8 @@ export const getPlayersSortValue = (
 export const getPlayersColumn = (
   col: string,
   player_id: string,
-  trendDate1: string,
-  trendDate2: string,
+  trendDate: string,
+  trendDays: number,
   type: string
 ) => {
   const state: RootState = store.getState();
@@ -209,8 +209,8 @@ export const getPlayersColumn = (
     case "KTC T":
       text = isLoadingKtcTrend
         ? "LOADING"
-        : (ktc_trend.date1 === trendDate1 &&
-            ktc_trend.date2 === trendDate2 &&
+        : (ktc_trend.date === trendDate &&
+            ktc_trend.days === trendDays &&
             (ktc_trend.values?.[player_id] || 0)) ||
           "-";
       trendColor = isLoadingKtcTrend
@@ -223,8 +223,8 @@ export const getPlayersColumn = (
     case "KTC P":
       text = isLoadingKtcPeak
         ? "LOADING"
-        : (ktc_peak.date1 === trendDate1 &&
-            ktc_peak.date2 === trendDate2 &&
+        : (ktc_peak.date === trendDate &&
+            ktc_peak.days === trendDays &&
             ktc_peak.max_values[player_id]?.value?.toString()) ||
           "-";
       trendColor = isLoadingKtcPeak
@@ -235,8 +235,8 @@ export const getPlayersColumn = (
     case "KTC PD":
       text = isLoadingKtcPeak
         ? "LOADING"
-        : (ktc_peak.date1 === trendDate1 &&
-            ktc_peak.date2 === trendDate2 &&
+        : (ktc_peak.date === trendDate &&
+            ktc_peak.days === trendDays &&
             ktc_peak.max_values[player_id] &&
             new Date(ktc_peak.max_values[player_id]?.date).toLocaleDateString(
               "en-US",
@@ -249,8 +249,8 @@ export const getPlayersColumn = (
     case "KTC L":
       text = isLoadingKtcPeak
         ? "LOADING"
-        : (ktc_peak.date1 === trendDate1 &&
-            ktc_peak.date2 === trendDate2 &&
+        : (ktc_peak.date === trendDate &&
+            ktc_peak.days === trendDays &&
             ktc_peak.min_values[player_id]?.value?.toString()) ||
           "-";
       trendColor = getTrendColor_Range(parseInt(text) || 0, 1000, 8000);
@@ -259,8 +259,8 @@ export const getPlayersColumn = (
     case "KTC LD":
       text = isLoadingKtcPeak
         ? "LOADING"
-        : (ktc_peak.date1 === trendDate1 &&
-            ktc_peak.date2 === trendDate2 &&
+        : (ktc_peak.date === trendDate &&
+            ktc_peak.days === trendDays &&
             ktc_peak.min_values[player_id] &&
             new Date(ktc_peak.min_values[player_id]?.date).toLocaleDateString(
               "en-US",
@@ -273,8 +273,8 @@ export const getPlayersColumn = (
     case "Ppr Ppg":
       text = isLoadingStatsTrend
         ? "LOADING"
-        : stats_trend.date1 === trendDate1 &&
-          stats_trend.date2 === trendDate2 &&
+        : stats_trend.date === trendDate &&
+          stats_trend.days === trendDays &&
           stats_trend.values[player_id]?.gp > 0
         ? (
             (stats_trend.values[player_id].pts_ppr || 0) /
@@ -293,8 +293,8 @@ export const getPlayersColumn = (
       text = isLoadingStatsTrend
         ? "LOADING"
         : (
-            (stats_trend.date1 === trendDate1 &&
-              stats_trend.date2 === trendDate2 &&
+            (stats_trend.date === trendDate &&
+              stats_trend.days === trendDays &&
               stats_trend.values[player_id]?.gp) ||
             0
           ).toLocaleString("en-US");

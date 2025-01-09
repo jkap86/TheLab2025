@@ -12,8 +12,8 @@ export interface PlayersState {
   };
   searchedPlayer: string;
   activePlayer: string;
-  trendDate1: string;
-  trendDate2: string;
+  trendDate: string;
+  trendDays: number;
   filterTeam: string;
   filterDraftClass: string;
   filterPosition: string;
@@ -69,10 +69,10 @@ const initialState: PlayersState = {
   },
   searchedPlayer: "",
   activePlayer: "",
-  trendDate1: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000)
+  trendDate: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000)
     .toISOString()
     .split("T")[0],
-  trendDate2: new Date().toISOString().split("T")[0],
+  trendDays: 30,
   filterTeam: "",
   filterDraftClass: "",
   filterPosition: "",

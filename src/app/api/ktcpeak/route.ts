@@ -71,8 +71,6 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json(
     {
-      date1: trendDate1,
-      date2: trendDate2,
       max_values: max_values_obj,
       min_values: min_values_obj,
     },
