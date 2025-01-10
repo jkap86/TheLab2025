@@ -27,7 +27,7 @@ export const getPlayerShares = (leagues: League[], user: User) => {
   };
 
   leagues.forEach((league) => {
-    league.userRoster.players?.forEach((player_id) => {
+    (league.userRoster?.players || [])?.forEach((player_id) => {
       if (!playershares[player_id]) {
         playershares[player_id] = {
           owned: [],

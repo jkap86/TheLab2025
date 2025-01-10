@@ -127,21 +127,17 @@ export const useFetchUserAndLeagues = (searched: string | null) => {
             })
           );
 
-          try {
-            const { playershares, leaguemates, pickshares } = getPlayerShares(
-              parsedLeaguesArray,
-              user
-            );
+          const { playershares, leaguemates, pickshares } = getPlayerShares(
+            parsedLeaguesArray,
+            user
+          );
 
-            dispatch(updateState({ key: "leagues", value: leagues_obj }));
+          dispatch(updateState({ key: "leagues", value: leagues_obj }));
 
-            dispatch(updateState({ key: "playershares", value: playershares }));
+          dispatch(updateState({ key: "playershares", value: playershares }));
 
-            dispatch(updateState({ key: "pickshares", value: pickshares }));
-            dispatch(updateState({ key: "leaguemates", value: leaguemates }));
-          } catch {
-            console.log("Error getting playershares");
-          }
+          dispatch(updateState({ key: "pickshares", value: pickshares }));
+          dispatch(updateState({ key: "leaguemates", value: leaguemates }));
         } catch (err: unknown) {
           console.log({ err });
 
