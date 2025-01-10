@@ -73,7 +73,7 @@ export const getPlayerShares = (leagues: League[], user: User) => {
 
         leaguemates[roster.user_id].leagues.push(league.league_id);
 
-        roster.players?.forEach((player_id) => {
+        (roster.players || [])?.forEach((player_id) => {
           if (!playershares[player_id]) {
             playershares[player_id] = {
               owned: [],
@@ -93,7 +93,7 @@ export const getPlayerShares = (leagues: League[], user: User) => {
           });
         });
 
-        roster.draftpicks.forEach((draft_pick) => {
+        (roster.draftpicks || []).forEach((draft_pick) => {
           const pick_id = draft_pick.order
             ? `${draft_pick.season} ${
                 draft_pick.round
