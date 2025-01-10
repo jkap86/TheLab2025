@@ -7,11 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateState as updatePlayersState } from "../redux/playersSlice";
 import { updateState } from "@/redux/commonSlice";
 import ColumnDropdown from "@/components/columnDropdown/columnDropdown";
-import {
-  columnOptions,
-  getPlayersSortValue,
-  getPlayersColumn,
-} from "../helpers/playersColumn";
+import { columnOptions, getPlayersSortValue } from "../helpers/playersColumn";
 import SortIcon from "@/components/sortIcon/sortIcon";
 import Avatar from "@/components/avatar/avatar";
 import PlayerLeagues from "../components/playerLeagues/playerLeagues";
@@ -19,16 +15,31 @@ import LoadCommonData from "@/components/loadCommonData/loadCommonData";
 import axios from "axios";
 import "../players.css";
 import { getSlotAbbrev, position_map } from "@/utils/getOptimalStarters";
+import { filterLeagueIds } from "@/utils/filterLeagues";
+import { getTrendColor_Range } from "@/utils/getTrendColor";
+import { getPositionMaxAge } from "@/utils/getPositionMaxAge";
 
 interface PlayersProps {
   params: Promise<{ searched: string }>;
 }
+
+type colObj = {
+  sort: number | string;
+  text: string | JSX.Element;
+  trendColor: { [key: string]: string };
+  classname: string;
+};
+
+type PlayersObj = {
+  [key: string]: colObj;
+};
 
 const Players = ({ params }: PlayersProps) => {
   const dispatch: AppDispatch = useDispatch();
   const { searched } = use(params);
   const {
     allplayers,
+    ktc_current,
     ktc_trend,
     ktc_peak,
     isLoadingKtcPeak,
@@ -36,7 +47,7 @@ const Players = ({ params }: PlayersProps) => {
     isLoadingStatsTrend,
     stats_trend,
   } = useSelector((state: RootState) => state.common);
-  const { playershares, pickshares } = useSelector(
+  const { playershares, pickshares, leagues } = useSelector(
     (state: RootState) => state.user
   );
   const {
@@ -67,6 +78,494 @@ const Players = ({ params }: PlayersProps) => {
       false
     );
   }, [trendDate, trendDays]);
+
+  const playersObj = useMemo(() => {
+    const obj: {
+      [player_id: string]: PlayersObj;
+    } = {};
+
+    Object.keys(playershares).forEach((player_id) => {
+      const numOwned = filterLeagueIds(playershares[player_id].owned).length;
+      const percentOwned =
+        (leagues && numOwned / filterLeagueIds(Object.keys(leagues)).length) ||
+        0;
+      const ktc = ktc_current?.[player_id] || 0;
+
+      const ktcTrend =
+        (ktc_trend.date === trendDate &&
+          ktc_trend.days === trendDays &&
+          ktc_trend.values?.[player_id]) ||
+        0;
+
+      const age = allplayers?.[player_id].age || 999;
+
+      const ktcPeak =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.days === trendDays &&
+          ktc_peak.max_values[player_id]?.value) ||
+        0;
+
+      const ktcPeakDate =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.days === trendDays &&
+          ktc_peak.max_values[player_id]?.date) ||
+        "-";
+
+      const ktcLow =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.days === trendDays &&
+          ktc_peak.min_values[player_id]?.value) ||
+        0;
+
+      const ktcLowDate =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.days === trendDays &&
+          new Date(ktc_peak.min_values[player_id]?.date)) ||
+        "-";
+
+      const ppr_ppg =
+        (stats_trend.values[player_id]?.gp || 0) > 0
+          ? (stats_trend.values[player_id]?.pts_ppr || 0) /
+            stats_trend.values[player_id].gp
+          : 0;
+
+      const gp = stats_trend.values[player_id]?.gp || 0;
+
+      const snaps = stats_trend.values[player_id]?.off_snp || 0;
+      const snaps_team = stats_trend.values[player_id]?.tm_off_snp;
+      const snp_pct = snaps_team > 0 ? (snaps / snaps_team) * 100 : 0;
+
+      const pass_att =
+        (stats_trend.values[player_id]?.gp || 0) > 0
+          ? stats_trend.values[player_id]?.pass_att || 0
+          : 0;
+
+      const rush_att =
+        (stats_trend.values[player_id]?.gp || 0) > 0
+          ? stats_trend.values[player_id]?.rush_att || 0
+          : 0;
+
+      const rec =
+        (stats_trend.values[player_id]?.gp || 0) > 0
+          ? stats_trend.values[player_id]?.rec || 0
+          : 0;
+
+      const rec_tgt =
+        (stats_trend.values[player_id]?.gp || 0) > 0
+          ? stats_trend.values[player_id]?.rec_tgt || 0
+          : 0;
+
+      const pass_yd =
+        (stats_trend.values[player_id]?.gp || 0) > 0
+          ? stats_trend.values[player_id]?.pass_yd || 0
+          : 0;
+
+      const rush_yd =
+        (stats_trend.values[player_id]?.gp || 0) > 0
+          ? stats_trend.values[player_id]?.rush_yd || 0
+          : 0;
+
+      const rec_yd =
+        (stats_trend.values[player_id]?.gp || 0) > 0
+          ? stats_trend.values[player_id]?.rec_yd || 0
+          : 0;
+
+      const pass_td =
+        (stats_trend.values[player_id]?.gp || 0) > 0
+          ? stats_trend.values[player_id]?.pass_td || 0
+          : 0;
+
+      const rush_td =
+        (stats_trend.values[player_id]?.gp || 0) > 0
+          ? stats_trend.values[player_id]?.rush_td || 0
+          : 0;
+
+      const rec_td =
+        (stats_trend.values[player_id]?.gp || 0) > 0
+          ? stats_trend.values[player_id]?.rec_td || 0
+          : 0;
+
+      obj[player_id] = {
+        "# Own": {
+          sort: numOwned,
+          text: numOwned.toString(),
+          trendColor: getTrendColor_Range(
+            numOwned / filterLeagueIds(Object.keys(leagues || {})).length,
+            0,
+            0.25
+          ),
+          classname: "age",
+        },
+        "% Own": {
+          sort: percentOwned,
+          text: Math.round(percentOwned * 100) + "%",
+          trendColor: getTrendColor_Range(numOwned, 0, 0.25),
+          classname: "percentage",
+        },
+        Age: {
+          sort: age,
+          text: (age !== 999 && age.toString()) || "-",
+          trendColor: getTrendColor_Range(
+            parseInt(allplayers?.[player_id]?.age || "0"),
+            21,
+            getPositionMaxAge(allplayers?.[player_id]?.position),
+            true
+          ),
+          classname: "age",
+        },
+        KTC: {
+          sort: ktc,
+          text: ktc.toString(),
+          trendColor: getTrendColor_Range(ktc, 1000, 8000),
+          classname: "ktc",
+        },
+        "KTC T": {
+          sort: ktcTrend,
+          text: isLoadingKtcTrend
+            ? "LOADING"
+            : ktc_trend.date === trendDate && ktc_trend.days === trendDays
+            ? ktc_trend.values?.[player_id]?.toString()
+            : "-",
+          trendColor: isLoadingKtcTrend
+            ? { color: `rgb(100, 255, 255)` }
+            : getTrendColor_Range(ktcTrend, -500, 500),
+          classname: "ktc",
+        },
+        "KTC P": {
+          sort: ktcPeak,
+          text: isLoadingKtcPeak ? "LOADING" : ktcPeak.toString(),
+          trendColor: isLoadingKtcPeak
+            ? { color: `rgb(100, 255, 255)` }
+            : getTrendColor_Range(ktcPeak, 1000, 8000),
+          classname: "ktc",
+        },
+        "KTC PD": {
+          sort: new Date(ktcPeakDate).getTime(),
+          text: isLoadingKtcPeak
+            ? "LOADING"
+            : new Date(ktcPeakDate).toLocaleDateString("en-US", {
+                year: "2-digit",
+                month: "numeric",
+                day: "numeric",
+              }),
+          trendColor: isLoadingKtcPeak ? { color: `rgb(100, 255, 255)` } : {},
+          classname: "date",
+        },
+        "KTC L": {
+          sort: ktcLow,
+          text: isLoadingKtcPeak ? "LOADING" : ktcLow.toString(),
+          trendColor: isLoadingKtcPeak
+            ? { color: `rgb(100, 255, 255)` }
+            : getTrendColor_Range(ktcLow, 1000, 8000),
+          classname: "ktc",
+        },
+        "KTC LD": {
+          sort: new Date(ktcLowDate).getTime(),
+          text: isLoadingKtcPeak
+            ? "LOADING"
+            : new Date(ktcLowDate).toLocaleDateString("en-US", {
+                year: "2-digit",
+                month: "numeric",
+                day: "numeric",
+              }),
+          trendColor: isLoadingKtcPeak ? { color: `rgb(100, 255, 255)` } : {},
+          classname: "date",
+        },
+        "Ppr Ppg": {
+          sort: ppr_ppg,
+          text: isLoadingStatsTrend
+            ? "LOADING"
+            : ppr_ppg.toLocaleString("en-US", { maximumFractionDigits: 1 }),
+          trendColor: isLoadingStatsTrend
+            ? { color: `rgb(100, 255, 255)` }
+            : getTrendColor_Range(ppr_ppg, 5, 15),
+          classname: "fp",
+        },
+        "# Gp": {
+          sort: gp,
+          text: isLoadingStatsTrend ? "LOADING" : gp.toString(),
+          trendColor: isLoadingStatsTrend
+            ? { color: `rgb(100, 255, 255)` }
+            : {},
+          classname: "fp",
+        },
+        "Snp %": {
+          sort: snp_pct,
+          text: isLoadingStatsTrend
+            ? "LOADING"
+            : snp_pct.toLocaleString("en-US", { maximumFractionDigits: 0 }) +
+              "%",
+          trendColor: getTrendColor_Range(snp_pct, 25, 75),
+          classname: "percentage",
+        },
+        "Pass Att": {
+          sort: pass_att,
+          text: isLoadingStatsTrend
+            ? "LOADING"
+            : pass_att.toLocaleString("en-US", { maximumFractionDigits: 0 }),
+          trendColor: getTrendColor_Range(pass_att / gp, 20, 35),
+          classname: "stat",
+        },
+        "Rush Att": {
+          sort: rush_att,
+          text: isLoadingStatsTrend
+            ? "LOADING"
+            : rush_att.toLocaleString("en-US", { maximumFractionDigits: 0 }),
+          trendColor: getTrendColor_Range(rush_att / gp, 5, 15),
+          classname: "stat",
+        },
+        Tgt: {
+          sort: rec_tgt,
+          text: isLoadingStatsTrend
+            ? "LOADING"
+            : rec_tgt.toLocaleString("en-US", { maximumFractionDigits: 0 }),
+          trendColor: getTrendColor_Range(rec_tgt / gp, 2, 10),
+          classname: "stat",
+        },
+        Rec: {
+          sort: rec,
+          text: isLoadingStatsTrend
+            ? "LOADING"
+            : rec.toLocaleString("en-US", { maximumFractionDigits: 0 }),
+          trendColor: getTrendColor_Range(rec / gp, 0, 8),
+          classname: "stat",
+        },
+        "Pass Yds": {
+          sort: pass_yd,
+          text: isLoadingStatsTrend
+            ? "LOADING"
+            : pass_yd.toLocaleString("en-US", { maximumFractionDigits: 0 }),
+          trendColor: getTrendColor_Range(pass_yd / gp, 150, 300),
+          classname: "stat",
+        },
+        "Rush Yds": {
+          sort: rush_yd,
+          text: isLoadingStatsTrend
+            ? "LOADING"
+            : rush_yd.toLocaleString("en-US", { maximumFractionDigits: 0 }),
+          trendColor: getTrendColor_Range(rush_yd, 25, 100),
+          classname: "stat",
+        },
+        "Rec Yds": {
+          sort: rec_yd,
+          text: isLoadingStatsTrend
+            ? "LOADING"
+            : rec_yd.toLocaleString("en-US", { maximumFractionDigits: 0 }),
+          trendColor: getTrendColor_Range(rec_yd, 25, 100),
+          classname: "stat",
+        },
+        "Pass Td": {
+          sort: pass_td,
+          text: isLoadingStatsTrend ? "LOADING" : pass_td.toString(),
+          trendColor: getTrendColor_Range(pass_td, 150, 300),
+          classname: "fp",
+        },
+        "Rush Td": {
+          sort: rush_td,
+          text: isLoadingStatsTrend ? "LOADING" : rush_td.toString(),
+          trendColor: getTrendColor_Range(rush_td, 25, 100),
+          classname: "fp",
+        },
+        "Rec Td": {
+          sort: rec_td,
+          text: isLoadingStatsTrend ? "LOADING" : rec_td.toString(),
+          trendColor: getTrendColor_Range(rec_td, 25, 100),
+          classname: "fp",
+        },
+        "Tgt %": {
+          sort: snaps > 0 ? rec_tgt / snaps : 0,
+          text: isLoadingStatsTrend
+            ? "LOADING"
+            : snaps > 0
+            ? ((rec_tgt / snaps) * 100).toLocaleString("en-US", {
+                maximumFractionDigits: 0,
+              }) + "%"
+            : "-",
+          trendColor: getTrendColor_Range(rec_tgt / snaps, 0, 0.2),
+          classname: "percentage",
+        },
+      };
+    });
+
+    Object.keys(pickshares).forEach((pick_id) => {
+      const numOwned = filterLeagueIds(pickshares[pick_id].owned).length;
+      const percentOwned =
+        (leagues && numOwned / filterLeagueIds(Object.keys(leagues)).length) ||
+        0;
+      const ktc = ktc_current?.[pick_id] || 0;
+
+      const ktcTrend =
+        (ktc_trend.date === trendDate &&
+          ktc_trend.days === trendDays &&
+          ktc_trend.values?.[pick_id]) ||
+        0;
+
+      const age: number = 0;
+
+      const ktcPeak =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.days === trendDays &&
+          ktc_peak.max_values[pick_id]?.value) ||
+        0;
+
+      const ktcPeakDate =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.days === trendDays &&
+          ktc_peak.max_values[pick_id]?.date) ||
+        "-";
+
+      const ktcLow =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.days === trendDays &&
+          ktc_peak.min_values[pick_id]?.value) ||
+        0;
+
+      const ktcLowDate =
+        (ktc_peak.date === trendDate &&
+          ktc_peak.days === trendDays &&
+          new Date(ktc_peak.min_values[pick_id]?.date)) ||
+        "-";
+
+      const ppr_ppg = 0;
+
+      const gp = 0;
+
+      const snp_pct = 0;
+
+      obj[pick_id] = {
+        "# Own": {
+          sort: numOwned,
+          text: numOwned.toString(),
+          trendColor: getTrendColor_Range(
+            numOwned / filterLeagueIds(Object.keys(leagues || {})).length,
+            0,
+            0.25
+          ),
+          classname: "age",
+        },
+        "% Own": {
+          sort: percentOwned,
+          text: Math.round(percentOwned * 100) + "%",
+          trendColor: getTrendColor_Range(numOwned, 0, 0.25),
+          classname: "percentage",
+        },
+        Age: {
+          sort: age,
+          text: (age !== 999 && age.toString()) || "-",
+          trendColor: getTrendColor_Range(
+            parseInt(allplayers?.[pick_id]?.age || "0"),
+            21,
+            getPositionMaxAge(allplayers?.[pick_id]?.position),
+            true
+          ),
+          classname: "age",
+        },
+        KTC: {
+          sort: ktc,
+          text: ktc.toString(),
+          trendColor: getTrendColor_Range(ktc, 1000, 8000),
+          classname: "ktc",
+        },
+        "KTC T": {
+          sort: ktcTrend,
+          text: isLoadingKtcTrend
+            ? "LOADING"
+            : (
+                ktc_trend.date === trendDate &&
+                ktc_trend.days === trendDays &&
+                (ktc_trend.values?.[pick_id] || 0)
+              ).toString() || "-",
+          trendColor: isLoadingKtcTrend
+            ? { color: `rgb(100, 255, 255)` }
+            : getTrendColor_Range(ktcTrend, -500, 500),
+          classname: "ktc",
+        },
+        "KTC P": {
+          sort: ktcPeak,
+          text: ktcPeak.toString(),
+          trendColor: isLoadingKtcPeak
+            ? { color: `rgb(100, 255, 255)` }
+            : getTrendColor_Range(ktcPeak, 1000, 8000),
+          classname: "ktc",
+        },
+        "KTC PD": {
+          sort: new Date(ktcPeakDate).getTime(),
+          text: new Date(ktcPeakDate).toLocaleDateString("en-US", {
+            year: "2-digit",
+            month: "numeric",
+            day: "numeric",
+          }),
+          trendColor: isLoadingKtcPeak ? { color: `rgb(100, 255, 255)` } : {},
+          classname: "date",
+        },
+        "KTC L": {
+          sort: ktcLow,
+          text: ktcLow.toString(),
+          trendColor: isLoadingKtcPeak
+            ? { color: `rgb(100, 255, 255)` }
+            : getTrendColor_Range(ktcLow, 1000, 8000),
+          classname: "ktc",
+        },
+        "KTC LD": {
+          sort: new Date(ktcLowDate).getTime(),
+          text: new Date(ktcLowDate).toLocaleDateString("en-US", {
+            year: "2-digit",
+            month: "numeric",
+            day: "numeric",
+          }),
+          trendColor: isLoadingKtcPeak ? { color: `rgb(100, 255, 255)` } : {},
+          classname: "date",
+        },
+        "Ppr Ppg": {
+          sort: ppr_ppg,
+          text: ppr_ppg.toLocaleString("en-US", { maximumFractionDigits: 1 }),
+          trendColor: isLoadingStatsTrend
+            ? { color: `rgb(100, 255, 255)` }
+            : getTrendColor_Range(ppr_ppg, 5, 15),
+          classname: "fp",
+        },
+        "# Gp": {
+          sort: gp,
+          text: gp.toString(),
+          trendColor: isLoadingStatsTrend
+            ? { color: `rgb(100, 255, 255)` }
+            : {},
+          classname: "fp",
+        },
+        "Snp %": {
+          sort: snp_pct,
+          text: isLoadingStatsTrend
+            ? "LOADING"
+            : snp_pct.toLocaleString("en-US", { maximumFractionDigits: 0 }) +
+              "%",
+          trendColor: getTrendColor_Range(snp_pct, 25, 75),
+          classname: "percentage",
+        },
+        "Pass Yds": {
+          sort: 0,
+          text: "-",
+          trendColor: {},
+          classname: "fp",
+        },
+      };
+    });
+
+    return obj;
+  }, [
+    playershares,
+    allplayers,
+    isLoadingKtcPeak,
+    isLoadingKtcTrend,
+    isLoadingStatsTrend,
+    ktc_current,
+    ktc_peak,
+    ktc_trend,
+    leagues,
+    pickshares,
+    stats_trend,
+    trendDate,
+    trendDays,
+  ]);
 
   const fetchKTCPrev = useCallback(async () => {
     if (
@@ -179,8 +678,6 @@ const Players = ({ params }: PlayersProps) => {
     dispatch,
   ]);
 
-  console.log({ trendDate, trendDays, ktc_trend, ktc_peak, stats_trend });
-
   useEffect(() => {
     fetchKTCPeak();
     fetchKTCPrev();
@@ -259,14 +756,13 @@ const Players = ({ params }: PlayersProps) => {
             allplayers?.[player_id].years_exp === parseInt(filterDraftClass))
       )
       .map((player_id) => {
+        const col = [column1, column2, column3, column4][
+          sortPlayersBy.column - 1
+        ];
+        const { sort } = playersObj[player_id][col] || {};
         return {
           id: player_id,
-          sortby: getPlayersSortValue(
-            player_id,
-            trendDate,
-            trendDays,
-            "player"
-          ),
+          sortby: sort,
           search: {
             text: allplayers?.[player_id]?.full_name || player_id,
             display: (allplayers && (
@@ -290,6 +786,7 @@ const Players = ({ params }: PlayersProps) => {
               classname: sortPlayersBy.column === 0 ? "sort" : "",
             },
             ...[column1, column2, column3, column4].map((col, index) => {
+              /*
               const { text, trendColor, classname } = getPlayersColumn(
                 col,
                 player_id,
@@ -297,9 +794,13 @@ const Players = ({ params }: PlayersProps) => {
                 trendDays,
                 "player"
               );
+              */
+
+              const { text, trendColor, classname } =
+                playersObj[player_id][col as keyof PlayersObj] || {};
 
               return {
-                text,
+                text: text || "-",
                 colspan: 1,
                 style: trendColor,
                 classname:
@@ -333,6 +834,7 @@ const Players = ({ params }: PlayersProps) => {
                 classname: sortPlayersBy.column === 0 ? "sort" : "",
               },
               ...[column1, column2, column3, column4].map((col, index) => {
+                /*
                 const { text, trendColor, classname } = getPlayersColumn(
                   col,
                   player_id,
@@ -340,6 +842,10 @@ const Players = ({ params }: PlayersProps) => {
                   trendDays,
                   "pick"
                 );
+                */
+
+                const { text, trendColor, classname } =
+                  playersObj[player_id][col as keyof PlayersObj] || {};
 
                 return {
                   text,
@@ -352,7 +858,7 @@ const Players = ({ params }: PlayersProps) => {
                 };
               }),
             ],
-            secondary: <PlayerLeagues player_obj={playershares[player_id]} />,
+            secondary: <PlayerLeagues player_obj={pickshares[player_id]} />,
           };
         })
       : []),
@@ -484,11 +990,14 @@ const Players = ({ params }: PlayersProps) => {
     "# Gp",
     "Snp %",
   ];
+
   const component = (
     <>
       {filters}
       {[column1, column2, column3, column4].some((col) =>
-        trendColumns.includes(col)
+        trendColumns.some(
+          (tcol) => col === tcol || col.includes("Yd") || col.includes("Td")
+        )
       ) && (
         <div
           className="trend-dates-wrapper"

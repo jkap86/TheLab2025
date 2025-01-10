@@ -12,6 +12,17 @@ export const columnOptions = [
   { text: "Ppr Ppg", abbrev: "Ppr Ppg" },
   { text: "# Games Played", abbrev: "# Gp" },
   { text: "Snap Percentage", abbrev: "Snp %" },
+  { text: "Passing attempts", abbrev: "Pass Att" },
+  { text: "Rushing attempts", abbrev: "Rush Att" },
+  { text: "Targets", abbrev: "Tgt" },
+  { text: "Receptions", abbrev: "Rec" },
+  { text: "Passing yards", abbrev: "Pass Yds" },
+  { text: "Rushing yards", abbrev: "Rush Yds" },
+  { text: "Receiving yards", abbrev: "Rec Yds" },
+  { text: "Passing TDs", abbrev: "Pass Td" },
+  { text: "Rushing TDs", abbrev: "Rush Td" },
+  { text: "Receiving TDs", abbrev: "Rec Td" },
+  { text: "Targets per Snap", abbrev: "Tgt %" },
   { text: "KTC Dynasty Value", abbrev: "KTC" },
   { text: "KTC Trend", abbrev: "KTC T" },
   { text: "KTC Peak", abbrev: "KTC P" },
@@ -131,7 +142,7 @@ export const getPlayersSortValue = (
       break;
 
     default:
-      sort = allplayers?.[player_id].full_name || player_id;
+      sort = allplayers?.[player_id]?.full_name || player_id;
       break;
   }
   return sort;
