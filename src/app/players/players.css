@@ -1,12 +1,17 @@
 div.trend-dates-wrapper {
   text-align: center;
-  font-size: 2rem;
   width: fit-content;
   margin: auto;
   border: 0.5rem ridge silver;
   padding: 1rem;
   box-shadow: inset 0 0 5rem black;
 }
+
+div.trend-dates-wrapper > p.info,
+div.trend-dates-wrapper label {
+  font-size: 2rem;
+}
+
 div.trendDates,
 div.trendDates > span {
   width: fit-content;
@@ -56,9 +61,10 @@ div.players-filters select {
 
 input.trend-days {
   background-color: var(--color3);
-  width: 5rem;
-  font-size: 2rem;
-  font-weight: 900;
+  width: 7rem;
+  height: 7rem;
+  font-size: 20px;
+  font-weight: 600;
   text-align: center;
 }
 

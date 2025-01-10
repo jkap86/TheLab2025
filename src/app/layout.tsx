@@ -17,7 +17,7 @@ export default function RootLayout({
       <head>
         <meta
           name="viewport"
-          content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1"
+          content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no"
         />
         <link href="https://fonts.cdnfonts.com/css/pulang" rel="stylesheet" />
         <link href="https://fonts.cdnfonts.com/css/chillit" rel="stylesheet" />

@@ -67,15 +67,16 @@ const Players = ({ params }: PlayersProps) => {
   } = useSelector((state: RootState) => state.players);
 
   const trendDate2 = useMemo(() => {
+    const newTrendDate2 =
+      new Date(trendDate).getTime() + 1000 * 60 * 60 * 24 * trendDays;
+
+    const now = new Date().getTime();
+
     return (
       (trendDate &&
         trendDays &&
-        new Date(
-          new Date(trendDate).getTime() + 1000 * 60 * 60 * 24 * trendDays
-        )
-          .toISOString()
-          .split("T")[0]) ||
-      false
+        new Date(Math.min(newTrendDate2, now)).toISOString().split("T")[0]) ||
+      new Date(now).toISOString().split("T")[0]
     );
   }, [trendDate, trendDays]);
 
@@ -1017,7 +1018,7 @@ const Players = ({ params }: PlayersProps) => {
             fetchStatsTrend();
           }}
         >
-          <p>Select Date Range for Historical Values/Trends</p>
+          <p className="info">Select Date Range for Historical Values/Trends</p>
 
           <div className="trendDates">
             <span>
@@ -1048,7 +1049,7 @@ const Players = ({ params }: PlayersProps) => {
                   dispatch(
                     updatePlayersState({
                       key: "trendDays",
-                      value: parseInt(e.target.value),
+                      value: parseInt(e.target.value) || "",
                     })
                   )
                 }
