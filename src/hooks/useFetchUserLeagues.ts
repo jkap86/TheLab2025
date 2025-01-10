@@ -139,6 +139,7 @@ export const useFetchUserAndLeagues = (searched: string | null) => {
           dispatch(updateState({ key: "pickshares", value: pickshares }));
           dispatch(updateState({ key: "leaguemates", value: leaguemates }));
         } catch (err: unknown) {
+          console.log("ERRRRRR");
           console.log({ err });
 
           if (err instanceof Error)
