@@ -121,7 +121,7 @@ const Logs = () => {
           })}
         </select>
       </div>
-      <h2>{logs.length} Entries</h2>
+      <h2>{filterLogs(logs).length} Entries</h2>
       <br />
       <table className="logs">
         <thead>
