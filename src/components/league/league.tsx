@@ -1,6 +1,6 @@
 import { League as LeagueType } from "@/lib/types/userTypes";
 import TableMain from "../tableMain/tableMain";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { usePathname } from "next/navigation";
@@ -8,8 +8,6 @@ import Avatar from "../avatar/avatar";
 import ColumnDropdown from "../columnDropdown/columnDropdown";
 import {
   standingsColumnOptions,
-  getStandingsColumn,
-  getStandingsColumnSort,
   teamColumnOptions,
   getTeamColumn,
 } from "./helpers/getStandingsColumn";
@@ -18,10 +16,23 @@ import SortIcon from "../sortIcon/sortIcon";
 import { syncLeague } from "@/redux/userActions";
 import { getDraftPickId } from "@/utils/getPickId";
 import { getSlotAbbrev } from "@/utils/getOptimalStarters";
+import { getKtcAvgValue, getKtcTotValue } from "@/utils/getTeamKtcValues";
+import { getTrendColor_Range } from "@/utils/getTrendColor";
 
 type LeagueProps = {
   type: number;
   league: LeagueType;
+};
+
+type colObj = {
+  sort: number | string;
+  text: string | JSX.Element;
+  trendColor: { [key: string]: string };
+  classname: string;
+};
+
+type RosterObj = {
+  [colText: string]: colObj;
 };
 
 const League = ({ league, type }: LeagueProps) => {
@@ -45,7 +56,90 @@ const League = ({ league, type }: LeagueProps) => {
     (r) => r.roster_id.toString() === activeRosterId
   );
 
-  console.log({ ktc_current });
+  const ktcPicksValues = useMemo(() => {
+    const league_totals = (league.rosters || []).map((roster) => {
+      const roster_total = roster.draftpicks.reduce((accR, curR) => {
+        return accR + (ktc_current?.[getDraftPickId(curR)] || 0);
+      }, 0);
+
+      return roster_total;
+    });
+
+    console.log({ league_totals });
+
+    return { min: Math.min(...league_totals), max: Math.max(...league_totals) };
+    /*
+    let value;
+
+    if (Object.keys(ktc_current || {}).find((id) => id.includes("."))) {
+      value = Object.keys(ktc_current || {})
+        .filter((id) => id.includes("."))
+        .reduce((acc, cur) => acc + (ktc_current?.[cur] || 0), 0);
+    } else {
+      value =
+        (Object.keys(ktc_current || {})
+          .filter((id) =>
+            ["Early", "Mid", "Late"].some((range) => id.includes(range))
+          )
+          .reduce((acc, cur) => acc + (ktc_current?.[cur] || 0), 0) *
+          league.rosters.length) /
+        3;
+    }
+    return value;
+*/
+  }, [league, ktc_current]);
+
+  const standingsObj = useMemo(() => {
+    const obj: {
+      [roster_id: number]: RosterObj;
+    } = {};
+
+    league.rosters.forEach((r) => {
+      const ktc_s = getKtcAvgValue(r.starters_optimal || []);
+      const ktc_b = getKtcAvgValue(
+        (r.players || []).filter(
+          (player_id) => !r.starters_optimal?.includes(player_id)
+        )
+      );
+      const ktc_p = getKtcAvgValue(r.players || []);
+
+      const ktc_pk = getKtcTotValue([], r.draftpicks || []);
+
+      obj[r.roster_id] = {
+        "KTC S": {
+          sort: ktc_s,
+          text: ktc_s.toString(),
+          trendColor: getTrendColor_Range(ktc_s, 1000, 8000),
+          classname: "ktc",
+        },
+        "KTC B": {
+          sort: ktc_b,
+          text: ktc_b.toString(),
+          trendColor: getTrendColor_Range(ktc_b, 1000, 8000),
+          classname: "ktc",
+        },
+        "KTC P": {
+          sort: ktc_p,
+          text: ktc_p.toString(),
+          trendColor: getTrendColor_Range(ktc_p, 1000, 8000),
+          classname: "ktc",
+        },
+        "KTC Pk": {
+          sort: ktc_pk,
+          text: ktc_pk.toLocaleString("en-US"),
+          trendColor: getTrendColor_Range(
+            ktc_pk,
+            ktcPicksValues.min,
+            ktcPicksValues.max
+          ),
+          classname: "ktc total",
+        },
+      };
+    });
+
+    return obj;
+  }, [league, ktcPicksValues]);
+
   useEffect(() => {
     if (league?.userRoster)
       setActiveRosterId(league.userRoster.roster_id.toString());
@@ -172,10 +266,23 @@ const League = ({ league, type }: LeagueProps) => {
         ]}
         data={[...league.rosters]
           .sort((a, b) => {
-            const a_sortby = getStandingsColumnSort(a);
-            const b_sortby = getStandingsColumnSort(b);
+            const sortColumn = [column1_standings, column2_standings][
+              sortStandingsBy.column - 1
+            ];
 
-            return b_sortby > a_sortby ? 1 : -1;
+            const { sort: a_sortby } =
+              standingsObj[a.roster_id][sortColumn as keyof RosterObj] || {};
+
+            const { sort: b_sortby } =
+              standingsObj[b.roster_id][sortColumn as keyof RosterObj] || {};
+
+            return sortStandingsBy.asc
+              ? a_sortby > b_sortby
+                ? 1
+                : -1
+              : b_sortby > a_sortby
+              ? 1
+              : -1;
           })
           .map((roster, index) => {
             return {
@@ -198,11 +305,8 @@ const League = ({ league, type }: LeagueProps) => {
                   classname: "",
                 },
                 ...[column1_standings, column2_standings].map((col, index) => {
-                  const { text, trendColor, classname } = getStandingsColumn(
-                    col,
-                    roster,
-                    league.rosters
-                  );
+                  const { text, trendColor, classname } =
+                    standingsObj[roster.roster_id][col] || {};
                   return {
                     text,
                     colspan: 2,

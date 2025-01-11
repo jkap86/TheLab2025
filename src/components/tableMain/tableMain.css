@@ -106,6 +106,10 @@ td.content.age {
   letter-spacing: 0.5rem;
 }
 
+td.content.ktc.total {
+  letter-spacing: 0;
+}
+
 td.content.fp {
   font-family: var(--fontScore);
   font-size: 125%;

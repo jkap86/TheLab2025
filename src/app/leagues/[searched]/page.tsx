@@ -9,10 +9,7 @@ import TableMain from "@/components/tableMain/tableMain";
 import SortIcon from "@/components/sortIcon/sortIcon";
 import { updateLeaguesState } from "../redux/leaguesSlice";
 import ColumnDropdown from "@/components/columnDropdown/columnDropdown";
-import {
-  getLeaguesColumnSortValue,
-  leaguesColumnOptions,
-} from "@/utils/getLeaguesColumn";
+import { leaguesColumnOptions } from "@/utils/getLeaguesColumn";
 import Avatar from "@/components/avatar/avatar";
 import League from "@/components/league/league";
 import LoadCommonData from "@/components/loadCommonData/loadCommonData";
@@ -134,6 +131,23 @@ const Leagues = ({ params }: LeaguesProps) => {
           )
           .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
 
+      const ktc_b_rk =
+        [...league.rosters]
+          .sort(
+            (a, b) =>
+              getKtcAvgValue(
+                (b.players || []).filter(
+                  (player_id) => !b.starters_optimal?.includes(player_id)
+                )
+              ) -
+              getKtcAvgValue(
+                (a.players || []).filter(
+                  (player_id) => !a.starters_optimal?.includes(player_id)
+                )
+              )
+          )
+          .findIndex((r) => r.roster_id === league.userRoster.roster_id) + 1;
+
       const ktc_pk_rk =
         [...league.rosters]
           .sort(
@@ -164,6 +178,12 @@ const Leagues = ({ params }: LeaguesProps) => {
       );
 
       obj[league.league_id] = {
+        League: {
+          sort: sortLeaguesBy.asc ? league.name : league.index,
+          text: league.name,
+          trendColor: {},
+          classname: "",
+        },
         Rk: {
           sort: rank,
           text: rank.toString(),
@@ -191,6 +211,17 @@ const Leagues = ({ params }: LeaguesProps) => {
           text: ktc_s_rk.toString(),
           trendColor: getTrendColor_Range(
             ktc_s_rk,
+            1,
+            league.rosters.length + 1,
+            true
+          ),
+          classname: "rank",
+        },
+        "KTC B Rk": {
+          sort: ktc_b_rk,
+          text: ktc_b_rk.toString(),
+          trendColor: getTrendColor_Range(
+            ktc_b_rk,
             1,
             league.rosters.length + 1,
             true
@@ -261,30 +292,29 @@ const Leagues = ({ params }: LeaguesProps) => {
     });
 
     return obj;
-  }, [leagues, state]);
+  }, [leagues, state, sortLeaguesBy]);
 
   const data =
     (leagues &&
       filterLeagueIds(Object.keys(leagues))
         .sort((a, b) => {
-          const a_sortValue = getLeaguesColumnSortValue(
-            leagues[a],
-            sortLeaguesBy,
-            [column1, column2, column3, column4]
-          );
-          const b_sortValue = getLeaguesColumnSortValue(
-            leagues[b],
-            sortLeaguesBy,
-            [column1, column2, column3, column4]
-          );
+          const sortColumn = ["League", column1, column2, column3, column4][
+            sortLeaguesBy.column
+          ];
 
-          return a_sortValue === b_sortValue
-            ? leagues[a].index > leagues[b].index
-              ? 1
-              : -1
-            : a_sortValue > b_sortValue
-            ? 1
-            : -1;
+          const { sort: a_sortValue } =
+            leaguesObj[a][sortColumn as keyof LeagueObj] || {};
+
+          const { sort: b_sortValue } =
+            leaguesObj[b][sortColumn as keyof LeagueObj] || {};
+
+          if (a_sortValue === b_sortValue) {
+            return leagues[a].index > leagues[b].index ? 1 : -1;
+          } else if (sortLeaguesBy.asc) {
+            return a_sortValue > b_sortValue ? 1 : -1;
+          } else {
+            return a_sortValue < b_sortValue ? 1 : -1;
+          }
         })
         .map((league_id) => {
           const league = leagues[league_id];

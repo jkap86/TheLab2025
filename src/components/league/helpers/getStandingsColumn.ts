@@ -2,6 +2,7 @@ import store, { RootState } from "@/redux/store";
 import { Roster } from "@/lib/types/userTypes";
 import { getTrendColor_Range } from "@/utils/getTrendColor";
 import { getPositionMaxAge } from "@/utils/getPositionMaxAge";
+import { getKtcTotValue } from "@/utils/getTeamKtcValues";
 
 export const standingsColumnOptions = [
   { text: "Record", abbrev: "W/L" },
@@ -9,6 +10,7 @@ export const standingsColumnOptions = [
   { text: "Avg Starter KTC Value", abbrev: "KTC S" },
   { text: "Avg Bench KTC Value", abbrev: "KTC B" },
   { text: "Avg Player KTC Value", abbrev: "KTC P" },
+  { text: "Total Draft Pick KTC Value", abbrev: "KTC Pk" },
 ];
 
 export const getStandingsColumnSort = (roster: Roster) => {
@@ -67,6 +69,24 @@ export const getStandingsColumnSort = (roster: Roster) => {
             starters.length) ||
         0;
       break;
+    case "KTC P":
+      sort =
+        (ktc_current &&
+          (roster.players || []).length > 0 &&
+          Math.round(
+            (roster.players || []).reduce(
+              (acc, cur) => acc + (ktc_current[cur] || 0),
+              0
+            ) / (roster.players || []).length
+          )) ||
+        0;
+
+      break;
+    case "KTC Pk":
+      sort = getKtcTotValue([], roster.draftpicks || []);
+
+      break;
+
     default:
       sort = 0;
       break;
@@ -163,6 +183,17 @@ export const getStandingsColumn = (
       trendColor =
         parseInt(text) && getTrendColor_Range(parseInt(text), 1000, 8000);
       break;
+    case "KTC Pk":
+      text = getKtcTotValue([], roster.draftpicks || []).toLocaleString(
+        "en-US"
+      );
+
+      classname = "ktc total";
+
+      trendColor =
+        parseInt(text) && getTrendColor_Range(parseInt(text), 1000, 8000);
+      break;
+
     default:
       text = "-";
       trendColor = { color: `rgb(255, 255, 255)` };
