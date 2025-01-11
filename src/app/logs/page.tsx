@@ -40,7 +40,7 @@ const Logs = () => {
       const log_id = log_split[2];
 
       return (
-        ["", log_id].includes(filterId) &&
+        ["", log_id.toLowerCase()].includes(filterId) &&
         ["", log_route].includes(filterRoute) &&
         ["", log.ip].includes(filterIp)
       );
@@ -61,23 +61,21 @@ const Logs = () => {
 
       console.log(typeof log.ip);
 
-      if (!routes.includes(log_route)) {
-        routes.push(log_route);
+      if (!routes.includes(log_route.toLowerCase())) {
+        routes.push(log_route.toLowerCase());
       }
 
-      if (!ids.includes(log_id)) {
-        ids.push(log_id);
+      if (!ids.includes(log_id.toLowerCase())) {
+        ids.push(log_id.toLowerCase());
       }
 
-      if (!ips.includes(log_ip)) {
-        ips.push(log_ip);
+      if (!ips.includes(log_ip.toLowerCase())) {
+        ips.push(log_ip.toLowerCase());
       }
     });
 
     return { ips: ips, routes: routes, ids: ids };
   }, [logs, filterLogs]);
-
-  console.log({ ips, routes, ids });
 
   return (
     <>
@@ -87,13 +85,19 @@ const Logs = () => {
           <option key={"All"} value="">
             All
           </option>
-          {ids.map((id) => {
-            return (
-              <option key={id} value={id}>
-                {id}
-              </option>
-            );
-          })}
+          {ids
+            .sort((a, b) => {
+              const a_sort = parseInt(a) ? 2 : 1;
+              const b_sort = parseInt(b) ? 2 : 1;
+              return a_sort - b_sort || a > b ? 1 : -1;
+            })
+            .map((id) => {
+              return (
+                <option key={id} value={id}>
+                  {id}
+                </option>
+              );
+            })}
         </select>
 
         <select
@@ -103,29 +107,41 @@ const Logs = () => {
           <option key={"All"} value="">
             All
           </option>
-          {routes.map((route) => {
-            return (
-              <option key={route} value={route}>
-                {route}
-              </option>
-            );
-          })}
+          {routes
+            .sort((a, b) => (a > b ? 1 : -1))
+            .map((route) => {
+              return (
+                <option key={route} value={route}>
+                  {route}
+                </option>
+              );
+            })}
         </select>
 
         <select onChange={(e) => setFilterIp(e.target.value)} value={filterIp}>
           <option key={"All"} value="">
             All
           </option>
-          {ips.map((ip, index) => {
-            return (
-              <option key={index} value={ip}>
-                {ip}
-              </option>
-            );
-          })}
+          {ips
+            .sort((a, b) => {
+              const a_type = typeof a === "number" ? 2 : 1;
+              const b_type = typeof b === "number" ? 2 : 1;
+
+              return a_type - b_type || a > b ? 1 : -1;
+            })
+            .map((ip, index) => {
+              return (
+                <option key={index} value={ip}>
+                  {ip}
+                </option>
+              );
+            })}
         </select>
       </div>
       <h2>{filterLogs(logs).length} Entries</h2>
+      <h2>
+        {ids.length} IDs {ips.length} IPs
+      </h2>
       <br />
       <table className="logs">
         <thead>
