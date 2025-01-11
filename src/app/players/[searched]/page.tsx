@@ -39,6 +39,8 @@ const Players = ({ params }: PlayersProps) => {
   const { searched } = use(params);
   const {
     allplayers,
+    type1,
+    type2,
     ktc_current,
     ktc_trend,
     ktc_peak,
@@ -566,6 +568,8 @@ const Players = ({ params }: PlayersProps) => {
     stats_trend,
     trendDate,
     trendDays,
+    type1,
+    type2,
   ]);
 
   const fetchKTCPrev = useCallback(async () => {

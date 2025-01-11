@@ -3,7 +3,7 @@
 import SortIcon from "@/components/sortIcon/sortIcon";
 import TableMain from "@/components/tableMain/tableMain";
 import { AppDispatch, RootState } from "@/redux/store";
-import { use } from "react";
+import { use, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateLeaguematesState } from "../redux/leaguematesSlice";
 import ColumnDropdown from "@/components/columnDropdown/columnDropdown";
@@ -23,6 +23,7 @@ interface LeaguematesProps {
 const Leaguemates = ({ params }: LeaguematesProps) => {
   const dispatch: AppDispatch = useDispatch();
   const { searched } = use(params);
+  const { type1, type2 } = useSelector((state: RootState) => state.common);
   const { leaguemates } = useSelector((state: RootState) => state.user);
   const {
     column1,
@@ -90,50 +91,52 @@ const Leaguemates = ({ params }: LeaguematesProps) => {
     }),
   ];
 
-  const data = Object.values(leaguemates)
-    .map((lm) => {
-      return {
-        id: lm.user_id,
-        sortby: getLeaguematesSortby(lm),
-        search: {
-          text: lm.username,
-          display: <Avatar id={lm.avatar} text={lm.username} type="U" />,
-        },
-        columns: [
-          {
-            text: <Avatar id={lm.avatar} text={lm.username} type="U" />,
-            colspan: 3,
-            classname: sortLeaguematesBy.column === 0 ? "sort" : "",
+  const data = useMemo(() => {
+    return Object.values(leaguemates)
+      .map((lm) => {
+        return {
+          id: lm.user_id,
+          sortby: getLeaguematesSortby(lm),
+          search: {
+            text: lm.username,
+            display: <Avatar id={lm.avatar} text={lm.username} type="U" />,
           },
-          ...[column1, column2, column3, column4].map((col, index) => {
-            const { text, trendColor, classname } = getLeaguematesColumn(
-              col,
-              lm
-            );
+          columns: [
+            {
+              text: <Avatar id={lm.avatar} text={lm.username} type="U" />,
+              colspan: 3,
+              classname: sortLeaguematesBy.column === 0 ? "sort" : "",
+            },
+            ...[column1, column2, column3, column4].map((col, index) => {
+              const { text, trendColor, classname } = getLeaguematesColumn(
+                col,
+                lm
+              );
 
-            return {
-              text,
-              colspan: 1,
-              style: trendColor,
-              classname:
-                sortLeaguematesBy.column === index + 1
-                  ? "sort " + classname
-                  : classname,
-            };
-          }),
-        ],
-        secondary: <LeaguemateLeagues league_ids={lm.leagues} />,
-      };
-    })
-    .sort((a, b) =>
-      sortLeaguematesBy.asc
-        ? a.sortby > b.sortby
+              return {
+                text,
+                colspan: 1,
+                style: trendColor,
+                classname:
+                  sortLeaguematesBy.column === index + 1
+                    ? "sort " + classname
+                    : classname,
+              };
+            }),
+          ],
+          secondary: <LeaguemateLeagues league_ids={lm.leagues} />,
+        };
+      })
+      .sort((a, b) =>
+        sortLeaguematesBy.asc
+          ? a.sortby > b.sortby
+            ? 1
+            : -1
+          : a.sortby < b.sortby
           ? 1
           : -1
-        : a.sortby < b.sortby
-        ? 1
-        : -1
-    );
+      );
+  }, [type1, type2, leaguemates, sortLeaguematesBy]);
 
   const setPage = (pageNum: number) =>
     dispatch(updateLeaguematesState({ key: "page", value: pageNum }));
