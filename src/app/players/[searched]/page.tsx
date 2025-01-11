@@ -100,7 +100,7 @@ const Players = ({ params }: PlayersProps) => {
           ktc_trend.values?.[player_id]) ||
         0;
 
-      const age = allplayers?.[player_id].age || 999;
+      const age = allplayers?.[player_id]?.age || 999;
 
       const ktcPeak =
         (ktc_peak.date === trendDate &&
@@ -890,9 +890,9 @@ const Players = ({ params }: PlayersProps) => {
   const yearsExps = Array.from(
     new Set(
       (allplayers &&
-        Object.keys(playershares).map(
-          (player_id) => allplayers?.[player_id]?.years_exp
-        )) ||
+        Object.keys(playershares)
+          .filter((player_id) => allplayers?.[player_id]?.years_exp)
+          .map((player_id) => allplayers?.[player_id]?.years_exp)) ||
         []
     )
   );
