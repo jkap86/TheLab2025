@@ -15,3 +15,17 @@ h1 {
 h2 {
   font-size: 3rem;
 }
+
+div.filters {
+  width: 100vmin;
+  margin: auto;
+  justify-content: space-evenly;
+  display: flex;
+  font-size: 3rem;
+}
+
+div.filters select,
+div.filters option {
+  background-color: black;
+  color: var(--color1);
+}

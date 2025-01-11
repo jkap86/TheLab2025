@@ -40,6 +40,8 @@ export const config = {
     "/leagues/:path",
     "/players/:path",
     "/trades/:path",
+    "/playoffs/:path",
+    "/picktracker/:path",
     //"/((?!api|_next/static|favicon.ico|picktracker|playoffs|logs|$).*)",
   ],
 };

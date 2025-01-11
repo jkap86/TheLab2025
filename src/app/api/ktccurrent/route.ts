@@ -15,7 +15,16 @@ export async function GET(req: NextRequest) {
   const ktc_dates: { [date: string]: { [key: string]: number } } =
     ktc_dates_db.rows[0]?.data || {};
 
-  const current_values_obj = ktc_dates[trendDate];
+  let current_values_obj = ktc_dates[trendDate];
+
+  if (!current_values_obj) {
+    current_values_obj =
+      ktc_dates[
+        new Date(new Date(trendDate).getUTCMilliseconds() - 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0]
+      ];
+  }
 
   const current_values_array =
     (current_values_obj && Object.entries(current_values_obj)) || [];

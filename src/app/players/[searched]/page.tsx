@@ -576,7 +576,6 @@ const Players = ({ params }: PlayersProps) => {
     if (
       !isLoadingKtcTrend &&
       trendDate &&
-      trendDays &&
       !(ktc_trend.date === trendDate && ktc_trend.days === trendDays)
     ) {
       console.log("fetch KTC PREV");
@@ -615,7 +614,6 @@ const Players = ({ params }: PlayersProps) => {
     if (
       !isLoadingKtcPeak &&
       trendDate &&
-      trendDays &&
       !(ktc_peak.date === trendDate && ktc_peak.days === trendDays)
     ) {
       dispatch(updateState({ key: "isLoadingKtcPeak", value: true }));
@@ -647,7 +645,6 @@ const Players = ({ params }: PlayersProps) => {
     if (
       !isLoadingStatsTrend &&
       trendDate &&
-      trendDays &&
       !(stats_trend.date === trendDate && stats_trend.days === trendDays)
     ) {
       dispatch(updateState({ key: "isLoadingStatsTrend", value: true }));
