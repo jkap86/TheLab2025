@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
             query batch_scores {
                 scores(
                     sport: "nfl"
-                    season_type: "regular"
+                    season_type: "${season_type}"
                     season: "2024"
                     week: ${week}
                 ) {

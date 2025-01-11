@@ -42,7 +42,7 @@ const Logs = () => {
       return (
         ["", log_id].includes(filterId) &&
         ["", log_route].includes(filterRoute) &&
-        ["", log.ip].includes(log.ip)
+        ["", log.ip].includes(filterIp)
       );
     });
   };
@@ -117,7 +117,11 @@ const Logs = () => {
             All
           </option>
           {ips.map((ip, index) => {
-            return <option key={index}>{ip}</option>;
+            return (
+              <option key={index} value={ip}>
+                {ip}
+              </option>
+            );
           })}
         </select>
       </div>

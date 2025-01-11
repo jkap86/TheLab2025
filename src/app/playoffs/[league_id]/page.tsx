@@ -20,7 +20,7 @@ const Playoffs = ({ params }: PlayoffsProps) => {
   const { state, allplayers } = useSelector((state: RootState) => state.common);
   const { league_id } = use(params);
   const [league, setLeague] = useState<League | null>(null);
-  const [weeks, setWeeks] = useState<number[]>([18]);
+  const [weeks, setWeeks] = useState<number[]>([]);
   const [pointsObj, setPointsObj] = useState<{
     [week: string]: {
       [player_id: string]: number;
@@ -35,6 +35,12 @@ const Playoffs = ({ params }: PlayoffsProps) => {
     {}
   );
   const [activeRosterId, setActiveRosterId] = useState("");
+
+  useEffect(() => {
+    if (state?.week) {
+      setWeeks([state.week as number]);
+    }
+  }, [state]);
 
   const rounds = [
     { display: "Week 18", week: 18 },
