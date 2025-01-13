@@ -38,6 +38,7 @@ div.heading_wrapper h2 > select {
   color: var(--color1);
   text-align: center;
   background-color: transparent;
-
+  width: fit-content;
+  margin: auto;
   font-family: var(--fontMetal);
 }

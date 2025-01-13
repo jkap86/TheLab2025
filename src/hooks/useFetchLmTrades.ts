@@ -49,7 +49,21 @@ export const useFetchLmTrades = () => {
                   manager,
                   player,
                   count: parseInt(lmTrades.data.count),
-                  trades: lmTrades.data.rows,
+                  trades: lmTrades.data.rows.map((trade: Trade) => {
+                    return {
+                      ...trade,
+                      rosters: trade.rosters.map((r) => {
+                        return {
+                          ...r,
+                          starters_optimal: getOptimalStarters(
+                            trade.roster_positions,
+                            r.players || [],
+                            ktc_current
+                          ),
+                        };
+                      }),
+                    };
+                  }),
                 },
               ],
             })

@@ -78,21 +78,24 @@ const LmTrades = () => {
             key: "lmTrades",
             value: {
               count: parseInt(moreTrades.data.count),
-              trades: moreTrades.data.rows.map((trade: TradeType) => {
-                return {
-                  ...trade,
-                  rosters: trade.rosters.map((r) => {
-                    return {
-                      ...r,
-                      starters_optimal: getOptimalStarters(
-                        trade.roster_positions,
-                        r.players || [],
-                        ktc_current
-                      ),
-                    };
-                  }),
-                };
-              }),
+              trades: [
+                ...(lmTrades.trades || []),
+                ...moreTrades.data.rows.map((trade: TradeType) => {
+                  return {
+                    ...trade,
+                    rosters: trade.rosters.map((r) => {
+                      return {
+                        ...r,
+                        starters_optimal: getOptimalStarters(
+                          trade.roster_positions,
+                          r.players || [],
+                          ktc_current
+                        ),
+                      };
+                    }),
+                  };
+                }),
+              ],
             },
           })
         );
@@ -134,7 +137,8 @@ const LmTrades = () => {
       : lmTrades.count || 0;
 
   useEffect(() => {
-    dispatch(updateTradesState({ key: "page_lm", value: 1 }));
+    if (searched_player_lm || searched_player_lm)
+      dispatch(updateTradesState({ key: "page_lm", value: 1 }));
   }, [searched_player_lm, searched_manager_lm, dispatch]);
 
   const table = (
