@@ -1065,13 +1065,13 @@ const Players = ({ params }: PlayersProps) => {
               year: "numeric",
             }
           )} - ${
-            trendDate2
+            trendDate2 && trendDays
               ? new Date(trendDate2).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
                   year: "numeric",
                 })
-              : ""
+              : "Today"
           }`}</p>
         </div>
       )}

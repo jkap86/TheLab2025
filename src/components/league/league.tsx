@@ -324,183 +324,237 @@ const League = ({ league, type }: LeagueProps) => {
         active={activeRosterId.toString()}
         setActive={setActiveRosterId}
       />
-      <TableMain
-        type={type}
-        half={true}
-        headers={[
-          { text: "Slot", colspan: 1 },
-          { text: "Player", colspan: 3 },
-          {
-            text: (
-              <ColumnDropdown
-                options={teamColumnOptions}
-                columnText={column1_team}
-                setColumnText={(colValue) =>
-                  dispatch(
-                    updateLeagueState({ key: "column1_team", value: colValue })
-                  )
-                }
-              />
-            ),
-            colspan: 2,
-          },
-        ]}
-        data={[
-          ...league.roster_positions
-            .filter((rp) => rp !== "BN")
-            .map((rp, index) => {
-              const player_id = activeRoster?.starters_optimal?.[index] || "0";
+      {activeRoster ? (
+        <TableMain
+          type={type}
+          half={true}
+          headers={[
+            { text: "Slot", colspan: 1 },
+            { text: "Player", colspan: 3 },
+            {
+              text: (
+                <ColumnDropdown
+                  options={teamColumnOptions}
+                  columnText={column1_team}
+                  setColumnText={(colValue) =>
+                    dispatch(
+                      updateLeagueState({
+                        key: "column1_team",
+                        value: colValue,
+                      })
+                    )
+                  }
+                />
+              ),
+              colspan: 2,
+            },
+          ]}
+          data={[
+            ...league.roster_positions
+              .filter((rp) => rp !== "BN")
+              .map((rp, index) => {
+                const player_id =
+                  activeRoster?.starters_optimal?.[index] || "0";
 
-              const { text, trendColor, classname } = getTeamColumn(
-                column1_team,
-                player_id
-              );
+                const { text, trendColor, classname } = getTeamColumn(
+                  column1_team,
+                  player_id
+                );
 
-              return {
-                id: `${rp}__${index}`,
-                columns: [
-                  {
-                    text: getSlotAbbrev(rp),
-                    colspan: 1,
-                    classname: "slot",
-                  },
-                  {
-                    text:
-                      (allplayers && player_id && allplayers[player_id] && (
-                        <Avatar
-                          id={player_id}
-                          text={allplayers[player_id].full_name}
-                          type="P"
-                        />
-                      )) ||
-                      "-",
-                    colspan: 3,
-                    classname: "",
-                  },
-                  {
-                    text,
-                    colspan: 2,
-                    style: trendColor || {},
-                    classname,
-                  },
-                ],
-              };
-            }),
-          ...(activeRoster?.players
-            ?.filter(
-              (player_id) => !activeRoster.starters_optimal?.includes(player_id)
+                return {
+                  id: `${rp}__${index}`,
+                  columns: [
+                    {
+                      text: getSlotAbbrev(rp),
+                      colspan: 1,
+                      classname: "slot",
+                    },
+                    {
+                      text:
+                        (allplayers && player_id && allplayers[player_id] && (
+                          <Avatar
+                            id={player_id}
+                            text={allplayers[player_id].full_name}
+                            type="P"
+                          />
+                        )) ||
+                        "-",
+                      colspan: 3,
+                      classname: "",
+                    },
+                    {
+                      text,
+                      colspan: 2,
+                      style: trendColor || {},
+                      classname,
+                    },
+                  ],
+                };
+              }),
+            ...(activeRoster?.players
+              ?.filter(
+                (player_id) =>
+                  !activeRoster.starters_optimal?.includes(player_id)
+              )
+              ?.sort((a, b) => {
+                const getPositionValue = (player_id: string) => {
+                  const position =
+                    allplayers && allplayers[player_id]?.position;
+
+                  switch (position) {
+                    case "QB":
+                      return 1;
+                    case "RB":
+                      return 2;
+                    case "FB":
+                      return 2;
+                    case "WR":
+                      return 3;
+                    case "TE":
+                      return 4;
+                    default:
+                      return 5;
+                  }
+                };
+
+                return (
+                  getPositionValue(a) - getPositionValue(b) ||
+                  (ktc_current?.[b] || 0) - (ktc_current?.[a] || 0)
+                );
+              })
+              ?.map((player_id) => {
+                const { text, trendColor, classname } = getTeamColumn(
+                  column1_team,
+                  player_id
+                );
+
+                return {
+                  id: player_id,
+                  columns: [
+                    {
+                      text: "BN",
+                      colspan: 1,
+                      classname: "slot",
+                    },
+                    {
+                      text:
+                        (allplayers && player_id && allplayers[player_id] && (
+                          <Avatar
+                            id={player_id}
+                            text={allplayers[player_id].full_name}
+                            type="P"
+                          />
+                        )) ||
+                        "-",
+                      colspan: 3,
+                      classname: "",
+                    },
+                    {
+                      text,
+                      colspan: 2,
+                      style: trendColor || {},
+                      classname,
+                    },
+                  ],
+                };
+              }) || []),
+            ...([...(activeRoster?.draftpicks || [])]
+              ?.sort(
+                (a, b) =>
+                  a.season - b.season ||
+                  a.round - b.round ||
+                  (a.order || 0) - (b.order || 0) ||
+                  (b.roster_id === activeRoster?.roster_id ? 1 : 0) -
+                    (a.roster_id === activeRoster?.roster_id ? 1 : 0)
+              )
+              ?.map((pick) => {
+                const pick_id = getDraftPickId(pick);
+
+                const { text, trendColor, classname } = getTeamColumn(
+                  column1_team,
+                  pick_id
+                );
+
+                return {
+                  id: `${pick.season}_${pick.round}_${pick.roster_id}`,
+                  columns: [
+                    {
+                      text: "PK",
+                      colspan: 1,
+                      classname: "slot",
+                    },
+                    {
+                      text: pick.order
+                        ? `${pick.season} ${
+                            pick.round
+                          }.${pick.order.toLocaleString("en-US", {
+                            minimumIntegerDigits: 2,
+                          })}`
+                        : `${pick.season} Round ${pick.round}` +
+                          (pick.roster_id === activeRoster?.roster_id
+                            ? ""
+                            : ` ${pick.original_user.username}`),
+                      colspan: 3,
+                      classname: "",
+                    },
+                    {
+                      text,
+                      colspan: 2,
+                      style: trendColor || {},
+                      classname,
+                    },
+                  ],
+                };
+              }) || []),
+          ]}
+        />
+      ) : (
+        <TableMain
+          type={type}
+          half={true}
+          headers={[{ text: "Scoring Settings", colspan: 2 }]}
+          data={Object.keys(league.scoring_settings)
+            .filter(
+              (cat) =>
+                league.scoring_settings[cat] !== 0 &&
+                (league.roster_positions.includes("K") ||
+                  (!cat.includes("fg") && !cat.includes("xp"))) &&
+                (league.roster_positions.includes("DEF") ||
+                  !cat.includes("pts_allow"))
             )
-            ?.sort((a, b) => {
-              const getPositionValue = (player_id: string) => {
-                const position = allplayers && allplayers[player_id]?.position;
-
-                switch (position) {
-                  case "QB":
-                    return 1;
-                  case "RB":
-                    return 2;
-                  case "FB":
-                    return 2;
-                  case "WR":
-                    return 3;
-                  case "TE":
-                    return 4;
-                  default:
-                    return 5;
-                }
-              };
-
-              return (
-                getPositionValue(a) - getPositionValue(b) ||
-                (ktc_current?.[b] || 0) - (ktc_current?.[a] || 0)
-              );
-            })
-            ?.map((player_id) => {
-              const { text, trendColor, classname } = getTeamColumn(
-                column1_team,
-                player_id
-              );
-
-              return {
-                id: player_id,
-                columns: [
-                  {
-                    text: "BN",
-                    colspan: 1,
-                    classname: "slot",
-                  },
-                  {
-                    text:
-                      (allplayers && player_id && allplayers[player_id] && (
-                        <Avatar
-                          id={player_id}
-                          text={allplayers[player_id].full_name}
-                          type="P"
-                        />
-                      )) ||
-                      "-",
-                    colspan: 3,
-                    classname: "",
-                  },
-                  {
-                    text,
-                    colspan: 2,
-                    style: trendColor || {},
-                    classname,
-                  },
-                ],
-              };
-            }) || []),
-          ...([...(activeRoster?.draftpicks || [])]
-            ?.sort(
+            .sort(
               (a, b) =>
-                a.season - b.season ||
-                a.round - b.round ||
-                (a.order || 0) - (b.order || 0) ||
-                (b.roster_id === activeRoster?.roster_id ? 1 : 0) -
-                  (a.roster_id === activeRoster?.roster_id ? 1 : 0)
+                ((b.startsWith("pass") && 1) || 0) -
+                  ((a.startsWith("pass") && 1) || 0) ||
+                b.indexOf("pass") - a.indexOf("pass") ||
+                ((b.startsWith("rush") && 1) || 0) -
+                  ((a.startsWith("rush") && 1) || 0) ||
+                b.indexOf("rush") - a.indexOf("rush") ||
+                ((b.startsWith("rec") && 1) || 0) -
+                  ((a.startsWith("rec") && 1) || 0) ||
+                b.indexOf("rec") - a.indexOf("rec")
             )
-            ?.map((pick) => {
-              const pick_id = getDraftPickId(pick);
-
-              const { text, trendColor, classname } = getTeamColumn(
-                column1_team,
-                pick_id
-              );
-
+            .map((cat) => {
               return {
-                id: `${pick.season}_${pick.round}_${pick.roster_id}`,
+                id: cat,
                 columns: [
                   {
-                    text: "PK",
+                    text: cat.replace(/_/g, " "),
                     colspan: 1,
-                    classname: "slot",
-                  },
-                  {
-                    text: pick.order
-                      ? `${pick.season} ${
-                          pick.round
-                        }.${pick.order.toLocaleString("en-US", {
-                          minimumIntegerDigits: 2,
-                        })}`
-                      : `${pick.season} Round ${pick.round}` +
-                        (pick.roster_id === activeRoster?.roster_id
-                          ? ""
-                          : ` ${pick.original_user.username}`),
-                    colspan: 3,
                     classname: "",
                   },
                   {
-                    text,
-                    colspan: 2,
-                    style: trendColor || {},
-                    classname,
+                    text: league.scoring_settings[cat].toLocaleString("en-US", {
+                      maximumFractionDigits: 2,
+                    }),
+                    colspan: 1,
+                    classname: "",
                   },
                 ],
               };
-            }) || []),
-        ]}
-      />
+            })}
+        />
+      )}
     </>
   );
 };
