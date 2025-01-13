@@ -58,9 +58,10 @@ const League = ({ league, type }: LeagueProps) => {
 
   const ktcPicksValues = useMemo(() => {
     const league_totals = (league.rosters || []).map((roster) => {
-      const roster_total = roster.draftpicks.reduce((accR, curR) => {
-        return accR + (ktc_current?.[getDraftPickId(curR)] || 0);
-      }, 0);
+      const roster_total =
+        roster.draftpicks?.reduce((accR, curR) => {
+          return accR + (ktc_current?.[getDraftPickId(curR)] || 0);
+        }, 0) || 0;
 
       return roster_total;
     });
