@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateState as updatePlayersState } from "../redux/playersSlice";
 import { updateState } from "@/redux/commonSlice";
 import ColumnDropdown from "@/components/columnDropdown/columnDropdown";
-import { columnOptions, getPlayersSortValue } from "../helpers/playersColumn";
+import { columnOptions } from "../helpers/playersColumn";
 import SortIcon from "@/components/sortIcon/sortIcon";
 import Avatar from "@/components/avatar/avatar";
 import PlayerLeagues from "../components/playerLeagues/playerLeagues";
@@ -18,6 +18,10 @@ import { getSlotAbbrev, position_map } from "@/utils/getOptimalStarters";
 import { filterLeagueIds } from "@/utils/filterLeagues";
 import { getTrendColor_Range } from "@/utils/getTrendColor";
 import { getPositionMaxAge } from "@/utils/getPositionMaxAge";
+import {
+  converDraftPickNameToKtc,
+  convertDraftPickName,
+} from "@/utils/getPickId";
 
 interface PlayersProps {
   params: Promise<{ searched: string }>;
@@ -67,6 +71,8 @@ const Players = ({ params }: PlayersProps) => {
     filterDraftClass,
     filterPosition,
   } = useSelector((state: RootState) => state.players);
+
+  console.log({ ktc_trend });
 
   const trendDate2 = useMemo(() => {
     const newTrendDate2 =
@@ -389,18 +395,20 @@ const Players = ({ params }: PlayersProps) => {
         },
       };
     });
-
+    console.log({ pickshares, ktc_current });
     Object.keys(pickshares).forEach((pick_id) => {
       const numOwned = filterLeagueIds(pickshares[pick_id].owned).length;
       const percentOwned =
         (leagues && numOwned / filterLeagueIds(Object.keys(leagues)).length) ||
         0;
-      const ktc = ktc_current?.[pick_id] || 0;
+
+      const ktc_pick_name = converDraftPickNameToKtc(pick_id);
+      const ktc = ktc_current?.[ktc_pick_name] || 0;
 
       const ktcTrend =
         (ktc_trend.date === trendDate &&
           ktc_trend.days === trendDays &&
-          ktc_trend.values?.[pick_id]) ||
+          ktc_trend.values?.[ktc_pick_name]) ||
         0;
 
       const age: number = 0;
@@ -408,25 +416,25 @@ const Players = ({ params }: PlayersProps) => {
       const ktcPeak =
         (ktc_peak.date === trendDate &&
           ktc_peak.days === trendDays &&
-          ktc_peak.max_values[pick_id]?.value) ||
+          ktc_peak.max_values[ktc_pick_name]?.value) ||
         0;
 
       const ktcPeakDate =
         (ktc_peak.date === trendDate &&
           ktc_peak.days === trendDays &&
-          ktc_peak.max_values[pick_id]?.date) ||
+          ktc_peak.max_values[ktc_pick_name]?.date) ||
         "-";
 
       const ktcLow =
         (ktc_peak.date === trendDate &&
           ktc_peak.days === trendDays &&
-          ktc_peak.min_values[pick_id]?.value) ||
+          ktc_peak.min_values[ktc_pick_name]?.value) ||
         0;
 
       const ktcLowDate =
         (ktc_peak.date === trendDate &&
           ktc_peak.days === trendDays &&
-          new Date(ktc_peak.min_values[pick_id]?.date)) ||
+          new Date(ktc_peak.min_values[ktc_pick_name]?.date)) ||
         "-";
 
       const ppr_ppg = 0;
@@ -471,13 +479,7 @@ const Players = ({ params }: PlayersProps) => {
         },
         "KTC T": {
           sort: ktcTrend,
-          text: isLoadingKtcTrend
-            ? "LOADING"
-            : (
-                ktc_trend.date === trendDate &&
-                ktc_trend.days === trendDays &&
-                (ktc_trend.values?.[pick_id] || 0)
-              ).toString() || "-",
+          text: isLoadingKtcTrend ? "LOADING" : ktcTrend?.toString() || "-",
           trendColor: isLoadingKtcTrend
             ? { color: `rgb(100, 255, 255)` }
             : getTrendColor_Range(ktcTrend, -500, 500),
@@ -817,21 +819,24 @@ const Players = ({ params }: PlayersProps) => {
       }),
     ...(filterPosition === "PI"
       ? Object.keys(pickshares).map((player_id) => {
+          const pick_name = convertDraftPickName(player_id);
+
+          const col = [column1, column2, column3, column4][
+            sortPlayersBy.column - 1
+          ];
+
+          const { sort } = playersObj[player_id][col] || {};
+
           return {
             id: player_id,
-            sortby: getPlayersSortValue(
-              player_id,
-              trendDate,
-              trendDays,
-              "pick"
-            ),
+            sortby: sort,
             search: {
-              text: player_id,
-              display: <>{player_id}</>,
+              text: pick_name,
+              display: <>{pick_name}</>,
             },
             columns: [
               {
-                text: player_id,
+                text: pick_name,
                 colspan: 3,
                 classname: sortPlayersBy.column === 0 ? "sort" : "",
               },

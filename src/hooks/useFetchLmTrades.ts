@@ -2,6 +2,7 @@ import { Trade } from "@/lib/types/userTypes";
 import { AppDispatch, RootState } from "@/redux/store";
 import { updateState } from "@/redux/userSlice";
 import { getOptimalStarters } from "@/utils/getOptimalStarters";
+import { convertDraftPickId } from "@/utils/getPickId";
 import axios from "axios";
 import { useCallback, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -30,7 +31,7 @@ export const useFetchLmTrades = () => {
           offset: 0,
           limit: 125,
           manager,
-          player,
+          player: player && convertDraftPickId(player),
         });
 
         if (manager || player) {

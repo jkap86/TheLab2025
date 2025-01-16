@@ -159,7 +159,7 @@ const Trade = ({ trade, activeTrade, setActiveTrade }: TradeProps) => {
                       .map((dp) => {
                         return (
                           <tr
-                            key={`${dp.season}_${dp.round}_${dp.original}_${index}`}
+                            key={`${dp.season}_${dp.round}_${dp.original}_${index}_${trade.transaction_id}`}
                           >
                             <td colSpan={2}>
                               {dp.order
@@ -230,7 +230,7 @@ const Trade = ({ trade, activeTrade, setActiveTrade }: TradeProps) => {
                       .map((dp, index) => {
                         return (
                           <tr
-                            key={`${dp.season}_${dp.round}_${dp.original}_${index}`}
+                            key={`${dp.season}_${dp.round}_${dp.original}_${index}_${trade.transaction_id}`}
                           >
                             <td>
                               <div>

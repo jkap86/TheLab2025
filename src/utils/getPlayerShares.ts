@@ -1,5 +1,4 @@
 import { League, Playershare, User } from "@/lib/types/userTypes";
-import { getDraftPickId } from "./getPickId";
 
 export const getPlayerShares = (leagues: League[], user: User) => {
   const playershares: {
@@ -40,13 +39,11 @@ export const getPlayerShares = (leagues: League[], user: User) => {
     });
 
     (league.userRoster.draftpicks || []).forEach((draft_pick) => {
-      const pick_id = draft_pick.order
-        ? `${draft_pick.season} ${
-            draft_pick.round
-          }.${draft_pick.order.toLocaleString("en-US", {
-            minimumIntegerDigits: 2,
-          })}`
-        : getDraftPickId(draft_pick);
+      const pick_id = `${draft_pick.season} ${draft_pick.round}.${
+        draft_pick.order?.toLocaleString("en-US", {
+          minimumIntegerDigits: 2,
+        }) || draft_pick.order
+      }`;
 
       if (!pickshares[pick_id]) {
         pickshares[pick_id] = {
@@ -94,13 +91,11 @@ export const getPlayerShares = (leagues: League[], user: User) => {
         });
 
         (roster.draftpicks || []).forEach((draft_pick) => {
-          const pick_id = draft_pick.order
-            ? `${draft_pick.season} ${
-                draft_pick.round
-              }.${draft_pick.order.toLocaleString("en-US", {
-                minimumIntegerDigits: 2,
-              })}`
-            : getDraftPickId(draft_pick);
+          const pick_id = `${draft_pick.season} ${draft_pick.round}.${
+            draft_pick.order?.toLocaleString("en-US", {
+              minimumIntegerDigits: 2,
+            }) || draft_pick.order
+          }`;
 
           if (!pickshares[pick_id]) {
             pickshares[pick_id] = {

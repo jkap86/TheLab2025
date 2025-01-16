@@ -39,3 +39,41 @@ const getSuffix = (round: number) => {
       return "th";
   }
 };
+
+export const convertDraftPickName = (pick_id: string) => {
+  let pick_name = pick_id;
+
+  if (pick_name.includes(".null")) {
+    const pick_array = pick_id.split(" ");
+    const season = pick_array[0];
+    const round = pick_array[1].split(".")[0];
+    pick_name = `${season} Round ${round}`;
+  }
+
+  return pick_name;
+};
+
+export const convertDraftPickId = (pick_id: string) => {
+  let pick_name = pick_id;
+
+  if (pick_name.includes(" Round ")) {
+    const pick_array = pick_id.split(" Round ");
+    const season = pick_array[0];
+    const round = pick_array[1];
+    pick_name = `${season} ${round}.null`;
+  }
+
+  return pick_name;
+};
+
+export const converDraftPickNameToKtc = (pick_name: string) => {
+  const pick_array = pick_name.split(" ");
+
+  const season = pick_array[0];
+  const round = parseInt(pick_array[1].split(".")[0]);
+  const order = parseInt(pick_array[1].split(".")[1]) || null;
+
+  const ktc_name = getDraftPickId({ season, round, order });
+
+  return ktc_name;
+};

@@ -10,6 +10,7 @@ import { getOptimalStarters } from "@/utils/getOptimalStarters";
 import Search from "@/components/search/search";
 import Avatar from "@/components/avatar/avatar";
 import { useEffect } from "react";
+import { convertDraftPickId } from "@/utils/getPickId";
 
 const LmTrades = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -33,6 +34,8 @@ const LmTrades = () => {
         leaguemate_ids: Object.keys(leaguemates),
         offset: lmTrades.trades?.length,
         limit: 125,
+        player: player && convertDraftPickId(player),
+        manager: manager && manager,
       });
 
       updatePage();
@@ -211,14 +214,22 @@ const LmTrades = () => {
             };
           }),
           ...Object.keys(pickshares || {}).map((pick_id) => {
+            let pick_name = pick_id;
+
+            if (pick_name.includes("null")) {
+              const pick_array = pick_id.split(" ");
+              const season = pick_array[0];
+              const round = pick_array[1].split(".")[0];
+              pick_name = `${season} Round ${round}`;
+            }
             return {
-              id: pick_id,
-              text: pick_id,
-              display: <>{pick_id}</>,
+              id: pick_name,
+              text: pick_name,
+              display: <>{pick_name}</>,
             };
           }),
         ]}
-        placeholder="Player"
+        placeholder="Player or Pick"
       />
       <Search
         searched={

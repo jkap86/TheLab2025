@@ -9,13 +9,16 @@ import axios from "axios";
 import Trade from "./trade";
 import { Trade as TradeType } from "@/lib/types/userTypes";
 import { getOptimalStarters } from "@/utils/getOptimalStarters";
+import { convertDraftPickId } from "@/utils/getPickId";
 
 const PcTrades = () => {
   const dispatch: AppDispatch = useDispatch();
   const { allplayers, pcTrades, ktc_current } = useSelector(
     (state: RootState) => state.common
   );
-  const { playershares } = useSelector((state: RootState) => state.user);
+  const { playershares, pickshares } = useSelector(
+    (state: RootState) => state.user
+  );
   const { searched_player1_pc, searched_player2_pc, page_pc, activeTrade_pc } =
     useSelector((state: RootState) => state.trades);
 
@@ -28,8 +31,8 @@ const PcTrades = () => {
           params: {
             offset: 0,
             limit: 125,
-            player1,
-            player2,
+            player1: player1 && convertDraftPickId(player1),
+            player2: player2 && convertDraftPickId(player2),
           },
         });
 
@@ -87,8 +90,8 @@ const PcTrades = () => {
     try {
       const moreTrades = await axios.get("/api/pctrades", {
         params: {
-          player1,
-          player2,
+          player1: player1 && convertDraftPickId(player1),
+          player2: player2 && convertDraftPickId(player2),
           offset: (
             pcTrades.find(
               (s) =>
@@ -217,6 +220,37 @@ const PcTrades = () => {
     </div>
   );
 
+  const player_pick_options = [
+    ...Object.keys(playershares || {}).map((player_id) => {
+      return {
+        id: player_id,
+        text: allplayers?.[player_id]?.full_name || player_id,
+        display: (
+          <Avatar
+            id={player_id}
+            text={allplayers?.[player_id]?.full_name || player_id}
+            type="P"
+          />
+        ),
+      };
+    }),
+    ...Object.keys(pickshares || {}).map((pick_id) => {
+      let pick_name = pick_id;
+
+      if (pick_name.includes("null")) {
+        const pick_array = pick_id.split(" ");
+        const season = pick_array[0];
+        const round = pick_array[1].split(".")[0];
+        pick_name = `${season} Round ${round}`;
+      }
+      return {
+        id: pick_name,
+        text: pick_name,
+        display: <>{pick_name}</>,
+      };
+    }),
+  ];
+
   const searches = (
     <div className="searches">
       <Search
@@ -226,19 +260,7 @@ const PcTrades = () => {
         setSearched={(value) =>
           dispatch(updateTradesState({ key: "searched_player1_pc", value }))
         }
-        options={Object.keys(playershares || {}).map((player_id) => {
-          return {
-            id: player_id,
-            text: allplayers?.[player_id]?.full_name || player_id,
-            display: (
-              <Avatar
-                id={player_id}
-                text={allplayers?.[player_id]?.full_name || player_id}
-                type="P"
-              />
-            ),
-          };
-        })}
+        options={player_pick_options}
         placeholder="Player"
       />
       {searched_player1_pc ? (
@@ -249,19 +271,9 @@ const PcTrades = () => {
           setSearched={(value) =>
             dispatch(updateTradesState({ key: "searched_player2_pc", value }))
           }
-          options={Object.keys(playershares || {}).map((player_id) => {
-            return {
-              id: player_id,
-              text: allplayers?.[player_id]?.full_name || player_id,
-              display: (
-                <Avatar
-                  id={player_id}
-                  text={allplayers?.[player_id]?.full_name || player_id}
-                  type="P"
-                />
-              ),
-            };
-          })}
+          options={player_pick_options.filter(
+            (o) => o.id !== searched_player1_pc
+          )}
           placeholder="Player 2"
         />
       ) : null}
