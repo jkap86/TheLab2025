@@ -16,9 +16,8 @@ const LmTrades = () => {
   const { ktc_current, allplayers } = useSelector(
     (state: RootState) => state.common
   );
-  const { lmTrades, lmTradeSearches, leaguemates, playershares } = useSelector(
-    (state: RootState) => state.user
-  );
+  const { lmTrades, lmTradeSearches, leaguemates, playershares, pickshares } =
+    useSelector((state: RootState) => state.user);
   const { activeTrade_lm, page_lm, searched_manager_lm, searched_player_lm } =
     useSelector((state: RootState) => state.trades);
 
@@ -197,19 +196,28 @@ const LmTrades = () => {
         setSearched={(value) =>
           dispatch(updateTradesState({ key: "searched_player_lm", value }))
         }
-        options={Object.keys(playershares || {}).map((player_id) => {
-          return {
-            id: player_id,
-            text: allplayers?.[player_id]?.full_name || player_id,
-            display: (
-              <Avatar
-                id={player_id}
-                text={allplayers?.[player_id]?.full_name || player_id}
-                type="P"
-              />
-            ),
-          };
-        })}
+        options={[
+          ...Object.keys(playershares || {}).map((player_id) => {
+            return {
+              id: player_id,
+              text: allplayers?.[player_id]?.full_name || player_id,
+              display: (
+                <Avatar
+                  id={player_id}
+                  text={allplayers?.[player_id]?.full_name || player_id}
+                  type="P"
+                />
+              ),
+            };
+          }),
+          ...Object.keys(pickshares || {}).map((pick_id) => {
+            return {
+              id: pick_id,
+              text: pick_id,
+              display: <>{pick_id}</>,
+            };
+          }),
+        ]}
         placeholder="Player"
       />
       <Search
@@ -239,6 +247,7 @@ const LmTrades = () => {
     </div>
   );
 
+  console.log({ pickshares });
   return (
     <>
       {searches}
