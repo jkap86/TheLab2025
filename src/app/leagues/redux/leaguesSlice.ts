@@ -22,7 +22,7 @@ const initialState: LeaguesState = {
   page: 1,
   sortLeaguesBy: {
     column: 0,
-    asc: false,
+    asc: true,
   },
   searchedLeague: "",
   activeLeague: "",

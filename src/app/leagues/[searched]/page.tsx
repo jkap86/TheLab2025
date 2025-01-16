@@ -179,7 +179,7 @@ const Leagues = ({ params }: LeaguesProps) => {
 
       obj[league.league_id] = {
         League: {
-          sort: sortLeaguesBy.asc ? league.name : league.index,
+          sort: sortLeaguesBy.asc ? league.index : league.name,
           text: league.name,
           trendColor: {},
           classname: "",
