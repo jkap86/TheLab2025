@@ -1,0 +1,10 @@
+a.home {
+  font-size: 2rem;
+  padding: 2rem;
+  display: block;
+}
+
+h1 {
+  font-size: 5rem;
+  color: var(--color1);
+}

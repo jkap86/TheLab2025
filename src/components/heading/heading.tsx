@@ -36,7 +36,11 @@ const Heading = () => {
             <h1>
               <Avatar id={user.avatar} type="U" text={user.username} />
             </h1>
-            <LeagueTypeSwitch />
+            {["LEAGUES", "PLAYERS", "LEAGUEMATES", "MATCHUPS"].includes(
+              navTab
+            ) ? (
+              <LeagueTypeSwitch />
+            ) : null}
           </div>
           <h2>
             <select

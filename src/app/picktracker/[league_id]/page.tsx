@@ -1,13 +1,16 @@
 "use client";
 
 import Avatar from "@/components/avatar/avatar";
+import ShNavbar from "@/components/shNavbar/shNavbar";
 import TableMain from "@/components/tableMain/tableMain";
 import { Allplayer } from "@/lib/types/commonTypes";
 import { updateState } from "@/redux/commonSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import axios from "axios";
+import Link from "next/link";
 import { use, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import "../picktracker.css";
 
 interface PicktrackerProps {
   params: Promise<{ league_id: string }>;
@@ -77,6 +80,10 @@ const PickTracker = ({ params }: PicktrackerProps) => {
         <h1>Loading...</h1>
       ) : (
         <>
+          <ShNavbar />
+          <Link href={"/"} className="home">
+            The Lab Home
+          </Link>
           <h1>
             <Avatar
               id={picks.league?.avatar}
