@@ -4,7 +4,7 @@ a.home {
   display: block;
 }
 
-h1 {
+div.picktracker h1 {
   font-size: 5rem;
   color: var(--color1);
 }

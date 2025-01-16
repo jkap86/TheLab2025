@@ -112,6 +112,10 @@ const Trade = ({ trade, activeTrade, setActiveTrade }: TradeProps) => {
                       .filter(
                         (add) => trade.adds[add] === manager_roster?.user_id
                       )
+                      .sort(
+                        (a, b) =>
+                          (ktc_current?.[b] || 0) - (ktc_current?.[a] || 0)
+                      )
                       .map((add, index) => {
                         return (
                           <tr key={`${add}_${index}`}>
@@ -147,6 +151,11 @@ const Trade = ({ trade, activeTrade, setActiveTrade }: TradeProps) => {
 
                     {trade.draft_picks
                       .filter((dp) => dp.new === manager_roster?.user_id)
+                      .sort(
+                        (a, b) =>
+                          (ktc_current?.[getDraftPickId(b)] || 0) -
+                          (ktc_current?.[getDraftPickId(a)] || 0)
+                      )
                       .map((dp) => {
                         return (
                           <tr
@@ -185,6 +194,10 @@ const Trade = ({ trade, activeTrade, setActiveTrade }: TradeProps) => {
                         (drops) =>
                           trade.drops[drops] === manager_roster?.user_id
                       )
+                      .sort(
+                        (a, b) =>
+                          (ktc_current?.[b] || 0) - (ktc_current?.[a] || 0)
+                      )
                       .map((drop, index) => {
                         return (
                           <tr key={`${drop}_${index}`}>
@@ -209,6 +222,11 @@ const Trade = ({ trade, activeTrade, setActiveTrade }: TradeProps) => {
 
                     {trade.draft_picks
                       .filter((dp) => dp.old === manager_roster?.user_id)
+                      .sort(
+                        (a, b) =>
+                          (ktc_current?.[getDraftPickId(b)] || 0) -
+                          (ktc_current?.[getDraftPickId(a)] || 0)
+                      )
                       .map((dp, index) => {
                         return (
                           <tr

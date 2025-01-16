@@ -79,7 +79,7 @@ const PickTracker = ({ params }: PicktrackerProps) => {
       {isLoading ? (
         <h1>Loading...</h1>
       ) : (
-        <>
+        <div className="picktracker">
           <ShNavbar />
           <Link href={"/"} className="home">
             The Lab Home
@@ -142,7 +142,7 @@ const PickTracker = ({ params }: PicktrackerProps) => {
               };
             })}
           />
-        </>
+        </div>
       )}
     </>
   );
