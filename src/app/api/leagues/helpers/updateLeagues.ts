@@ -32,8 +32,6 @@ export const updateLeagues = async (
   const updatedLeagues: LeagueDb[] = [];
   const matchupsBatch: Matchup[] = [];
   const tradesBatch: Trade[] = [];
-  const startupDraftsBatch: DraftDb[] = [];
-  const rookieDraftsBatch: DraftDb[] = [];
 
   const batchSize = 10;
 
@@ -124,36 +122,6 @@ export const updateLeagues = async (
               (d: SleeperDraft) =>
                 d.draft_order &&
                 d.settings.rounds === league.data.settings.draft_rounds
-            );
-
-            startupDraftsBatch.push(
-              ...drafts.data
-                .filter(
-                  (d: SleeperDraft) =>
-                    d.settings.rounds !== league.data.settings.draft_rounds
-                )
-                .map((d: SleeperDraft) => {
-                  return {
-                    ...d,
-                    type: "startup",
-                    league_id: leagueToUpdate.league_id,
-                  };
-                })
-            );
-
-            rookieDraftsBatch.push(
-              ...drafts.data
-                .filter(
-                  (d: SleeperDraft) =>
-                    d.settings.rounds === league.data.settings.draft_rounds
-                )
-                .map((d: SleeperDraft) => {
-                  return {
-                    ...d,
-                    type: "rookie",
-                    league_id: leagueToUpdate.league_id,
-                  };
-                })
             );
           } else {
             league_draftpicks_obj = {};
@@ -287,8 +255,6 @@ export const updateLeagues = async (
       await upsertUserLeagues(db, userLeagues_db);
       await upsertMatchups(db, matchupsBatch);
       await upsertTrades(db, tradesBatch);
-      await upsertDrafts(db, startupDraftsBatch);
-      await upsertDrafts(db, rookieDraftsBatch);
       await db.query("COMMIT");
     } catch (err) {
       await db.query("ROLLBACK");

@@ -29,6 +29,7 @@ export const columnOptions = [
   { text: "KTC Peak Date", abbrev: "KTC PD" },
   { text: "KTC Low", abbrev: "KTC L" },
   { text: "KTC Low Date", abbrev: "KTC LD" },
+  //{ text: "SF Dynasty ADP La", abbrev: "ADP" },
 ];
 
 export const getPlayersSortValue = (

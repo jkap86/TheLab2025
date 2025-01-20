@@ -79,9 +79,9 @@ const initialState: PlayersState = {
 
   playerLeaguesTab: "Owned",
 
-  column1_owned: "Rk",
-  column2_owned: "Pts Rk",
-  column3_owned: "KTC S Rk",
+  column1_owned: "KTC S Rk",
+  column2_owned: "KTC B Rk",
+  column3_owned: "KTC Pk Rk",
   column4_owned: "KTC T Rk",
   page_owned: 1,
   sortOwnedBy: {

@@ -52,6 +52,7 @@ const Players = ({ params }: PlayersProps) => {
     isLoadingKtcTrend,
     isLoadingStatsTrend,
     stats_trend,
+    adp_current,
   } = useSelector((state: RootState) => state.common);
   const { playershares, pickshares, leagues } = useSelector(
     (state: RootState) => state.user
@@ -71,8 +72,6 @@ const Players = ({ params }: PlayersProps) => {
     filterDraftClass,
     filterPosition,
   } = useSelector((state: RootState) => state.players);
-
-  console.log({ ktc_trend });
 
   const trendDate2 = useMemo(() => {
     const newTrendDate2 =
@@ -193,6 +192,12 @@ const Players = ({ params }: PlayersProps) => {
         (stats_trend.values[player_id]?.gp || 0) > 0
           ? stats_trend.values[player_id]?.rec_td || 0
           : 0;
+
+      const adp = adp_current?.[player_id]
+        ? `${Math.ceil(adp_current?.[player_id] / 12)}.${(
+            adp_current?.[player_id] % 12
+          ).toLocaleString("en-US", { minimumIntegerDigits: 2 })}`
+        : "-";
 
       obj[player_id] = {
         "# Own": {
@@ -393,9 +398,15 @@ const Players = ({ params }: PlayersProps) => {
           trendColor: getTrendColor_Range(rec_tgt / snaps, 0, 0.2),
           classname: "percentage",
         },
+        ADP: {
+          sort: adp_current?.[player_id] || 9999,
+          text: adp,
+          trendColor: {},
+          classname: "",
+        },
       };
     });
-    console.log({ pickshares, ktc_current });
+
     Object.keys(pickshares).forEach((pick_id) => {
       const numOwned = filterLeagueIds(pickshares[pick_id].owned).length;
       const percentOwned =

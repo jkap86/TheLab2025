@@ -7,7 +7,7 @@ import { Allplayer } from "@/lib/types/commonTypes";
 
 export const useFetchStateAndAllplayers = () => {
   const dispatch: AppDispatch = useDispatch();
-  const { state, allplayers, ktc_current } = useSelector(
+  const { state, allplayers, ktc_current, adp_current } = useSelector(
     (state: RootState) => state.common
   );
 
@@ -58,4 +58,23 @@ export const useFetchStateAndAllplayers = () => {
 
     fetchKtcCurrent();
   }, [ktc_current, dispatch]);
+
+  useEffect(() => {
+    const fetchAdpCurrent = async () => {
+      if (!adp_current) {
+        const adp_current_new = await axios.get("/api/adp");
+        const adp_obj = Object.fromEntries(
+          adp_current_new.data.map(
+            (obj: { player_key: string; average_value: string }) => [
+              obj.player_key,
+              Math.round(parseFloat(obj.average_value)),
+            ]
+          )
+        );
+
+        dispatch(updateState({ key: "adp_current", value: adp_obj }));
+      }
+    };
+    fetchAdpCurrent();
+  }, [adp_current, dispatch]);
 };

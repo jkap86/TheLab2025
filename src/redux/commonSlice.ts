@@ -6,6 +6,7 @@ export interface CommonState {
   state: { [key: string]: string | number } | null;
   allplayers: { [player_id: string]: Allplayer } | null;
   ktc_current: { [player_id: string]: number } | null;
+  adp_current: { [player_id: string]: number } | null;
 
   isLoadingKtcTrend: boolean;
   ktc_trend: {
@@ -48,6 +49,7 @@ const initialState: CommonState = {
   state: null,
   allplayers: null,
   ktc_current: null,
+  adp_current: null,
 
   isLoadingKtcTrend: false,
   ktc_trend: { date: "", days: 0, values: {} },
