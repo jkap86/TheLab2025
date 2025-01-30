@@ -3,10 +3,22 @@ div.searches {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
+}
+
+div.searches.pc {
+  width: 50%;
+  display: inline-flex;
+}
+
+div.searches.pc > p {
+  font-size: 2rem;
+  margin-top: 1rem;
 }
 
 div.search_container {
   font-size: 3rem;
+
   position: relative;
 }
 

@@ -28,7 +28,6 @@ export const updateLeagues = async (
 ) => {
   const db = pool;
   const users_db: UserDb[] = [];
-  const userLeagues_db: { user_id: string; league_id: string }[] = [];
   const updatedLeagues: LeagueDb[] = [];
   const matchupsBatch: Matchup[] = [];
   const tradesBatch: Trade[] = [];
@@ -146,11 +145,6 @@ export const updateLeagues = async (
                   createdAt: new Date(),
                 });
               }
-
-              userLeagues_db.push({
-                user_id: ru.user_id,
-                league_id: league.data.league_id,
-              });
             });
 
           if (
@@ -252,7 +246,6 @@ export const updateLeagues = async (
       await db.query("BEGIN");
       await upsertLeagues(db, updatedLeagues);
       await upsertUsers(db, users_db);
-      await upsertUserLeagues(db, userLeagues_db);
       await upsertMatchups(db, matchupsBatch);
       await upsertTrades(db, tradesBatch);
       await db.query("COMMIT");

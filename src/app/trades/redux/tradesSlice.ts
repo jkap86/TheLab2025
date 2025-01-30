@@ -12,6 +12,8 @@ export interface TradesState {
   activeTrade_pc: string;
   searched_player1_pc: string;
   searched_player2_pc: string;
+  searched_player3_pc: string;
+  searched_player4_pc: string;
 
   tab_detail: "Tips" | "League";
 }
@@ -28,6 +30,8 @@ const initialState: TradesState = {
   activeTrade_pc: "",
   searched_player1_pc: "",
   searched_player2_pc: "",
+  searched_player3_pc: "",
+  searched_player4_pc: "",
 
   tab_detail: "League",
 };

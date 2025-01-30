@@ -36,6 +36,8 @@ export interface CommonState {
   pcTrades: {
     player1: string | undefined;
     player2: string | undefined;
+    player3: string | undefined;
+    player4: string | undefined;
     count: number;
     trades: Trade[];
   }[];
