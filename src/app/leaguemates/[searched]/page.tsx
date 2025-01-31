@@ -136,7 +136,16 @@ const Leaguemates = ({ params }: LeaguematesProps) => {
           ? 1
           : -1
       );
-  }, [type1, type2, leaguemates, sortLeaguematesBy]);
+  }, [
+    type1,
+    type2,
+    leaguemates,
+    sortLeaguematesBy,
+    column1,
+    column2,
+    column3,
+    column4,
+  ]);
 
   const setPage = (pageNum: number) =>
     dispatch(updateLeaguematesState({ key: "page", value: pageNum }));

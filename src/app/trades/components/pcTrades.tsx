@@ -233,6 +233,24 @@ const PcTrades = () => {
     fetchPcTrades,
   ]);
 
+  useEffect(() => {
+    if (!searched_player1_pc) {
+      dispatch(updateTradesState({ key: "searched_player2_pc", value: "" }));
+    }
+  }, [searched_player1_pc, dispatch]);
+
+  useEffect(() => {
+    if (!searched_player2_pc) {
+      dispatch(updateTradesState({ key: "searched_player3_pc", value: "" }));
+    }
+  }, [searched_player2_pc, dispatch]);
+
+  useEffect(() => {
+    if (!searched_player3_pc) {
+      dispatch(updateTradesState({ key: "searched_player4_pc", value: "" }));
+    }
+  }, [searched_player3_pc, dispatch]);
+
   const tradesDisplay =
     pcTrades.find(
       (s) =>
@@ -319,7 +337,7 @@ const PcTrades = () => {
   ];
 
   const searches = (
-    <>
+    <div className="searches-wrapper">
       <div className="searches pc">
         <p>Team 1</p>
         <Search
@@ -360,47 +378,52 @@ const PcTrades = () => {
           />
         ) : null}
       </div>
-      <div className="searches pc">
-        <p>Team 2</p>
-        <Search
-          searched={
-            allplayers?.[searched_player3_pc]?.full_name || searched_player3_pc
-          }
-          setSearched={(value) =>
-            dispatch(updateTradesState({ key: "searched_player3_pc", value }))
-          }
-          options={player_pick_options.filter(
-            (o) =>
-              ![
-                searched_player1_pc,
-                searched_player2_pc,
-                searched_player4_pc,
-              ].includes(o.id)
-          )}
-          placeholder="Player"
-        />
-        {searched_player1_pc ? (
+      {searched_player1_pc ? (
+        <div className="searches">
+          <p>Team 2</p>
           <Search
             searched={
-              allplayers?.[searched_player4_pc]?.full_name ||
-              searched_player4_pc
+              allplayers?.[searched_player3_pc]?.full_name ||
+              searched_player3_pc
             }
             setSearched={(value) =>
-              dispatch(updateTradesState({ key: "searched_player4_pc", value }))
+              dispatch(updateTradesState({ key: "searched_player3_pc", value }))
             }
             options={player_pick_options.filter(
               (o) =>
                 ![
                   searched_player1_pc,
                   searched_player2_pc,
-                  searched_player3_pc,
+                  searched_player4_pc,
                 ].includes(o.id)
             )}
-            placeholder="Player 2"
+            placeholder="Player"
           />
-        ) : null}
-      </div>
-    </>
+          {searched_player3_pc ? (
+            <Search
+              searched={
+                allplayers?.[searched_player4_pc]?.full_name ||
+                searched_player4_pc
+              }
+              setSearched={(value) =>
+                dispatch(
+                  updateTradesState({ key: "searched_player4_pc", value })
+                )
+              }
+              options={player_pick_options.filter(
+                (o) =>
+                  ![
+                    searched_player1_pc,
+                    searched_player2_pc,
+                    searched_player3_pc,
+                  ].includes(o.id)
+              )}
+              placeholder="Player 2"
+            />
+          ) : null}
+        </div>
+      ) : null}
+    </div>
   );
 
   const setActiveTrade = (transaction_id: string) => {

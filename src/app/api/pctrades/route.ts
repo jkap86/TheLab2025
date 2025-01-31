@@ -34,27 +34,140 @@ export async function GET(req: NextRequest) {
   }
 */
 
-  const conditions = [`t.adds ? $1`];
+  const conditions: string[] = [];
+
+  if (player_id1?.includes(".")) {
+    conditions.push(
+      `EXISTS (SELECT 1 FROM jsonb_array_elements(t.draft_picks) AS dp WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') = $1)`
+    );
+  } else {
+    conditions.push(`t.adds ? $1`);
+  }
+
   const values = [player_id1];
 
   if (player_id2) {
-    conditions.push(`t.adds ? $${values.length + 1}`);
-    conditions.push(`t.adds ->> $1 = t.adds ->> $${values.length + 1}`);
+    if (player_id2?.includes(".")) {
+      if (player_id1?.includes(".")) {
+        conditions.push(
+          `
+          ((SELECT dp->>'new' FROM jsonb_array_elements(t.draft_picks) AS dp WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') =$1 )
+          = (SELECT dp->>'new' FROM jsonb_array_elements(t.draft_picks) AS dp WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') = $${
+            values.length + 1
+          }))
+          `
+        );
+      } else {
+        conditions.push(`
+          (
+            SELECT dp->>'new' 
+            FROM jsonb_array_elements(t.draft_picks) AS dp 
+            WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') 
+              = $${values.length + 1}
+          ) = t.adds ->> $1
+          `);
+      }
+    } else {
+      if (player_id1?.includes(".")) {
+        conditions.push(
+          `(
+              t.adds ->> $${values.length + 1}
+            ) = (
+              SELECT dp->>'new' 
+              FROM jsonb_array_elements(t.draft_picks) AS dp 
+              WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') 
+                = $1
+            )`
+        );
+      } else {
+        conditions.push(`t.adds ? $${values.length + 1}`);
+        conditions.push(`t.adds ->> $1 = t.adds ->> $${values.length + 1}`);
+      }
+    }
     values.push(player_id2);
   }
 
   if (player_id3) {
-    conditions.push(`t.adds ? $${values.length + 1}`);
-    conditions.push(`t.adds ->> $1 != t.adds ->> $${values.length + 1}`);
+    if (player_id3?.includes(".")) {
+      if (player_id1?.includes(".")) {
+        conditions.push(
+          `(
+            SELECT dp->>'new' 
+            FROM jsonb_array_elements(t.draft_picks) AS dp 
+            WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') 
+              = $1
+        ) != (
+            SELECT dp->>'new' 
+            FROM jsonb_array_elements(t.draft_picks) AS dp 
+            WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') 
+              = $${values.length + 1}
+          )`
+        );
+      } else {
+        conditions.push(`(
+            SELECT dp->>'new' 
+            FROM jsonb_array_elements(t.draft_picks) AS dp 
+            WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') 
+              = $${values.length + 1}
+        ) != t.adds ->> $1`);
+      }
+    } else {
+      if (player_id1?.includes(".")) {
+        conditions.push(
+          `t.adds ->> $${values.length + 1} != (
+            SELECT dp->>'new' 
+            FROM jsonb_array_elements(t.draft_picks) AS dp 
+            WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') 
+              = $1
+          )`
+        );
+      } else {
+        conditions.push(`t.adds ->> $1 != t.adds ->> $${values.length + 1}`);
+      }
+    }
     values.push(player_id3);
   }
 
   if (player_id4) {
-    conditions.push(`t.adds ? $${values.length + 1}`);
-    conditions.push(`t.adds ->> $1 != t.adds ->> $${values.length + 1}`);
-    conditions.push(
-      `t.adds ->> $${values.length} = t.adds ->> $${values.length + 1}`
-    );
+    if (player_id4?.includes(".")) {
+      if (player_id3?.includes(".")) {
+        conditions.push(
+          `(
+            SELECT dp->>'new' 
+            FROM jsonb_array_elements(t.draft_picks) AS dp 
+            WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') 
+              = $${values.length}
+          ) = (
+            SELECT dp->>'new' 
+            FROM jsonb_array_elements(t.draft_picks) AS dp 
+            WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') 
+              = $${values.length + 1}
+          )`
+        );
+      } else {
+        conditions.push(`
+          (
+            SELECT dp->>'new' 
+            FROM jsonb_array_elements(t.draft_picks) AS dp 
+            WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') 
+              = $${values.length + 1}
+          ) = t.adds ->> $${values.length}`);
+      }
+    } else {
+      if (player_id3?.includes(".")) {
+        conditions.push(`t.adds ->> $${values.length + 1} = (
+            SELECT dp->>'new' 
+            FROM jsonb_array_elements(t.draft_picks) AS dp 
+            WHERE (dp->>'season') || ' ' || (dp->>'round')::text || '.' || COALESCE(LPAD((dp->>'order')::text, 2, '0'), 'null') 
+              = $${values.length}
+          )`);
+      } else {
+        conditions.push(
+          `t.adds ->> ${values.length} = t.adds ->> $${values.length + 1}`
+        );
+      }
+    }
+
     values.push(player_id4);
   }
 
