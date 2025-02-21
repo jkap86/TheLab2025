@@ -14,7 +14,12 @@ export async function GET(req: NextRequest) {
 
     const result = await pool.query(findUserQuery, [searched]);
 
-    if (result.rows.length === 0) {
+    if (
+      !(
+        result.rows[0]?.updatedat >
+        new Date(new Date().getTime() - 1 * 60 * 60 * 1000)
+      )
+    ) {
       const user = await axiosInstance.get(
         `https://api.sleeper.app/v1/user/${searched}`
       );
