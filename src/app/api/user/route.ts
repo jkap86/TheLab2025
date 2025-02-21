@@ -18,7 +18,8 @@ export async function GET(req: NextRequest) {
       !(
         result.rows[0]?.updatedat >
         new Date(new Date().getTime() - 1 * 60 * 60 * 1000)
-      )
+      ) ||
+      result.rows[0]?.type !== "S"
     ) {
       const user = await axiosInstance.get(
         `https://api.sleeper.app/v1/user/${searched}`
