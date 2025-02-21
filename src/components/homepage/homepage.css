@@ -6,17 +6,35 @@ div#homepage {
   filter: contrast(2);
 }
 
+div#homepage > a {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2rem;
+  font-size: 3rem;
+  color: gold;
+  font-weight: 600;
+}
+
 div#homepage div.logo-container {
   width: 100vmin;
   height: 100vmin;
   position: relative;
 }
 
-div#homepage h1 {
+div#homepage h1,
+div#homepage h2 {
   color: var(--color1);
   font-family: var(--fontPulang);
-  font-size: 30rem;
   text-shadow: 0 0 10rem black;
+}
+
+div#homepage h1 {
+  font-size: 30rem;
+}
+
+div#homepage h2 {
+  font-size: 25rem;
 }
 
 div#homepage .home-logo {

@@ -88,7 +88,7 @@ const PickTracker = ({ params }: PicktrackerProps) => {
             <Avatar
               id={picks.league?.avatar}
               type="L"
-              text={picks.league.name}
+              text={picks.league?.name}
             />
           </h1>
           <TableMain
@@ -107,40 +107,42 @@ const PickTracker = ({ params }: PicktrackerProps) => {
                 colspan: 4,
               },
             ]}
-            data={picks.picks.map((pick) => {
-              return {
-                id: pick.player_id,
-                columns: [
-                  {
-                    text: pick.pick,
-                    colspan: 2,
-                    classname: "",
-                  },
-                  {
-                    text: (
-                      <Avatar
-                        id={pick.picked_by_avatar}
-                        type="U"
-                        text={pick.picked_by}
-                      />
-                    ),
-                    colspan: 4,
-                    classname: "",
-                  },
-                  {
-                    text: (
-                      <Avatar
-                        id={pick.player_id}
-                        type="P"
-                        text={pick.player_name}
-                      />
-                    ),
-                    colspan: 4,
-                    classname: "",
-                  },
-                ],
-              };
-            })}
+            data={
+              picks.picks?.map((pick) => {
+                return {
+                  id: pick.player_id,
+                  columns: [
+                    {
+                      text: pick.pick,
+                      colspan: 2,
+                      classname: "",
+                    },
+                    {
+                      text: (
+                        <Avatar
+                          id={pick.picked_by_avatar}
+                          type="U"
+                          text={pick.picked_by}
+                        />
+                      ),
+                      colspan: 4,
+                      classname: "",
+                    },
+                    {
+                      text: (
+                        <Avatar
+                          id={pick.player_id}
+                          type="P"
+                          text={pick.player_name}
+                        />
+                      ),
+                      colspan: 4,
+                      classname: "",
+                    },
+                  ],
+                };
+              }) || []
+            }
           />
         </div>
       )}

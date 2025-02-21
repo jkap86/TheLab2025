@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useFetchUsers } from "@/hooks/useFetchUsers";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import Link from "next/link";
 
 const Homepage = () => {
   const { users } = useSelector((state: RootState) => state.common);
@@ -18,14 +19,8 @@ const Homepage = () => {
 
   useFetchUsers();
 
-  const leagueTabs = ["PICKTRACKER"];
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (leagueTabs.includes(tab)) {
-      setLeagueId(e.target.value);
-    } else {
-      setUsername_searched(e.target.value);
-    }
+    setUsername_searched(e.target.value);
   };
 
   useEffect(() => {
@@ -40,6 +35,9 @@ const Homepage = () => {
 
   return (
     <div id="homepage">
+      <Link href={"/picktracker"} className="picktracker">
+        PICKTRACKER
+      </Link>
       <div className="logo-container">
         <Image src={thelablogo} alt="logo" className="home-logo" />
 
@@ -51,23 +49,18 @@ const Homepage = () => {
             value={tab}
             onChange={(e) => setTab(e.target.value)}
           >
-            {[
-              "PLAYERS",
-              "LEAGUES",
-              "LEAGUEMATES",
-              "TRADES",
-              "MATCHUPS",
-              ...leagueTabs,
-            ].map((option) => {
-              return <option key={option}>{option}</option>;
-            })}
+            {["PLAYERS", "LEAGUES", "LEAGUEMATES", "TRADES", "MATCHUPS"].map(
+              (option) => {
+                return <option key={option}>{option}</option>;
+              }
+            )}
           </select>
 
           <div className="user-input">
             <input
               type="text"
-              value={leagueTabs.includes(tab) ? leagueId : username_searched}
-              placeholder={leagueTabs.includes(tab) ? "League ID" : "Username"}
+              value={username_searched}
+              placeholder={"Username"}
               onChange={handleInputChange}
               list="users"
             />
@@ -84,13 +77,7 @@ const Homepage = () => {
             <button
               type="button"
               onClick={() =>
-                router.push(
-                  `/${tab.toLowerCase()}/${
-                    leagueTabs.includes(tab)
-                      ? leagueId.trim()
-                      : username_searched.trim()
-                  }`
-                )
+                router.push(`/${tab.toLowerCase()}/${username_searched.trim()}`)
               }
             >
               Go

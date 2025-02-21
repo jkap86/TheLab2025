@@ -10,6 +10,7 @@ export const useFetchUsers = () => {
     const fetchUsers = async () => {
       const users = await axios.get("/api/users");
 
+      console.log({ users: users.data.length });
       dispatch(updateState({ key: "users", value: users.data }));
     };
 
