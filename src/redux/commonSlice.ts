@@ -3,6 +3,7 @@ import { PlayerProjection, Trade } from "@/lib/types/userTypes";
 import { createSlice, PayloadAction, Draft } from "@reduxjs/toolkit";
 
 export interface CommonState {
+  users: string[];
   state: { [key: string]: string | number } | null;
   allplayers: { [player_id: string]: Allplayer } | null;
   ktc_current: { [player_id: string]: number } | null;
@@ -48,6 +49,7 @@ export interface CommonState {
 }
 
 const initialState: CommonState = {
+  users: [],
   state: null,
   allplayers: null,
   ktc_current: null,

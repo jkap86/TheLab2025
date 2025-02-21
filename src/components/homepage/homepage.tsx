@@ -5,14 +5,20 @@ import "./homepage.css";
 import Image from "next/image";
 import thelablogo from "../../../public/images/thelab.png";
 import { useRouter } from "next/navigation";
+import { useFetchUsers } from "@/hooks/useFetchUsers";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const Homepage = () => {
+  const { users } = useSelector((state: RootState) => state.common);
   const router = useRouter();
   const [tab, setTab] = useState("");
   const [username_searched, setUsername_searched] = useState("");
   const [leagueId, setLeagueId] = useState("");
 
-  const leagueTabs = ["PICKTRACKER", "PLAYOFFS"];
+  useFetchUsers();
+
+  const leagueTabs = ["PICKTRACKER"];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (leagueTabs.includes(tab)) {
@@ -63,7 +69,18 @@ const Homepage = () => {
               value={leagueTabs.includes(tab) ? leagueId : username_searched}
               placeholder={leagueTabs.includes(tab) ? "League ID" : "Username"}
               onChange={handleInputChange}
+              list="users"
             />
+            <datalist id="users">
+              {users.map((user) => {
+                return (
+                  <option key={user} value={user}>
+                    {user}
+                  </option>
+                );
+              })}
+            </datalist>
+
             <button
               type="button"
               onClick={() =>

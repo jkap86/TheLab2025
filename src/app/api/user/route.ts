@@ -28,7 +28,9 @@ export async function GET(req: NextRequest) {
         VALUES ($1, $2, $3, $4, $5, $6)
         ON CONFLICT (user_id) DO UPDATE SET
           username = EXCLUDED.username,
-          avatar = EXCLUDED.avatar;
+          avatar = EXCLUDED.avatar,
+          type = EXCLUDED.type,
+          updatedat = EXCLUDED.updatedat;
       `;
 
       const values = [
