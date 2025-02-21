@@ -15,7 +15,6 @@ const Homepage = () => {
   const router = useRouter();
   const [tab, setTab] = useState("");
   const [username_searched, setUsername_searched] = useState("");
-  const [leagueId, setLeagueId] = useState("");
 
   useFetchUsers();
 

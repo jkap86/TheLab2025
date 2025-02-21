@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "../../components/homepage/homepage.css";
 import Image from "next/image";
 import thelablogo from "../../../public/images/thelab.png";
