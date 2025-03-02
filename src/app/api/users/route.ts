@@ -5,9 +5,16 @@ export async function GET() {
   try {
     const users = await pool.query(
       `
-            SELECT username 
-            FROM users
-            WHERE type = 'S'
+           SELECT u.username, COUNT(*) AS count
+            FROM users u
+            JOIN (
+              SELECT r ->> 'user_id' AS user_id
+              FROM leagues l, LATERAL jsonb_array_elements(l.rosters) r
+              WHERE jsonb_array_length((r ->> 'players')::jsonb) > 0
+             ) league_users ON u.user_id = league_users.user_id
+            WHERE u.type = 'S'
+            GROUP BY u.user_id, u.username
+            HAVING COUNT(*) >= 5
         `
     );
 
