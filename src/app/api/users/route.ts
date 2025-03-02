@@ -21,7 +21,7 @@ export async function GET() {
              ) league_users ON u.user_id = league_users.user_id
             WHERE u.type = 'S'
             GROUP BY u.user_id, u.username
-            HAVING COUNT(*) >= 5
+            HAVING COUNT(*) >= 1
         `
       );
 
