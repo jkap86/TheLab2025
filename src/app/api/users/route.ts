@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/api/pool";
+import fs from "fs";
 
 export async function GET() {
-  try {
-    const users = await pool.query(
-      `
+  const users_string = fs.readFileSync("./USERS.json", "utf-8");
+  const users_obj = JSON.parse(users_string);
+
+  if (new Date().getTime() - users_obj?.updatedAt < 1 * 60 * 60 * 1000) {
+    return NextResponse.json(users_obj.data);
+  } else {
+    try {
+      const users = await pool.query(
+        `
            SELECT u.username, COUNT(*) AS count
             FROM users u
             JOIN (
@@ -16,15 +23,16 @@ export async function GET() {
             GROUP BY u.user_id, u.username
             HAVING COUNT(*) >= 5
         `
-    );
+      );
 
-    return NextResponse.json(
-      users.rows.map((user) => user.username).sort((a, b) => (a > b ? 1 : -1))
-    );
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      console.log(err.message);
-      return NextResponse.json("Error fetching users...", { status: 500 });
+      return NextResponse.json(
+        users.rows.map((user) => user.username).sort((a, b) => (a > b ? 1 : -1))
+      );
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.log(err.message);
+        return NextResponse.json("Error fetching users...", { status: 500 });
+      }
     }
   }
 }
