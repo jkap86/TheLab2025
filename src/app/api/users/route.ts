@@ -28,16 +28,12 @@ export async function GET() {
       fs.writeFileSync(
         "./USERS.json",
         JSON.stringify({
-          data: users.rows
-            .map((user) => user.username)
-            .sort((a, b) => (a > b ? 1 : -1)),
+          data: users.rows,
           updatedAt: new Date().getTime(),
         })
       );
 
-      return NextResponse.json(
-        users.rows.map((user) => user.username).sort((a, b) => (a > b ? 1 : -1))
-      );
+      return NextResponse.json(users.rows);
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.log(err.message);
