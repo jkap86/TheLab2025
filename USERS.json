@@ -1,12 +1,1 @@
-{
-  "data": [
-    { "username": "badbonniebaby", "count": "6" },
-    { "username": "jkap86", "count": "85" },
-    { "username": "jjzachariason", "count": "1" },
-    { "username": "KevinBok", "count": "22" },
-    { "username": "Bum_Phillips", "count": "1" },
-    { "username": "spikebok1", "count": "2" },
-    { "username": "BumPhillips", "count": "1" }
-  ],
-  "updatedAt": 0
-}
+{"data":[{"username":"jkap86","count":"85"}],"updatedAt":1745596705503}

@@ -903,9 +903,9 @@ const Players = ({ params }: PlayersProps) => {
   const yearsExps = Array.from(
     new Set(
       (allplayers &&
-        Object.keys(playershares)
-          .filter((player_id) => allplayers?.[player_id]?.years_exp)
-          .map((player_id) => allplayers?.[player_id]?.years_exp)) ||
+        Object.keys(playershares).map(
+          (player_id) => allplayers?.[player_id]?.years_exp || 0
+        )) ||
         []
     )
   );
